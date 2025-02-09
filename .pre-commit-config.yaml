@@ -37,17 +37,5 @@ repos:
     hooks:
       - id: flake8
         args: [--max-line-length=120]
-  - repo: https://github.com/jazzband/pip-tools
-    rev: 7.3.0
-    hooks:
-      - id: pip-compile
-        files: ^virtualenvs/requirements\.in$
-        args:
-          [
-            --upgrade,
-            virtualenvs/requirements.in,
-            --output-file,
-            virtualenvs/requirements.txt,
-          ]
 ci:
   autoupdate_schedule: monthly
