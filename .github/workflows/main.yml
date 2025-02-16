@@ -28,10 +28,10 @@ jobs:
         run: pip install uv
 
       - name: Install dependencies with uv
-        run: uv install
+        run: uv sync
 
       - name: Run Python script
-        run: uv run python your_script.py
+        run: uv run src/main_new.py
 
       - name: Commit and push changes
         env:
