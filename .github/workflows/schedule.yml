@@ -3,9 +3,6 @@ name: Run Python Script and Commit Changes
 on:
   schedule:
     - cron: "30 00,09 * * *"
-  push:
-    branches:
-      - master
 
 jobs:
   run-and-commit:
