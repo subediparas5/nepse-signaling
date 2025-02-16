@@ -2,7 +2,7 @@ name: Run Python Script and Commit Changes
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "30 09,00 * * *"
   push:
     branches:
       - master
@@ -40,5 +40,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
-          git commit -m "Update file via GitHub Actions" || echo "No changes to commit"
-          git push origin master
+          git commit -m "Update analyzed data on sheet via GitHub Actions"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
