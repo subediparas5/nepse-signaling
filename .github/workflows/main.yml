@@ -1,6 +1,8 @@
 name: Run Python Script and Commit Changes
 
 on:
+  schedule:
+    - cron: '5 7 * * *'
   push:
     branches:
       - master
@@ -22,19 +24,15 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Install uv dependency manager (if uv is installable via pip)
       - name: Install uv
         run: pip install uv
 
-      # Install dependencies using uv (adjust command if necessary)
       - name: Install dependencies with uv
         run: uv install
 
-      # Run your Python script (using uv run if available, otherwise adjust as needed)
       - name: Run Python script
         run: uv run python your_script.py
 
-      # Commit and push changes made by the script.
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
