@@ -63,6 +63,7 @@ def get_news(session, retries=5, delay=2):
             for item in news.get("companyNews", []):
                 symbol = item.get("symbol")
                 if symbol:
+                    print(f"News for {symbol}: {item.get('newsHeadline')}")
                     news_dict.setdefault(symbol, []).append(item)
             return news_dict
         except Exception as e:
@@ -226,6 +227,7 @@ def score_indicator(row, indicator, direction):
 # Stock Analysis Function
 # ---------------------------
 def analyze_stock(stock, news_dict):
+    print(f"Analyzing {stock['symbol']}")
     symbol = stock["symbol"]
     security_id = stock["id"]
     session = get_session()
@@ -279,6 +281,7 @@ def analyze_stock(stock, news_dict):
                    "Sell" if sell_points >= 3 and sell_points > buy_points else "Hold"
     
     try:
+        print(f"{symbol}: {final_signal} (Net Pressure: {int(net_pressure)})")
         return {
             "Symbol": symbol,
             "Final Signal": final_signal,
