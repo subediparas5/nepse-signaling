@@ -1,0 +1,46 @@
+name: Run Python Script and Commit Changes
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  run-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository.
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      # Set up Python.
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Install uv dependency manager (if uv is installable via pip)
+      - name: Install uv
+        run: pip install uv
+
+      # Install dependencies using uv (adjust command if necessary)
+      - name: Install dependencies with uv
+        run: uv install
+
+      # Run your Python script (using uv run if available, otherwise adjust as needed)
+      - name: Run Python script
+        run: uv run python your_script.py
+
+      # Commit and push changes made by the script.
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Update file via GitHub Actions" || echo "No changes to commit"
+          git push origin master
