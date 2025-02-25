@@ -2,7 +2,7 @@ name: Run Python Script and Commit Changes
 
 on:
   schedule:
-    - cron: "30 00,09 * * *"
+    - cron: "30 00 * * *"
 
 jobs:
   run-and-commit:
@@ -28,7 +28,7 @@ jobs:
         run: uv sync
 
       - name: Run Python script
-        run: uv run src/main_new.py
+        run: uv run src/main_signaling.py
 
       - name: Commit changes
         run: |

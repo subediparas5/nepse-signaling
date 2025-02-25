@@ -1,37 +1,16 @@
-from datetime import datetime
 import os
-from openpyxl import Workbook
-import pandas as pd
+import logging
+from datetime import datetime
 import requests
+import pandas as pd
 from openai import OpenAI
 
-unnecessary_metrics =[
-  "one_week_perf",
-  "one_month_perf",
-  "three_month_perf",
-  "six_month_perf",
-  "one_year_perf",
-  "avg_volume_6_days",
-  "avg_volume_9_days",
-  "avg_volume_12_days",
-  "avg_volume_15_days",
-  "avg_volume_30_days",
-  "q1",
-  "q2",
-  "q3",
-  "q4",
-  "capital_fund_to_rwa",
-  "npl_to_total_loan",
-  "total_loan_loss_provision_to_npl",
-  "ad_trend",
-  "bull_bear_signal",
-  "technical_rating",
-  "stock_bonus",
-  "symbol",
-  "full_name",
-]
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-
+OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
+if not OPEN_AI_API_KEY:
+    raise ValueError("OPEN_AI_API_KEY environment variable is not set.")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
@@ -48,42 +27,52 @@ HEADERS = {
     "TE": "trailers",
 }
 
-OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
-
-SECTOR_WISE_STOCKS = {}
-
 NEPSE_TRADING_SESSION = requests.Session()
 NEPSE_TRADING_SESSION.headers.update(HEADERS)
 
 STOCK_DETAILS_URL = "https://api.nepsetrading.com/sidebar?code={stock_symbol}"
-SECTOR_DETAILS_BASE_URL = (
-    "https://api.nepsetrading.com/stocks-listed"
-)
+SECTOR_DETAILS_BASE_URL = "https://api.nepsetrading.com/stocks-listed"
+FUNDAMENTAL_DETAILS_URL = "https://api.nepsetrading.com/recent-report?"
 
+unnecessary_metrics = [
+    "share_float",  # Not directly relevant for fundamental/technical analysis
+    "latesttransactionprice",  # Redundant with LTP
+    "volume",  # Already covered by avg_volume_3_days
+    "beta_yearly",  # Not a priority for low-cap stock selection
+    "support_zone_lower",  # Technical analysis can be derived from other indicators
+    "support_zone_upper",  # Technical analysis can be derived from other indicators
+    "resistance_zone_lower",  # Technical analysis can be derived from other indicators
+    "resistance_zone_upper",  # Technical analysis can be derived from other indicators
+    "macd_signal",  # Covered by technical_rating
+    "rsi_signal",  # Covered by technical_rating
+    "bb_signal",  # Covered by technical_rating
+    "fib_signal",  # Covered by technical_rating
+    "fib_range",  # Covered by technical_rating
+    "supertrend_signal",  # Covered by technical_rating
+    "ema_signal",  # Covered by technical_rating
+    "sar_signal",  # Covered by technical_rating
+    "market_trend",  # Covered by market_sentiment
+    "trade_signal",  # Covered by technical_rating
+    "market_sentiment",  # Redundant with other sentiment indicators
+    "ma_signal",  # Covered by technical_rating
+    "trend_confirmation",  # Covered by technical_rating
+    "obv_price_divergence",  # Covered by technical_rating
+    "obv_breakout",  # Covered by technical_rating
+    "daily_volatility_rs",  # Not a priority for low-cap stock selection
+    "weekly_volatility_rs",  # Not a priority for low-cap stock selection
+    "monthly_volatility_rs",  # Not a priority for low-cap stock selection
+    "avg_volume_3_days",  # Redundant with volume
+    "week_52_high",  # Not directly relevant for analysis
+    "week_52_low",  # Not directly relevant for analysis
+    "divident_yeild",  # Typo, and not a priority for low-cap stocks
+    "eps",  # Redundant with eps_ttm
+    "bv",  # Redundant with other metrics
+    "dpps",  # Not directly relevant for analysis
+    "npl",  # Not directly relevant for analysis
+    "ltp",  # Redundant with latesttransactionprice
+]
 
-def get_listed_stocks_with_sector() -> list:
-    final_response: list = []
-
-
-    for attempt in range(5):
-        try:
-            response = NEPSE_TRADING_SESSION.get(SECTOR_DETAILS_BASE_URL)
-
-            if response.status_code >= 400:
-                raise Exception("Error fetching stock info")
-            
-            json_response = response.json()
-            return json_response.get("data", [])
-
-        except Exception as e:
-            print(
-                f"Attempt {attempt + 1} - Error fetching stock info: {str(e)}"
-            )
-
-    return final_response
-
-
-def shorten_value(value):
+def shorten_value(value: str) -> str:
     if "Below" in value:
         value = value.replace("Below", "<")
     elif "Above" in value:
@@ -106,23 +95,40 @@ def shorten_value(value):
         value = value.replace("Buy", "BY")
     return value
 
-
-def get_stock_info(stock_symbol: str):
+# Functions
+def get_listed_stocks_with_sector() -> list:
     for attempt in range(5):
         try:
-            response = NEPSE_TRADING_SESSION.get(
-                STOCK_DETAILS_URL.format(stock_symbol=stock_symbol)
-            )
-            if response.status_code >= 400:
-                raise Exception(f"Error fetching stock info, {stock_symbol}")
+            response = NEPSE_TRADING_SESSION.get(SECTOR_DETAILS_BASE_URL)
+            response.raise_for_status()
+            return response.json().get("data", [])
+        except Exception as e:
+            logger.error(f"Attempt {attempt + 1} - Error fetching stock info: {str(e)}")
+            logger.error(f"Response: {response.text if 'response' in locals() else 'No response'}")
+    return []
 
-            response_json=response.json()
+def get_fundamental_details() -> list:
+    for attempt in range(5):
+        try:
+            response = NEPSE_TRADING_SESSION.get(FUNDAMENTAL_DETAILS_URL)
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            logger.error(f"Attempt {attempt + 1} - Error fetching fundamental data: {str(e)}")
+            logger.error(f"Response: {response.text if 'response' in locals() else 'No response'}")
+    return []
 
-            new_dict:dict = {}
+def get_stock_info(stock_symbol: str) -> dict:
+    for attempt in range(5):
+        try:
+            response = NEPSE_TRADING_SESSION.get(STOCK_DETAILS_URL.format(stock_symbol=stock_symbol))
+            response.raise_for_status()
+            response_json = response.json()
+
+            new_dict = {}
             for key, value in response_json.items():
                 if key in unnecessary_metrics:
                     continue
-
                 if isinstance(value, float):
                     new_dict[key] = round(value, 2)
                 elif isinstance(value, str):
@@ -132,51 +138,64 @@ def get_stock_info(stock_symbol: str):
                         new_dict[key] = shorten_value(value)
                 else:
                     new_dict[key] = value
-
             return new_dict
         except Exception as e:
-            print(
-                f"Attempt {attempt + 1} - Error fetching stock info, {stock_symbol}: {str(e)}"
-            )
+            logger.error(f"Attempt {attempt + 1} - Error fetching stock info, {stock_symbol}: {str(e)}")
             if attempt == 4:
                 return {}
 
+def join_fundamental_and_technical_data():
+    fundamental_data = get_fundamental_details()
+    combined_data = []
+
+    for stock in fundamental_data:
+        stock_symbol = stock.get("symbol")
+        if not stock_symbol:
+            continue
+
+        stock_details = get_stock_info(stock_symbol)
+        if not stock_details:
+            continue
+
+        # Merge fundamental and technical data
+        for key, value in stock.items():
+            if key not in stock_details:
+                stock_details[key] = value
+
+        combined_data.append(stock_details)
+
+    return combined_data
 
 def get_sector_wise_stocks():
+    sector_wise_stocks = {}
     listed_stocks = get_listed_stocks_with_sector()
+    combined_data = join_fundamental_and_technical_data()
+
     for stock in listed_stocks:
         sector = stock.get("sector")
         if not sector:
-            print(f"Skipping {stock['code']}")
+            logger.info(f"Skipping {stock['code']}")
             continue
 
         symbol_details = get_stock_info(stock["symbol"])
-
         if not symbol_details:
             continue
 
-        for key, value in stock.items():
-            if key in ["stockData","full_name"]:
-                continue
-            if key not in symbol_details:
-                if isinstance(value, float):
-                    symbol_details[key] = round(value, 2)
-                elif isinstance(value, str):
-                    try:
-                        symbol_details[key] = round(float(value), 2)
-                    except:
+        # Merge with fundamental data
+        for combined_stock in combined_data:
+            if combined_stock.get("symbol") == stock["symbol"]:
+                for key, value in combined_stock.items():
+                    if key not in symbol_details:
                         symbol_details[key] = value
-                else:
-                    symbol_details[key] = value
 
-        if sector not in SECTOR_WISE_STOCKS:
-            SECTOR_WISE_STOCKS[sector] = []
-        SECTOR_WISE_STOCKS[sector].append(symbol_details)
-    return SECTOR_WISE_STOCKS
+        if sector not in sector_wise_stocks:
+            sector_wise_stocks[sector] = []
+        sector_wise_stocks[sector].append(symbol_details)
 
+    return sector_wise_stocks
 
-def analyze_sector_wise_stocks(file):
-
+def analyze_sector_wise_stocks(stocks):
+    return "Analysis not implemented yet."
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
 
     response = client.chat.completions.create(
@@ -185,36 +204,36 @@ def analyze_sector_wise_stocks(file):
             {
                 "role": "system",
                 "content": """
-                    You are an expert stock analyst with deep knowledge of fundamental and technical analysis.
-                    Your task is to analyze the provided list of stocks and recommend the best low market capitalization stocks to buy based on the following criteria:
+                    You are an expert stock analyst specializing in identifying undervalued, low market capitalization stocks with strong growth potential. Your task is to analyze the provided list of stocks and recommend the best stocks to buy based on the following criteria:
 
-                    1. **Fundamental Analysis**:
-                    - Look for stocks with high promoter holding (>50%) as it indicates confidence in the company's future.
-                    - Favor stocks with significant institutional interest (FII/DII holding > 3.5%).
-                    - Prioritize companies with positive Return on Equity (ROE) and Return on Assets (ROA).
-                    - Consider stocks with a reasonable P/E ratio relative to their sector.
+                    **1. Fundamental Analysis**:
+                    - **Promoter Holding**: Prefer stocks with high promoter holding (>50%), indicating strong insider confidence.
+                    - **Institutional Interest**: Look for significant FII/DII holding (>3.5%), signaling institutional trust.
+                    - **Profitability**: Prioritize stocks with positive Return on Equity (ROE) and Return on Assets (ROA).
+                    - **Valuation**: Favor stocks with a reasonable Price-to-Earnings (P/E) ratio relative to their sector.
 
-                    2. **Technical Analysis**:
-                    - Use technical indicators like Supertrend, EMA, MACD, RSI, and Bollinger Bands to identify bullish trends.
-                    - Focus on stocks trading near support zones or breaking out from resistance zones.
-                    - Avoid stocks showing strong sell signals unless there’s a clear contrarian opportunity.
+                    **2. Technical Analysis**:
+                    - **Trend Indicators**: Use Supertrend, EMA, MACD, RSI, and Bollinger Bands to identify bullish trends.
+                    - **Support/Resistance**: Focus on stocks trading near support zones or breaking out of resistance zones.
+                    - **Avoid Sell Signals**: Exclude stocks with strong sell signals unless there is a compelling contrarian opportunity.
 
-                    3. **Market Sentiment and Performance**:
-                    - Favor stocks with recent positive performance (e.g., one-month, three-month returns).
-                    - Consider overall market sentiment (bullish/bearish) and its impact on the stock.
+                    **3. Market Sentiment**:
+                    - **Recent Performance**: Favor stocks with positive one-month and three-month returns.
+                    - **Market Sentiment**: Consider overall market conditions (bullish/bearish) and their impact on the stock.
 
-                    4. **Low Market Cap**:
-                    - Prioritize stocks with a market capitalization below a NRs 200000000.
+                    **4. Low Market Cap**:
+                    - **Market Capitalization**: Prioritize stocks with a market capitalization below NRs 200,000,000.
 
+                    **Output Format**:
                     For each recommended stock, provide the following details in JSON format:
-                    - "symbol": The stock symbol.
-                    - "name": The name of the company.
-                    - "market_cap": The market capitalization of the stock.
+                    - "symbol": Stock symbol.
+                    - "name": Company name.
+                    - "market_cap": Market capitalization.
                     - "fii_dii_holding": Percentage of institutional holding.
                     - "pe_ratio": Price-to-Earnings ratio.
                     - "roe": Return on Equity (TTM).
                     - "technical_rating": Overall technical rating (e.g., Buy, Neutral, Sell).
-                    - "buy_reason": A brief explanation of why this stock is recommended.
+                    - "buy_reason": A concise explanation of why this stock is recommended.
 
                     Return the results as a JSON array of recommended stocks.
                 """,
@@ -223,22 +242,27 @@ def analyze_sector_wise_stocks(file):
         ],
         stream=False,
     )
-    return response.model_json_schema()
+    return response.choices[0].message.content
 
+def convert_to_csv(overall_file_name, is_first, sector, stocks):
+    sector_file_path = os.path.join("data", f"{sector}.csv")
+    pd.DataFrame(stocks).to_csv(sector_file_path, index=False)
 
-def convert_to_csv(overall_file_name,is_first,sector,stocks):
-    pd.DataFrame(stocks).to_csv(f"data/{sector}.csv", index=False)
-
-    pd.DataFrame(stocks).to_csv(overall_file_name, mode='a', header=is_first, index=False)
-
+    mode = 'w' if is_first else 'a'
+    header = is_first
+    pd.DataFrame(stocks).to_csv(overall_file_name, mode=mode, header=header, index=False)
 
 if __name__ == "__main__":
     stocks = get_sector_wise_stocks()
-    overall_file_name = f"data/{datetime.now().isoformat()}/overall.csv"
-    if not os.path.exists(os.path.dirname(overall_file_name)):
-        os.makedirs(os.path.dirname(overall_file_name))
-    is_first = True
+    output_dir = os.path.join("data", datetime.now().isoformat())
+    os.makedirs(output_dir, exist_ok=True)
+    overall_file_name = os.path.join(output_dir, "overall.csv")
 
-    for sector, stocks in stocks.items():
-        convert_to_csv(overall_file_name,is_first,sector,stocks)
+    is_first = True
+    for sector, sector_stocks in stocks.items():
+        convert_to_csv(overall_file_name, is_first, sector, sector_stocks)
         is_first = False
+
+    # Analyze stocks using OpenAI
+    analysis_result = analyze_sector_wise_stocks(stocks)
+    logger.info(f"Analysis Result: {analysis_result}")
