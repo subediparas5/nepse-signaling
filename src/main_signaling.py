@@ -37,7 +37,7 @@ FUNDAMENTAL_DETAILS_URL = "https://api.nepsetrading.com/recent-report?"
 unnecessary_metrics = [
     "share_float",  # Not directly relevant for fundamental/technical analysis
     "latesttransactionprice",  # Redundant with LTP
-    "volume",  # Already covered by avg_volume_3_days
+    # "volume",  # Already covered by avg_volume_3_days
     "beta_yearly",  # Not a priority for low-cap stock selection
     "support_zone_lower",  # Technical analysis can be derived from other indicators
     "support_zone_upper",  # Technical analysis can be derived from other indicators
@@ -66,9 +66,9 @@ unnecessary_metrics = [
     "week_52_low",  # Not directly relevant for analysis
     "divident_yeild",  # Typo, and not a priority for low-cap stocks
     "eps",  # Redundant with eps_ttm
-    "bv",  # Redundant with other metrics
+    # "bv",  # Redundant with other metrics
     "dpps",  # Not directly relevant for analysis
-    "npl",  # Not directly relevant for analysis
+    # "npl",  # Not directly relevant for analysis
     "ltp",  # Redundant with latesttransactionprice
 ]
 
