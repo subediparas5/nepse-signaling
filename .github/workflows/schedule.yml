@@ -2,7 +2,7 @@ name: Run Python Script and Commit Changes
 
 on:
   schedule:
-    - cron: "30 00,10 * * *"
+    - cron: "30 09 * * *"
 
 jobs:
   run-and-commit:
