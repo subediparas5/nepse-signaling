@@ -1,5 +1,5 @@
 volume,one_week_perf,one_month_perf,three_month_perf,six_month_perf,one_year_perf,bull_bear_signal,technical_rating,ad_trend,avg_volume_6_days,avg_volume_9_days,avg_volume_12_days,avg_volume_15_days,avg_volume_30_days,q1,q2,q3,q4,capital_fund_to_rwa,npl_to_total_loan,return_on_equity,total_loan_loss_provision_to_npl,symbol,market_cap,eps_ttm,roa_ttm,roe_ttm,pr_ratio
-12737,-0.21,0.46,-9.69,-3.86,25.25,-,-,Accumulation,5385.0,4865.0,6583.0,7312.0,7288.0,,,,,,,,,MKCL (Muktinath Krishi Company Limited),10431050000.0,4.19,,,355.75
-96075,2.6,9.29,-3.34,64.81,92.5,-,BY,Distribution,122504.0,104177.0,101156.0,122307.0,133389.0,,,,,,,,,NRIC (Nepal Reinsurance Company Limited),169673896315.49,,,,
-8879,-0.05,-1.52,-6.56,-10.0,2.27,-,SL,Distribution,92497.0,71304.0,55790.0,55767.0,40926.0,-14.33%,-3.81%,-9.22%,-5.28%,,,,,NTC (Nepal Doorsanchar Company),153892800000.0,29.28,,,29.2
-2482,-2.06,-7.24,-11.05,-13.33,0.89,-,SL,Distribution,3077.0,2751.0,2770.0,3098.0,4404.0,115.54%,-1.50%,215.33%,215.33%,,,,,NWCL (Nepal Warehousing Company Limited),6048143750.0,,,,
+4192,-0.21,0.46,-9.69,-3.86,25.25,-,-,Accumulation,5385.0,4865.0,6583.0,7312.0,7288.0,,,,,,,,,MKCL (Muktinath Krishi Company Limited),10463600000.0,4.19,,,356.86
+60796,2.6,9.29,-3.34,64.81,92.5,-,BY,Distribution,122504.0,104177.0,101156.0,122307.0,133389.0,,,,,,,,,NRIC (Nepal Reinsurance Company Limited),167804185624.6,,,,
+24906,-0.05,-1.52,-6.56,-10.0,2.27,-,SL,Distribution,92497.0,71304.0,55790.0,55767.0,40926.0,-14.33%,-3.81%,-9.22%,-5.28%,,,,,NTC (Nepal Doorsanchar Company),152820000000.0,29.28,,,29.0
+2240,-2.06,-7.24,-11.05,-13.33,0.89,-,SL,Distribution,3077.0,2751.0,2770.0,3098.0,4404.0,115.54%,-1.50%,215.33%,215.33%,,,,,NWCL (Nepal Warehousing Company Limited),6091250000.0,,,,
