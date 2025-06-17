@@ -1,7 +1,7 @@
 volume,one_week_perf,one_month_perf,three_month_perf,six_month_perf,one_year_perf,bull_bear_signal,technical_rating,ad_trend,avg_volume_6_days,avg_volume_9_days,avg_volume_12_days,avg_volume_15_days,avg_volume_30_days,q1,q2,q3,q4,capital_fund_to_rwa,npl_to_total_loan,return_on_equity,total_loan_loss_provision_to_npl,symbol,market_cap,eps_ttm,roa_ttm,roe_ttm,pr_ratio
-129866,,,,,,-,-,No Change,154620.0,154620.0,154620.0,154620.0,154620.0,71.24%,-6.17%,71.24%,71.24%,,,,,HRL (Himalayan Reinsurance Limited),94168880000.0,11.86,,,76.32
-3660,0.36,1.51,-7.61,-0.38,24.0,-,SL,Distribution,5199.0,4871.0,5994.0,7071.0,7221.0,,,,,,,,,MKCL (Muktinath Krishi Company Limited),10394160000.0,4.19,,,354.49
-56448,3.11,5.03,-2.62,67.59,93.71,-,-,Distribution,123075.0,98588.0,96789.0,107976.0,131747.0,,,,,,,,,NRIC (Nepal Reinsurance Company Limited),166880739138.36,,,,
-38374,0.62,-1.76,-10.02,3.22,9.59,-,SL,Distribution,26366.0,22889.0,22816.0,22491.0,29120.0,-16.87%,-8.60%,23.46%,40.90%,,,,,NRM (Nepal Republic Media Limited),4456885500.0,-1.2,,,-383.85
-13426,-0.09,-2.27,-6.25,-10.31,1.87,-,SL,Distribution,92915.0,69611.0,56706.0,55933.0,41034.0,-14.33%,-3.81%,-9.22%,-5.28%,,,,,NTC (Nepal Doorsanchar Company),152992800000.0,29.28,,,29.03
-4801,0.59,-3.16,-9.44,-8.88,-1.59,-,-,Distribution,3035.0,2764.0,2675.0,2742.0,4301.0,115.54%,-1.50%,215.33%,215.33%,,,,,NWCL (Nepal Warehousing Company Limited),6053918750.0,,,,
+77449,,,,,,-,-,Distribution,143122.0,143122.0,143122.0,143122.0,143122.0,71.24%,-6.17%,71.24%,71.24%,,,,,HRL (Himalayan Reinsurance Limited),94110640000.0,11.86,,,76.27
+2628,-0.99,1.21,-7.37,-0.34,30.37,-,SL,Distribution,5054.0,4734.0,5739.0,6051.0,7067.0,,,,,,,,,MKCL (Muktinath Krishi Company Limited),10359230000.0,4.19,,,353.3
+32928,-3.77,4.03,-3.56,65.75,95.8,-,-,Distribution,123358.0,98744.0,94651.0,95374.0,130845.0,,,,,,,,,NRIC (Nepal Reinsurance Company Limited),166083461212.74,,,,
+15648,0.19,-0.01,-7.85,5.41,12.36,-,SL,Accumulation,27049.0,25694.0,24218.0,23890.0,28294.0,-16.87%,-8.60%,23.46%,40.90%,,,,,NRM (Nepal Republic Media Limited),4426409250.0,-1.2,,,-381.23
+10544,1.39,-2.1,-6.29,-9.77,2.4,-,SL,Distribution,89833.0,68852.0,57405.0,48167.0,39245.0,-14.33%,-3.81%,-9.22%,-5.28%,,,,,NTC (Nepal Doorsanchar Company),152476200000.0,29.28,,,28.93
+3472,-1.56,-3.72,-10.15,-9.78,1.68,-,SL,Distribution,2932.0,3145.0,2697.0,2845.0,4365.0,115.54%,-1.50%,215.33%,215.33%,,,,,NWCL (Nepal Warehousing Company Limited),5988400000.0,,,,
