@@ -55,82 +55,54 @@ def _parse_pct(x: Any) -> float | None:
     except ValueError:
         return None
 
+def _ma_position_vote(
+    ltp: Any, ma120: Any, ma180: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 2: Price vs 120d/180d MAs — trend-following signal."""
+    px = _to_float(ltp)
+    m120 = _to_float(ma120)
+    m180 = _to_float(ma180)
+    if px is None:
+        return 0, 0, None
 
-def _norm_str(x: Any) -> str:
-    return str(x or "").strip().lower()
+    below_both = (
+        m120 is not None and m180 is not None
+        and px < m120 and px < m180
+    )
+    above_both = (
+        m120 is not None and m180 is not None
+        and px > m120 and px > m180
+    )
 
+    if below_both:
+        pct_below = min(
+            (m120 - px) / m120 * 100 if m120 else 0,
+            (m180 - px) / m180 * 100 if m180 else 0,
+        )
+        if pct_below > 5:
+            return 2, 0, f"Below both MAs ({pct_below:.0f}% under — value zone)"
+        return 1, 0, "Below both MAs (near support)"
 
-def _signal_buy_sell_from_api_text(s: str) -> tuple[int, int]:
-    if not s or s in ("neutral", "-"):
-        return 0, 0
-    if ("below" in s and "30" in s) or "oversold" in s:
-        return 1, 0
-    if ("above" in s and "70" in s) or "overbought" in s:
-        return 0, 1
-    if "golden" in s or ("bull" in s and "bear" not in s):
-        return 1, 0
-    if "death" in s or ("bear" in s and "bull" not in s):
-        return 0, 1
-    tokens = s.replace("/", " ").split()
-    has_by = "by" in tokens or s.rstrip().endswith(" by")
-    has_sl = "sl" in tokens or s.rstrip().endswith(" sl")
-    if has_sl and not has_by:
-        return 0, 1
-    if has_by and not has_sl:
-        return 1, 0
-    if s in ("buy", "strong buy"):
-        return 1, 0
-    if s in ("sell", "strong sell"):
-        return 0, 1
-    return 0, 0
+    if above_both:
+        pct_above = min(
+            (px - m120) / m120 * 100 if m120 else 0,
+            (px - m180) / m180 * 100 if m180 else 0,
+        )
+        if pct_above > 15:
+            return 0, 2, f"Above both MAs by {pct_above:.0f}% (overextended)"
+        if pct_above > 8:
+            return 0, 1, f"Above both MAs by {pct_above:.0f}%"
 
+    if m120 is not None and px < m120:
+        return 1, 0, "Below 120d MA"
+    if m120 is not None and px > m120 * 1.15:
+        return 0, 1, "Well above 120d MA"
 
-def _rsi_vote(rsi_signal: Any) -> tuple[int, int, str | None]:
-    s = _norm_str(rsi_signal)
-    b, se = _signal_buy_sell_from_api_text(s)
-    if b:
-        return 2, 0, "RSI oversold/buy"
-    if se:
-        return 0, 2, "RSI overbought/sell"
     return 0, 0, None
 
 
-# Weight 2: MACD (rare, meaningful crossover)
-def _macd_vote(macd: Any) -> tuple[int, int, str | None]:
-    s = _norm_str(macd)
-    b, se = _signal_buy_sell_from_api_text(s)
-    if b:
-        return 2, 0, "MACD bullish crossover"
-    if se:
-        return 0, 1, "MACD bearish"
-    return 0, 0, None
-
-
-# Weight 1: MA (fires often, moderate signal)
-def _ma_vote(ma: Any) -> tuple[int, int, str | None]:
-    s = _norm_str(ma)
-    b, se = _signal_buy_sell_from_api_text(s)
-    if b:
-        return 1, 0, "MA buy"
-    if se:
-        return 0, 1, "MA sell"
-    return 0, 0, None
-
-
-# Weight 1: Volume breakout (50% above avg — meaningful for NEPSE)
-def _volume_vote(volume: Any, avg30: Any) -> tuple[int, int, str | None]:
-    v = _to_float(volume)
-    a = _to_float(avg30)
-    if v is not None and a is not None and a > 0:
-        if v >= 1.5 * a:
-            return 1, 0, f"Volume breakout ({v/a:.1f}x avg)"
-        if v <= 0.3 * a:
-            return 0, 1, "Very low volume"
-    return 0, 0, None
-
-
-# Weight 1: 52-week position
 def _week52_vote(ltp: Any, high52: Any, low52: Any) -> tuple[int, int, str | None]:
+    """Weight 1: Position within 52-week range."""
     px = _to_float(ltp)
     hi = _to_float(high52)
     lo = _to_float(low52)
@@ -144,51 +116,44 @@ def _week52_vote(ltp: Any, high52: Any, low52: Any) -> tuple[int, int, str | Non
     return 0, 0, None
 
 
-# Weight 1: Accumulation/Distribution trend (smart money flow)
-def _ad_trend_vote(ad_trend: Any) -> tuple[int, int, str | None]:
-    s = _norm_str(ad_trend)
-    if s == "accumulation":
-        return 1, 0, "Accumulation (smart money inflow)"
-    if s == "distribution":
-        return 0, 1, "Distribution (smart money outflow)"
-    return 0, 0, None
-
-
-# Weight 1: Momentum — both timeframes must agree
-def _momentum_vote(one_month: Any, three_month: Any) -> tuple[int, int, str | None]:
-    m1 = _parse_pct(one_month)
-    m3 = _parse_pct(three_month)
-    if m1 is None or m3 is None:
+def _daily_momentum_vote(
+    close: Any, prev_close: Any, open_price: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 1: Yesterday's price action — close vs prev_close and open."""
+    cl = _to_float(close)
+    pc = _to_float(prev_close)
+    op = _to_float(open_price)
+    if cl is None or pc is None or pc == 0:
         return 0, 0, None
-    if m1 > 5 and m3 > 10:
-        return 1, 0, f"Strong momentum (+{m1:.0f}% 1m, +{m3:.0f}% 3m)"
-    if m1 < -5 and m3 < -10:
-        return 0, 1, f"Weak momentum ({m1:.0f}% 1m, {m3:.0f}% 3m)"
+
+    day_chg_pct = (cl - pc) / pc * 100
+
+    closed_above_open = op is not None and cl > op
+
+    if day_chg_pct > 3 and closed_above_open:
+        return 1, 0, f"Bullish day (+{day_chg_pct:.1f}%, closed above open)"
+    if day_chg_pct < -3 and op is not None and cl < op:
+        return 0, 1, f"Bearish day ({day_chg_pct:.1f}%, closed below open)"
     return 0, 0, None
 
 
-def _sr_vote(
-    ltp: Any,
-    sup_lo: Any,
-    sup_hi: Any,
-    res_lo: Any,
-    res_hi: Any,
-) -> tuple[int, int, list[str]]:
+def _vwap_vote(ltp: Any, vwap: Any) -> tuple[int, int, str | None]:
+    """Weight 1: Close vs VWAP — institutional buying/selling pressure."""
     px = _to_float(ltp)
-    reasons: list[str] = []
-    b, s = 0, 0
-    slo, shi = _to_float(sup_lo), _to_float(sup_hi)
-    rlo, rhi = _to_float(res_lo), _to_float(res_hi)
-    if px is not None and slo is not None and shi is not None and slo <= shi:
-        if slo <= px <= shi:
-            b += 1
-            reasons.append("Price in support zone")
-    if px is not None and rlo is not None and rhi is not None and rlo <= rhi:
-        if rlo <= px <= rhi:
-            s += 1
-            reasons.append("Price in resistance zone")
-    return b, s, reasons
+    vw = _to_float(vwap)
+    if px is None or vw is None or vw == 0:
+        return 0, 0, None
+    diff_pct = (px - vw) / vw * 100
+    if diff_pct > 1.5:
+        return 1, 0, f"Closed above VWAP (+{diff_pct:.1f}%)"
+    if diff_pct < -1.5:
+        return 0, 1, f"Closed below VWAP ({diff_pct:.1f}%)"
+    return 0, 0, None
 
+
+# ---------------------------------------------------------------------------
+# Fundamental votes — from nepsetrading recent-report + stocks-listed
+# ---------------------------------------------------------------------------
 
 def _eps_qoq_vote(q1: Any, q2: Any) -> tuple[int, int, str | None]:
     a1, a2 = _parse_pct(q1), _parse_pct(q2)
@@ -276,58 +241,19 @@ def _technical_votes(stock: dict[str, Any]) -> tuple[int, int, list[str]]:
     b, s = 0, 0
     reasons: list[str] = []
 
-    for fn, key in (
-        (_rsi_vote, "rsi_signal"),
-        (_macd_vote, "macd_signal"),
-        (_ma_vote, "ma_signal"),
+    ltp = stock.get("ltp") or stock.get("close")
+
+    for fn, args in (
+        (_ma_position_vote, (ltp, stock.get("ma120"), stock.get("ma180"))),
+        (_week52_vote, (ltp, stock.get("week_52_high"), stock.get("week_52_low"))),
+        (_daily_momentum_vote, (stock.get("close"), stock.get("prev_close"), stock.get("open"))),
+        (_vwap_vote, (ltp, stock.get("vwap"))),
     ):
-        bb, ss, r = fn(stock.get(key))
+        bb, ss, r = fn(*args)
         b += bb
         s += ss
         if r:
             reasons.append(r)
-
-    bb, ss, r = _volume_vote(stock.get("volume"), stock.get("avg_volume_30_days"))
-    b += bb
-    s += ss
-    if r:
-        reasons.append(r)
-
-    bb, ss, r = _week52_vote(
-        stock.get("latesttransactionprice"),
-        stock.get("week_52_high"),
-        stock.get("week_52_low"),
-    )
-    b += bb
-    s += ss
-    if r:
-        reasons.append(r)
-
-    bb, ss, r = _ad_trend_vote(stock.get("ad_trend"))
-    b += bb
-    s += ss
-    if r:
-        reasons.append(r)
-
-    bb, ss, r = _momentum_vote(
-        stock.get("one_month_perf"),
-        stock.get("three_month_perf"),
-    )
-    b += bb
-    s += ss
-    if r:
-        reasons.append(r)
-
-    bb, ss, rs = _sr_vote(
-        stock.get("latesttransactionprice"),
-        stock.get("support_zone_lower"),
-        stock.get("support_zone_upper"),
-        stock.get("resistance_zone_lower"),
-        stock.get("resistance_zone_upper"),
-    )
-    b += bb
-    s += ss
-    reasons.extend(rs)
 
     return b, s, reasons
 

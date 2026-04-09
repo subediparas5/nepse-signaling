@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 import logging
 from datetime import datetime, timezone, timedelta
@@ -24,49 +25,28 @@ if not OPEN_AI_API_KEY:
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-HEADERS = {
+NEPSE_TRADING_HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en",
     "Accept-Encoding": "gzip, deflate",
     "Origin": "https://www.nepsetrading.com",
-    "Connection": "keep-alive",
     "Referer": "https://www.nepsetrading.com/",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site",
-    "Priority": "u=0",
-    "TE": "trailers",
 }
 
 NEPSE_TRADING_SESSION = requests.Session()
-NEPSE_TRADING_SESSION.headers.update(HEADERS)
+NEPSE_TRADING_SESSION.headers.update(NEPSE_TRADING_HEADERS)
 
-STOCK_DETAILS_URL = "https://api.nepsetrading.com/sidebar?code={stock_symbol}"
-SECTOR_DETAILS_BASE_URL = "https://api.nepsetrading.com/stocks-listed"
-FUNDAMENTAL_DETAILS_URL = "https://api.nepsetrading.com/recent-report?"
-
-UNNECESSARY_SIDEBAR_KEYS = frozenset({
-    "bb_signal", "fib_signal", "fib_range",
-    "ema_signal", "sar_signal",
-    "trade_signal", "trend_confirmation", "obv_breakout",
-    "daily_volatility_rs", "weekly_volatility_rs", "monthly_volatility_rs",
-    "avg_volume_3_days",
-    "eps", "dpps", "ltp",
-})
+STOCKS_LISTED_URL = "https://api.nepsetrading.com/stocks-listed"
+FUNDAMENTALS_URL = "https://api.nepsetrading.com/recent-report?"
 
 LLM_FIELDS = [
-    "symbol", "sector", "latesttransactionprice",
+    "symbol", "sector", "ltp",
     "signal_verdict", "signal_buy_score", "signal_sell_score", "signal_reasons",
     "pe", "pb", "roe", "npl", "eps_ttm",
-    "promoter_percentage", "share_float",
+    "promoter_percentage",
     "week_52_high", "week_52_low",
-    "one_month_perf", "three_month_perf",
-    "technical_rating", "supertrend_signal",
-    "market_sentiment", "market_trend",
-    "obv_price_divergence", "divident_yeild",
-    "beta_yearly",
-    "volume", "avg_volume_30_days",
+    "open", "high", "low", "vwap", "prev_close",
+    "volume", "ma120", "ma180",
 ]
 
 SYSTEM_PROMPT = """\
@@ -74,12 +54,12 @@ You are an expert Nepal stock market analyst. You receive the top BUY candidates
 from NEPSE that passed a strict rule-based screen.
 
 For each stock you get: buy/sell scores, reasons, P/E, P/B, ROE, NPL, EPS, \
-promoter %, 52-week range, momentum, volume, market sentiment, etc.
+promoter %, 52-week range, moving averages, volume, VWAP, etc.
 
 Your job:
 1. Review each candidate and either CONFIRM or REJECT.
 2. REJECT if: negative EPS, NPL > 5%, near 52-week high, low promoter (<25%), \
-or weak/negative momentum.
+or price well above 120d/180d MA (overextended).
 3. For confirmed picks, write a short reason a retail trader can act on.
 4. If promoter > 50%, add "check lock-in expiry" to the reason.
 5. Return at most 5 confirmed picks — quality over quantity.
@@ -93,67 +73,93 @@ If no stock passes your review, return exactly: "No strong picks today."\
 """
 
 
-def get_listed_stocks_with_sector() -> list:
-    for attempt in range(5):
+def get_listed_stocks() -> list[dict]:
+    """Stock listing with sector codes + promoter % from nepsetrading.com."""
+    for attempt in range(3):
         try:
-            response = NEPSE_TRADING_SESSION.get(SECTOR_DETAILS_BASE_URL)
-            response.raise_for_status()
-            return response.json().get("data", [])
+            resp = NEPSE_TRADING_SESSION.get(STOCKS_LISTED_URL)
+            resp.raise_for_status()
+            return resp.json().get("data", [])
         except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - Error fetching stock info: {e}")
+            logger.error(f"Attempt {attempt + 1} - stocks-listed: {e}")
     return []
 
 
 def get_fundamental_lookup() -> dict[str, dict]:
-    for attempt in range(5):
+    """Fundamentals (PE, PB, ROE, NPL, EPS) from nepsetrading.com."""
+    for attempt in range(3):
         try:
-            response = NEPSE_TRADING_SESSION.get(FUNDAMENTAL_DETAILS_URL)
-            response.raise_for_status()
-            rows = response.json()
+            resp = NEPSE_TRADING_SESSION.get(FUNDAMENTALS_URL)
+            resp.raise_for_status()
+            rows = resp.json()
             return {
                 row["symbol"].strip(): row
                 for row in rows
                 if row.get("symbol")
             }
         except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - Error fetching fundamental data: {e}")
+            logger.error(f"Attempt {attempt + 1} - fundamentals: {e}")
     return {}
 
 
-def get_stock_info(stock_symbol: str) -> dict:
-    for attempt in range(3):
-        try:
-            response = NEPSE_TRADING_SESSION.get(STOCK_DETAILS_URL.format(stock_symbol=stock_symbol))
-            if response.status_code == 404:
-                return {}
-            response.raise_for_status()
-            raw = response.json()
-            cleaned: dict = {}
-            for key, value in raw.items():
-                if key in UNNECESSARY_SIDEBAR_KEYS:
-                    continue
-                if isinstance(value, float):
-                    cleaned[key] = round(value, 2)
-                elif isinstance(value, str):
-                    try:
-                        cleaned[key] = round(float(value), 2)
-                    except ValueError:
-                        cleaned[key] = value
-                else:
-                    cleaned[key] = value
-            return cleaned
-        except Exception as e:
-            if attempt == 2:
-                logger.warning(f"Skipping {stock_symbol}: {e}")
-                return {}
-    return {}
+_SS_COL_MAP = {
+    3: "open", 4: "high", 5: "low", 6: "close", 7: "ltp",
+    10: "vwap", 11: "volume", 12: "prev_close",
+    20: "ma120", 21: "ma180",
+    22: "week_52_high", 23: "week_52_low",
+}
+
+
+def get_sharesansar_data() -> dict[str, dict]:
+    """OHLCV + 52-week range + MAs from ShareSansar (single bulk request)."""
+    url = "https://www.sharesansar.com/today-share-price"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0",
+    }
+    try:
+        resp = requests.get(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+        table_m = re.search(
+            r'<table[^>]*id="headFixed"[^>]*>(.*?)</table>', resp.text, re.DOTALL
+        )
+        if not table_m:
+            logger.warning("ShareSansar: table not found")
+            return {}
+        lookup: dict[str, dict] = {}
+        for row in re.findall(r'<tr[^>]*>(.*?)</tr>', table_m.group(1), re.DOTALL):
+            cells = re.findall(r'<td[^>]*>(.*?)</td>', row, re.DOTALL)
+            if len(cells) < 24:
+                continue
+            clean = [re.sub(r'<[^>]+>', '', c).strip().replace(",", "") for c in cells]
+            symbol = clean[1]
+            if not symbol or not symbol[0].isalpha():
+                continue
+            entry: dict = {}
+            for idx, key in _SS_COL_MAP.items():
+                try:
+                    entry[key] = float(clean[idx])
+                except (ValueError, IndexError):
+                    pass
+            lookup[symbol] = entry
+        logger.info(f"ShareSansar: {len(lookup)} stocks")
+        return lookup
+    except Exception as e:
+        logger.warning(f"ShareSansar failed: {e}")
+        return {}
 
 
 def get_classified_stocks() -> tuple[list[dict], int]:
-    listed_stocks = get_listed_stocks_with_sector()
+    listed_stocks = get_listed_stocks()
     fund_lookup = get_fundamental_lookup()
-    all_stocks: list[dict] = []
+    ss_data = get_sharesansar_data()
 
+    logger.info(
+        f"Data sources: {len(listed_stocks)} listed, "
+        f"{len(fund_lookup)} fundamentals, {len(ss_data)} ShareSansar"
+    )
+
+    all_stocks: list[dict] = []
     for stock in listed_stocks:
         sector = stock.get("sector")
         symbol = stock.get("symbol")
@@ -162,32 +168,27 @@ def get_classified_stocks() -> tuple[list[dict], int]:
         if sector not in TRADABLE_SECTORS:
             continue
 
-        data: dict = get_stock_info(symbol)
+        ss = ss_data.get(symbol, {})
+        fund = fund_lookup.get(symbol, {})
 
-        fund_row = fund_lookup.get(symbol, {})
-        for k, v in fund_row.items():
-            if k not in data:
-                data[k] = v
-
-        if not data:
+        if not ss and not fund:
             continue
 
+        data: dict = {**fund, **ss}
         data["sector"] = sector
-        data["symbol"] = data.get("symbol", symbol)
+        data["symbol"] = symbol
         data["promoter_percentage"] = stock.get("promoter_percentage")
         data["public_percentage"] = stock.get("public_percentage")
-        data["latesttransactionprice"] = data.get(
-            "latesttransactionprice", stock.get("latesttransactionprice")
-        )
+        data.setdefault("ltp", stock.get("latesttransactionprice"))
 
         data.update(classify_nepse_signal(data, sector))
         all_stocks.append(data)
 
-    buys = [
-        s for s in all_stocks
-        if s.get("signal_verdict") == "BUY"
-    ]
-    buys.sort(key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0), reverse=True)
+    buys = [s for s in all_stocks if s.get("signal_verdict") == "BUY"]
+    buys.sort(
+        key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0),
+        reverse=True,
+    )
     buys = buys[:10]
     logger.info(f"Classified {len(all_stocks)} stocks -> {len(buys)} top BUY candidates")
     return buys, len(all_stocks)
@@ -253,14 +254,14 @@ def format_all_buys_message(buys: list[dict]) -> str:
     ]
     for s in buys:
         sym = s.get("symbol", "?")
-        price = s.get("latesttransactionprice", "—")
+        price = s.get("ltp", "—")
         pe = s.get("pe")
         roe = s.get("roe")
         eps = s.get("eps_ttm")
         promo = s.get("promoter_percentage")
         buy_sc = s.get("signal_buy_score", 0)
         sell_sc = s.get("signal_sell_score", 0)
-        reasons = s.get("signal_reasons", [])
+        reasons = s.get("signal_reasons", "")
 
         stats = []
         if pe is not None:
@@ -276,7 +277,8 @@ def format_all_buys_message(buys: list[dict]) -> str:
         lines.append(f"*{sym}* — Rs {price}  (Score +{buy_sc}/−{sell_sc})")
         lines.append(f"    {stats_str}")
         if reasons:
-            lines.append(f"    _{', '.join(reasons[:4])}_")
+            top_reasons = reasons.split(" | ")[:4]
+            lines.append(f"    _{', '.join(top_reasons)}_")
         lines.append("")
 
     return "\n".join(lines)
