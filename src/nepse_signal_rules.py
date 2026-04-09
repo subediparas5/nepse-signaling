@@ -153,6 +153,22 @@ def _daily_momentum_vote(
     return 0, 0, None
 
 
+def _gap_vote(
+    open_price: Any, prev_close: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 1: Overnight gap — strong sentiment before market opens."""
+    op = _to_float(open_price)
+    pc = _to_float(prev_close)
+    if op is None or pc is None or pc == 0:
+        return 0, 0, None
+    gap_pct = (op - pc) / pc * 100
+    if gap_pct > 2:
+        return 1, 0, f"Gap up +{gap_pct:.1f}% (bullish sentiment)"
+    if gap_pct < -2:
+        return 0, 1, f"Gap down {gap_pct:.1f}% (bearish sentiment)"
+    return 0, 0, None
+
+
 def _vwap_vote(ltp: Any, vwap: Any) -> tuple[int, int, str | None]:
     """Weight 1: Close vs VWAP — institutional buying/selling pressure."""
     px = _to_float(ltp)
@@ -224,20 +240,34 @@ def _range_confirmation_vote(
     return 0, 0, None
 
 
+def _float_vote(public_pct: Any) -> tuple[int, int, str | None]:
+    """Weight 1: Public float analysis — very low float = volatile/risky."""
+    pp = _to_float(public_pct)
+    if pp is None:
+        return 0, 0, None
+    if pp < 15:
+        return 0, 1, f"Very low float {pp:.0f}% (volatile, hard to trade)"
+    return 0, 0, None
+
+
+def _sector_relative_vote(
+    diff_pct: Any, sector_median: float | None,
+) -> tuple[int, int, str | None]:
+    """Weight 1: Stock daily change vs sector median — relative strength."""
+    dp = _to_float(diff_pct)
+    if dp is None or sector_median is None:
+        return 0, 0, None
+    delta = dp - sector_median
+    if delta > 3:
+        return 1, 0, f"Outperforming sector by +{delta:.1f}pp"
+    if delta < -3:
+        return 0, 1, f"Underperforming sector by {delta:.1f}pp"
+    return 0, 0, None
+
+
 # ---------------------------------------------------------------------------
 # Fundamental votes — from nepsetrading recent-report + stocks-listed
 # ---------------------------------------------------------------------------
-
-def _eps_qoq_vote(q1: Any, q2: Any) -> tuple[int, int, str | None]:
-    a1, a2 = _parse_pct(q1), _parse_pct(q2)
-    if a1 is None or a2 is None:
-        return 0, 0, None
-    if a1 > a2:
-        return 1, 0, "EPS QoQ improving"
-    if a1 < a2:
-        return 0, 1, "EPS QoQ weakening"
-    return 0, 0, None
-
 
 def _dividend_yield_vote(
     ltp: Any, dpps: Any, eps: Any,
@@ -282,15 +312,22 @@ def _fundamental_votes(stock: dict[str, Any], sector: str) -> tuple[int, int, li
         s += 2
         reasons.append(f"Negative EPS ({eps:.2f})")
 
-    if sector in BFI_SECTORS:
-        pb = _to_float(stock.get("pb"))
-        if pb is not None and pb > 0:
+    pb = _to_float(stock.get("pb"))
+    if pb is not None and pb > 0:
+        if sector in BFI_SECTORS:
             if pb < 1.5:
                 b += 1
                 reasons.append(f"P/B {pb:.2f} (cheap for BFI)")
             elif pb > 3.0:
                 s += 1
                 reasons.append(f"P/B {pb:.2f} (expensive for BFI)")
+        else:
+            if pb < 1.0:
+                b += 1
+                reasons.append(f"P/B {pb:.2f} (below book value)")
+            elif pb > 5.0:
+                s += 1
+                reasons.append(f"P/B {pb:.2f} (expensive)")
 
     promoter = _to_float(stock.get("promoter_percentage"))
     if promoter is not None:
@@ -300,12 +337,6 @@ def _fundamental_votes(stock: dict[str, Any], sector: str) -> tuple[int, int, li
         elif promoter < 25:
             s += 1
             reasons.append(f"Low promoter {promoter:.0f}%")
-
-    eb, es, er = _eps_qoq_vote(stock.get("q1"), stock.get("q2"))
-    b += eb
-    s += es
-    if er:
-        reasons.append(er)
 
     db, ds, dr = _dividend_yield_vote(
         stock.get("ltp"), stock.get("dpps"), stock.get("eps"),
@@ -349,10 +380,13 @@ def _technical_votes(stock: dict[str, Any]) -> tuple[int, int, list[str]]:
         (_ma_position_vote, (ltp, stock.get("ma120"), stock.get("ma180"))),
         (_week52_vote, (ltp, stock.get("week_52_high"), stock.get("week_52_low"), stock.get("turnover"))),
         (_daily_momentum_vote, (stock.get("close"), stock.get("prev_close"), stock.get("open"))),
+        (_gap_vote, (stock.get("open"), stock.get("prev_close"))),
         (_vwap_vote, (ltp, stock.get("vwap"))),
         (_liquidity_vote, (stock.get("turnover"), stock.get("transactions"))),
         (_ma_convergence_vote, (ltp, stock.get("ma120"), stock.get("ma180"))),
         (_range_confirmation_vote, (stock.get("close"), stock.get("open"), stock.get("range_pct"))),
+        (_float_vote, (stock.get("public_percentage"),)),
+        (_sector_relative_vote, (stock.get("diff_pct"), stock.get("_sector_median_diff"))),
     ):
         bb, ss, r = fn(*args)
         b += bb
@@ -383,10 +417,17 @@ def classify_nepse_signal(stock: dict[str, Any], sector: str) -> dict[str, Any]:
     else:
         verdict = "HOLD"
 
+    total = buy_score + sell_score
+    if total > 0:
+        confidence = round(abs(buy_score - sell_score) / total * 100)
+    else:
+        confidence = 0
+
     return {
         "signal_verdict": verdict,
         "signal_buy_score": buy_score,
         "signal_sell_score": sell_score,
+        "signal_confidence": confidence,
         "signal_fundamental_buy": fb,
         "signal_fundamental_sell": fs,
         "signal_technical_buy": tb,

@@ -41,12 +41,13 @@ FUNDAMENTALS_URL = "https://api.nepsetrading.com/recent-report?"
 
 LLM_FIELDS = [
     "symbol", "sector", "market_cap_category", "ltp",
-    "signal_verdict", "signal_buy_score", "signal_sell_score", "signal_reasons",
+    "signal_verdict", "signal_buy_score", "signal_sell_score",
+    "signal_confidence", "signal_reasons",
     "pe", "pb", "roe", "npl", "eps_ttm",
     "promoter_percentage", "dividend_yield",
     "week_52_high", "week_52_low",
     "open", "high", "low", "vwap", "prev_close",
-    "volume", "turnover", "ma120", "ma180",
+    "volume", "turnover", "diff_pct", "ma120", "ma180",
 ]
 
 SYSTEM_PROMPT = """\
@@ -110,7 +111,7 @@ _SS_COL_MAP = {
     3: "open", 4: "high", 5: "low", 6: "close", 7: "ltp",
     10: "vwap", 11: "volume", 12: "prev_close",
     13: "turnover", 14: "transactions",
-    16: "range", 18: "range_pct",
+    16: "range", 17: "diff_pct", 18: "range_pct",
     20: "ma120", 21: "ma180",
     22: "week_52_high", 23: "week_52_low",
 }
@@ -155,7 +156,23 @@ def get_sharesansar_data() -> dict[str, dict]:
         return {}
 
 
-def get_classified_stocks() -> tuple[list[dict], int]:
+def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
+    """Compute median diff_pct per sector for relative-strength scoring."""
+    from statistics import median
+    sector_vals: dict[str, list[float]] = {}
+    for s in stocks:
+        dp = s.get("diff_pct")
+        sec = s.get("sector")
+        if dp is not None and sec:
+            try:
+                sector_vals.setdefault(sec, []).append(float(dp))
+            except (ValueError, TypeError):
+                pass
+    return {sec: median(vals) for sec, vals in sector_vals.items() if vals}
+
+
+def get_classified_stocks() -> tuple[list[dict], list[dict], int]:
+    """Returns (top_buys, top_sells, total_screened)."""
     listed_stocks = get_listed_stocks()
     fund_lookup = get_fundamental_lookup()
     ss_data = get_sharesansar_data()
@@ -165,7 +182,7 @@ def get_classified_stocks() -> tuple[list[dict], int]:
         f"{len(fund_lookup)} fundamentals, {len(ss_data)} ShareSansar"
     )
 
-    all_stocks: list[dict] = []
+    pre_stocks: list[dict] = []
     for stock in listed_stocks:
         sector = stock.get("sector")
         symbol = stock.get("symbol")
@@ -176,9 +193,6 @@ def get_classified_stocks() -> tuple[list[dict], int]:
 
         ss = ss_data.get(symbol, {})
         fund = fund_lookup.get(symbol, {})
-
-        if not ss and not fund:
-            continue
 
         data: dict = {**fund, **ss}
         data["sector"] = sector
@@ -212,7 +226,14 @@ def get_classified_stocks() -> tuple[list[dict], int]:
             except (ValueError, TypeError):
                 pass
 
-        data.update(classify_nepse_signal(data, sector))
+        pre_stocks.append(data)
+
+    sector_medians = _compute_sector_medians(pre_stocks)
+
+    all_stocks: list[dict] = []
+    for data in pre_stocks:
+        data["_sector_median_diff"] = sector_medians.get(data["sector"])
+        data.update(classify_nepse_signal(data, data["sector"]))
         all_stocks.append(data)
 
     buys = [s for s in all_stocks if s.get("signal_verdict") == "BUY"]
@@ -221,8 +242,19 @@ def get_classified_stocks() -> tuple[list[dict], int]:
         reverse=True,
     )
     buys = buys[:10]
-    logger.info(f"Classified {len(all_stocks)} stocks -> {len(buys)} top BUY candidates")
-    return buys, len(all_stocks)
+
+    sells = [s for s in all_stocks if s.get("signal_verdict") == "SELL"]
+    sells.sort(
+        key=lambda s: s.get("signal_sell_score", 0) - s.get("signal_buy_score", 0),
+        reverse=True,
+    )
+    sells = sells[:5]
+
+    logger.info(
+        f"Classified {len(all_stocks)} stocks -> "
+        f"{len(buys)} top BUY, {len(sells)} top SELL"
+    )
+    return buys, sells, len(all_stocks)
 
 
 def compact_for_llm(candidates: list[dict]) -> list[dict]:
@@ -278,45 +310,69 @@ def format_top_picks_message(llm_output: str, n_screened: int) -> str:
     return "\n".join(lines)
 
 
-def format_all_buys_message(buys: list[dict]) -> str:
+def _fmt_num(val, decimals=1) -> str:
+    """Safely format a number, handling raw API floats."""
+    if val is None:
+        return "—"
+    try:
+        return f"{float(val):.{decimals}f}"
+    except (ValueError, TypeError):
+        return str(val)
+
+
+def _format_stock_block(s: dict) -> list[str]:
+    sym = s.get("symbol", "?")
+    price = _fmt_num(s.get("ltp"), 1)
+    pe = s.get("pe")
+    roe = s.get("roe")
+    eps = s.get("eps_ttm")
+    promo = s.get("promoter_percentage")
+    dy = s.get("dividend_yield")
+    mcap = s.get("market_cap_category")
+    buy_sc = s.get("signal_buy_score", 0)
+    sell_sc = s.get("signal_sell_score", 0)
+    conf = s.get("signal_confidence", 0)
+    reasons = s.get("signal_reasons", "")
+
+    stats = []
+    if pe is not None:
+        stats.append(f"PE {_fmt_num(pe)}")
+    if roe is not None:
+        stats.append(f"ROE {_fmt_num(roe)}%")
+    if eps is not None:
+        stats.append(f"EPS {_fmt_num(eps, 2)}")
+    if promo is not None:
+        stats.append(f"Promo {_fmt_num(promo, 0)}%")
+    if dy is not None and dy > 0:
+        stats.append(f"DY {dy:.1f}%")
+    stats_str = " | ".join(stats) if stats else "—"
+
+    cap_tag = f" [{mcap}]" if mcap else ""
     lines = [
-        f"📊 *All BUY Signals — {_npt_now()}*",
-        "",
+        f"*{sym}*{cap_tag} — Rs {price}  (+{buy_sc}/−{sell_sc}, {conf}% conf)",
+        f"    {stats_str}",
     ]
+    if reasons:
+        top_reasons = reasons.split(" | ")[:5]
+        lines.append(f"    _{', '.join(top_reasons)}_")
+    lines.append("")
+    return lines
+
+
+def format_all_buys_message(buys: list[dict]) -> str:
+    lines = [f"📊 *All BUY Signals — {_npt_now()}*", ""]
     for s in buys:
-        sym = s.get("symbol", "?")
-        price = s.get("ltp", "—")
-        pe = s.get("pe")
-        roe = s.get("roe")
-        eps = s.get("eps_ttm")
-        promo = s.get("promoter_percentage")
-        dy = s.get("dividend_yield")
-        mcap = s.get("market_cap_category")
-        buy_sc = s.get("signal_buy_score", 0)
-        sell_sc = s.get("signal_sell_score", 0)
-        reasons = s.get("signal_reasons", "")
+        lines.extend(_format_stock_block(s))
+    return "\n".join(lines)
 
-        stats = []
-        if pe is not None:
-            stats.append(f"PE {pe}")
-        if roe is not None:
-            stats.append(f"ROE {roe}%")
-        if eps is not None:
-            stats.append(f"EPS {eps}")
-        if promo is not None:
-            stats.append(f"Promo {promo}%")
-        if dy is not None and dy > 0:
-            stats.append(f"DY {dy:.1f}%")
-        stats_str = " | ".join(stats) if stats else "—"
 
-        cap_tag = f" [{mcap}]" if mcap else ""
-        lines.append(f"*{sym}*{cap_tag} — Rs {price}  (Score +{buy_sc}/−{sell_sc})")
-        lines.append(f"    {stats_str}")
-        if reasons:
-            top_reasons = reasons.split(" | ")[:5]
-            lines.append(f"    _{', '.join(top_reasons)}_")
-        lines.append("")
-
+def format_sell_watchlist_message(sells: list[dict]) -> str:
+    if not sells:
+        return ""
+    lines = [f"⚠️ *SELL Watchlist — {_npt_now()}*", ""]
+    for s in sells:
+        lines.extend(_format_stock_block(s))
+    lines.append("_Stocks to avoid or consider exiting._")
     return "\n".join(lines)
 
 
@@ -341,7 +397,7 @@ def send_telegram(message: str) -> None:
 
 
 if __name__ == "__main__":
-    buys, n_screened = get_classified_stocks()
+    buys, sells, n_screened = get_classified_stocks()
 
     if not buys:
         send_telegram("No strong BUY signals found today.")
@@ -351,3 +407,7 @@ if __name__ == "__main__":
 
         send_telegram(format_top_picks_message(llm_output, n_screened))
         send_telegram(format_all_buys_message(buys))
+
+    sell_msg = format_sell_watchlist_message(sells)
+    if sell_msg:
+        send_telegram(sell_msg)
