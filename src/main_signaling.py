@@ -40,13 +40,13 @@ STOCKS_LISTED_URL = "https://api.nepsetrading.com/stocks-listed"
 FUNDAMENTALS_URL = "https://api.nepsetrading.com/recent-report?"
 
 LLM_FIELDS = [
-    "symbol", "sector", "ltp",
+    "symbol", "sector", "market_cap_category", "ltp",
     "signal_verdict", "signal_buy_score", "signal_sell_score", "signal_reasons",
     "pe", "pb", "roe", "npl", "eps_ttm",
-    "promoter_percentage",
+    "promoter_percentage", "dividend_yield",
     "week_52_high", "week_52_low",
     "open", "high", "low", "vwap", "prev_close",
-    "volume", "ma120", "ma180",
+    "volume", "turnover", "ma120", "ma180",
 ]
 
 SYSTEM_PROMPT = """\
@@ -54,15 +54,19 @@ You are an expert Nepal stock market analyst. You receive the top BUY candidates
 from NEPSE that passed a strict rule-based screen.
 
 For each stock you get: buy/sell scores, reasons, P/E, P/B, ROE, NPL, EPS, \
-promoter %, 52-week range, moving averages, volume, VWAP, etc.
+promoter %, dividend yield, 52-week range, moving averages, volume, turnover, \
+VWAP, and market cap category (Large/Mid/Small).
 
 Your job:
 1. Review each candidate and either CONFIRM or REJECT.
 2. REJECT if: negative EPS, NPL > 5%, near 52-week high, low promoter (<25%), \
-or price well above 120d/180d MA (overextended).
-3. For confirmed picks, write a short reason a retail trader can act on.
-4. If promoter > 50%, add "check lock-in expiry" to the reason.
-5. Return at most 5 confirmed picks — quality over quantity.
+price well above 120d/180d MA (overextended), or very low turnover (illiquid).
+3. PREFER stocks with: good dividend yield (>2%), high liquidity, MAs converging \
+bullishly, and strong fundamentals.
+4. For confirmed picks, write a short reason a retail trader can act on.
+5. If promoter > 50%, add "check lock-in expiry" to the reason.
+6. Factor in market cap: small caps carry higher risk, note if relevant.
+7. Return at most 5 confirmed picks — quality over quantity.
 
 Output format — return ONLY this, nothing else:
 
@@ -105,6 +109,8 @@ def get_fundamental_lookup() -> dict[str, dict]:
 _SS_COL_MAP = {
     3: "open", 4: "high", 5: "low", 6: "close", 7: "ltp",
     10: "vwap", 11: "volume", 12: "prev_close",
+    13: "turnover", 14: "transactions",
+    16: "range", 18: "range_pct",
     20: "ma120", 21: "ma180",
     22: "week_52_high", 23: "week_52_low",
 }
@@ -180,6 +186,31 @@ def get_classified_stocks() -> tuple[list[dict], int]:
         data["promoter_percentage"] = stock.get("promoter_percentage")
         data["public_percentage"] = stock.get("public_percentage")
         data.setdefault("ltp", stock.get("latesttransactionprice"))
+
+        mcap = stock.get("market_capitalization")
+        if mcap:
+            data["market_capitalization"] = mcap
+            try:
+                mc = float(mcap)
+                if mc >= 20_000_000_000:
+                    data["market_cap_category"] = "Large"
+                elif mc >= 5_000_000_000:
+                    data["market_cap_category"] = "Mid"
+                else:
+                    data["market_cap_category"] = "Small"
+            except (ValueError, TypeError):
+                pass
+
+        dpps = fund.get("dpps")
+        if dpps is not None:
+            data["dpps"] = dpps
+            try:
+                ltp_val = float(data.get("ltp", 0))
+                dpps_val = float(dpps)
+                if ltp_val > 0:
+                    data["dividend_yield"] = round(dpps_val / ltp_val * 100, 2)
+            except (ValueError, TypeError):
+                pass
 
         data.update(classify_nepse_signal(data, sector))
         all_stocks.append(data)
@@ -259,6 +290,8 @@ def format_all_buys_message(buys: list[dict]) -> str:
         roe = s.get("roe")
         eps = s.get("eps_ttm")
         promo = s.get("promoter_percentage")
+        dy = s.get("dividend_yield")
+        mcap = s.get("market_cap_category")
         buy_sc = s.get("signal_buy_score", 0)
         sell_sc = s.get("signal_sell_score", 0)
         reasons = s.get("signal_reasons", "")
@@ -272,12 +305,15 @@ def format_all_buys_message(buys: list[dict]) -> str:
             stats.append(f"EPS {eps}")
         if promo is not None:
             stats.append(f"Promo {promo}%")
+        if dy is not None and dy > 0:
+            stats.append(f"DY {dy:.1f}%")
         stats_str = " | ".join(stats) if stats else "—"
 
-        lines.append(f"*{sym}* — Rs {price}  (Score +{buy_sc}/−{sell_sc})")
+        cap_tag = f" [{mcap}]" if mcap else ""
+        lines.append(f"*{sym}*{cap_tag} — Rs {price}  (Score +{buy_sc}/−{sell_sc})")
         lines.append(f"    {stats_str}")
         if reasons:
-            top_reasons = reasons.split(" | ")[:4]
+            top_reasons = reasons.split(" | ")[:5]
             lines.append(f"    _{', '.join(top_reasons)}_")
         lines.append("")
 

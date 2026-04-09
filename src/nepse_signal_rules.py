@@ -101,17 +101,33 @@ def _ma_position_vote(
     return 0, 0, None
 
 
-def _week52_vote(ltp: Any, high52: Any, low52: Any) -> tuple[int, int, str | None]:
-    """Weight 1: Position within 52-week range."""
+def _week52_vote(
+    ltp: Any, high52: Any, low52: Any, turnover: Any = None,
+) -> tuple[int, int, str | None]:
+    """Weight 1-2: 52-week range position with breakout/capitulation detection."""
     px = _to_float(ltp)
     hi = _to_float(high52)
     lo = _to_float(low52)
     if px is None or hi is None or lo is None or hi <= lo:
         return 0, 0, None
+
     pct_from_low = (px - lo) / (hi - lo)
-    if pct_from_low <= 0.15:
+    vol = _to_float(turnover)
+    has_volume = vol is not None and vol > 5_000_000
+
+    if pct_from_low >= 0.98:
+        if has_volume:
+            return 2, 0, f"52w high breakout on volume (Rs {vol/1e6:.1f}M)"
+        return 1, 0, "52w high breakout (momentum)"
+
+    if pct_from_low <= 0.02:
+        if has_volume:
+            return 2, 0, f"At 52w low with volume (Rs {vol/1e6:.1f}M) — capitulation buy?"
+        return 1, 0, "At 52w low (potential capitulation/value)"
+
+    if pct_from_low <= 0.20:
         return 1, 0, f"Near 52w low ({pct_from_low:.0%} of range)"
-    if pct_from_low >= 0.90:
+    if pct_from_low >= 0.85:
         return 0, 1, f"Near 52w high ({pct_from_low:.0%} of range)"
     return 0, 0, None
 
@@ -151,6 +167,63 @@ def _vwap_vote(ltp: Any, vwap: Any) -> tuple[int, int, str | None]:
     return 0, 0, None
 
 
+def _liquidity_vote(
+    turnover: Any, transactions: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 1: Turnover + transaction count as liquidity/interest proxy."""
+    to = _to_float(turnover)
+    tx = _to_float(transactions)
+    if to is None and tx is None:
+        return 0, 0, None
+
+    if to is not None and to < 500_000:
+        return 0, 1, f"Low turnover Rs {to/1e6:.2f}M (illiquid)"
+    if tx is not None and tx < 50:
+        return 0, 1, f"Only {int(tx)} transactions (illiquid)"
+
+    if to is not None and to > 10_000_000 and tx is not None and tx > 500:
+        return 1, 0, f"High activity: Rs {to/1e6:.1f}M, {int(tx)} txns"
+    return 0, 0, None
+
+
+def _ma_convergence_vote(
+    ltp: Any, ma120: Any, ma180: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 1: 120d/180d MA convergence — potential crossover signal."""
+    px = _to_float(ltp)
+    m120 = _to_float(ma120)
+    m180 = _to_float(ma180)
+    if px is None or m120 is None or m180 is None or m180 == 0:
+        return 0, 0, None
+
+    gap_pct = abs(m120 - m180) / m180 * 100
+    if gap_pct > 2:
+        return 0, 0, None
+
+    if px > m120 and px > m180:
+        return 1, 0, f"MAs converging ({gap_pct:.1f}% gap), price above — golden cross setup"
+    if px < m120 and px < m180:
+        return 0, 1, f"MAs converging ({gap_pct:.1f}% gap), price below — death cross risk"
+    return 0, 0, None
+
+
+def _range_confirmation_vote(
+    close: Any, open_price: Any, range_pct: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 1: Wide intraday range + directional close = conviction."""
+    cl = _to_float(close)
+    op = _to_float(open_price)
+    rp = _to_float(range_pct)
+    if cl is None or op is None or rp is None:
+        return 0, 0, None
+
+    if rp > 3 and cl > op:
+        return 1, 0, f"Wide range ({rp:.1f}%) bullish bar"
+    if rp > 3 and cl < op:
+        return 0, 1, f"Wide range ({rp:.1f}%) bearish bar"
+    return 0, 0, None
+
+
 # ---------------------------------------------------------------------------
 # Fundamental votes — from nepsetrading recent-report + stocks-listed
 # ---------------------------------------------------------------------------
@@ -163,6 +236,27 @@ def _eps_qoq_vote(q1: Any, q2: Any) -> tuple[int, int, str | None]:
         return 1, 0, "EPS QoQ improving"
     if a1 < a2:
         return 0, 1, "EPS QoQ weakening"
+    return 0, 0, None
+
+
+def _dividend_yield_vote(
+    ltp: Any, dpps: Any, eps: Any,
+) -> tuple[int, int, str | None]:
+    """Weight 1: Dividend yield — NEPSE investors love dividends."""
+    px = _to_float(ltp)
+    dps = _to_float(dpps)
+    if px is None or dps is None or px <= 0:
+        return 0, 0, None
+
+    dy = dps / px * 100
+    if dy > 4:
+        return 1, 0, f"Dividend yield {dy:.1f}% (attractive)"
+    if dy >= 2:
+        return 1, 0, f"Dividend yield {dy:.1f}%"
+
+    eps_val = _to_float(eps)
+    if dps == 0 and eps_val is not None and eps_val > 0:
+        return 0, 1, "No dividend despite positive EPS"
     return 0, 0, None
 
 
@@ -213,6 +307,14 @@ def _fundamental_votes(stock: dict[str, Any], sector: str) -> tuple[int, int, li
     if er:
         reasons.append(er)
 
+    db, ds, dr = _dividend_yield_vote(
+        stock.get("ltp"), stock.get("dpps"), stock.get("eps"),
+    )
+    b += db
+    s += ds
+    if dr:
+        reasons.append(dr)
+
     if sector in BANK_LIKE_SECTORS:
         roe = _to_float(stock.get("roe_ttm")) or _to_float(stock.get("return_on_equity"))
         if roe is None:
@@ -245,9 +347,12 @@ def _technical_votes(stock: dict[str, Any]) -> tuple[int, int, list[str]]:
 
     for fn, args in (
         (_ma_position_vote, (ltp, stock.get("ma120"), stock.get("ma180"))),
-        (_week52_vote, (ltp, stock.get("week_52_high"), stock.get("week_52_low"))),
+        (_week52_vote, (ltp, stock.get("week_52_high"), stock.get("week_52_low"), stock.get("turnover"))),
         (_daily_momentum_vote, (stock.get("close"), stock.get("prev_close"), stock.get("open"))),
         (_vwap_vote, (ltp, stock.get("vwap"))),
+        (_liquidity_vote, (stock.get("turnover"), stock.get("transactions"))),
+        (_ma_convergence_vote, (ltp, stock.get("ma120"), stock.get("ma180"))),
+        (_range_confirmation_vote, (stock.get("close"), stock.get("open"), stock.get("range_pct"))),
     ):
         bb, ss, r = fn(*args)
         b += bb
@@ -267,13 +372,13 @@ def classify_nepse_signal(stock: dict[str, Any], sector: str) -> dict[str, Any]:
     reasons = fr + tr
 
     margin = 3
-    if buy_score >= 5 and buy_score >= sell_score + margin:
+    if buy_score >= 6 and buy_score >= sell_score + margin:
         verdict = "BUY"
-    elif sell_score >= 5 and sell_score >= buy_score + margin:
+    elif sell_score >= 6 and sell_score >= buy_score + margin:
         verdict = "SELL"
-    elif buy_score >= 3 and buy_score > sell_score:
+    elif buy_score >= 4 and buy_score > sell_score:
         verdict = "LEAN_BUY"
-    elif sell_score >= 3 and sell_score > buy_score:
+    elif sell_score >= 4 and sell_score > buy_score:
         verdict = "LEAN_SELL"
     else:
         verdict = "HOLD"
