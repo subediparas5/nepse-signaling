@@ -70,29 +70,26 @@ LLM_FIELDS = [
 ]
 
 SYSTEM_PROMPT = """\
-You are an expert Nepal stock market analyst. You receive two groups of NEPSE stocks:
+You are an expert Nepal stock market analyst. You receive the top BUY candidates \
+from NEPSE that passed a strict rule-based screen.
 
-**STRONG signals** (BUY/SELL) — high-conviction picks from the rule engine.
-**LEAN signals** (LEAN_BUY/LEAN_SELL) — weaker/mixed signals worth a second look.
-
-For each stock you get: signal_verdict, buy/sell scores, reasons, P/E, P/B, ROE, \
-NPL, EPS, promoter %, 52-week range, momentum, volume, market sentiment, etc.
+For each stock you get: buy/sell scores, reasons, P/E, P/B, ROE, NPL, EPS, \
+promoter %, 52-week range, momentum, volume, market sentiment, etc.
 
 Your job:
-1. For STRONG BUY — confirm or downgrade to HOLD. Red flags: negative EPS, \
-high NPL (>5%), weak momentum, low promoter (<25%), near 52w high.
-2. For STRONG SELL — confirm or upgrade to HOLD. Look for contrarian value: \
-near 52w low + improving EPS + accumulation.
-3. For LEAN signals — promote to BUY/SELL only if the data strongly supports it. \
-Otherwise mark HOLD.
-4. If promoter holding is high (>50%), remind reader to check lock-in expiry.
-5. Never recommend a stock with negative EPS as BUY unless there's a clear \
-turnaround story in the metrics.
+1. Review each candidate and either CONFIRM or REJECT.
+2. REJECT if: negative EPS, NPL > 5%, near 52-week high, low promoter (<25%), \
+or weak/negative momentum.
+3. For confirmed picks, write a short reason a retail trader can act on.
+4. If promoter > 50%, add "check lock-in expiry" to the reason.
+5. Return at most 5 confirmed picks — quality over quantity.
 
-Output format — return ONLY lines in this exact format, nothing else:
-SYMBOL (BUY|SELL|HOLD): <concise 10-20 word reason>
+Output format — return ONLY this, nothing else:
 
-Group BUY first, then SELL, then HOLD. No markdown, no headers, no extra text.\
+SYMBOL | Rs PRICE | reason (15 words max)
+
+One stock per line. No numbering, no markdown, no headers. \
+If no stock passes your review, return exactly: "No strong picks today."\
 """
 
 
@@ -124,9 +121,11 @@ def get_fundamental_lookup() -> dict[str, dict]:
 
 
 def get_stock_info(stock_symbol: str) -> dict:
-    for attempt in range(5):
+    for attempt in range(3):
         try:
             response = NEPSE_TRADING_SESSION.get(STOCK_DETAILS_URL.format(stock_symbol=stock_symbol))
+            if response.status_code == 404:
+                return {}
             response.raise_for_status()
             raw = response.json()
             cleaned: dict = {}
@@ -144,13 +143,13 @@ def get_stock_info(stock_symbol: str) -> dict:
                     cleaned[key] = value
             return cleaned
         except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - Error fetching sidebar for {stock_symbol}: {e}")
-            if attempt == 4:
+            if attempt == 2:
+                logger.warning(f"Skipping {stock_symbol}: {e}")
                 return {}
     return {}
 
 
-def get_classified_stocks() -> list[dict]:
+def get_classified_stocks() -> tuple[list[dict], int]:
     listed_stocks = get_listed_stocks_with_sector()
     fund_lookup = get_fundamental_lookup()
     all_stocks: list[dict] = []
@@ -163,34 +162,35 @@ def get_classified_stocks() -> list[dict]:
         if sector not in TRADABLE_SECTORS:
             continue
 
-        sidebar = get_stock_info(symbol)
-        if not sidebar:
-            continue
+        data: dict = get_stock_info(symbol)
 
         fund_row = fund_lookup.get(symbol, {})
         for k, v in fund_row.items():
-            if k not in sidebar:
-                sidebar[k] = v
+            if k not in data:
+                data[k] = v
 
-        sidebar["sector"] = sector
-        sidebar["promoter_percentage"] = stock.get("promoter_percentage")
-        sidebar["public_percentage"] = stock.get("public_percentage")
+        if not data:
+            continue
 
-        sidebar.update(classify_nepse_signal(sidebar, sector))
-        all_stocks.append(sidebar)
+        data["sector"] = sector
+        data["symbol"] = data.get("symbol", symbol)
+        data["promoter_percentage"] = stock.get("promoter_percentage")
+        data["public_percentage"] = stock.get("public_percentage")
+        data["latesttransactionprice"] = data.get(
+            "latesttransactionprice", stock.get("latesttransactionprice")
+        )
 
-    strong = [s for s in all_stocks if s.get("signal_verdict") in ("BUY", "SELL")]
-    lean = [s for s in all_stocks if s.get("signal_verdict") in ("LEAN_BUY", "LEAN_SELL")]
-    lean.sort(
-        key=lambda s: abs(s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0)),
-        reverse=True,
-    )
-    lean = lean[:30]
-    logger.info(
-        f"Classified {len(all_stocks)} stocks -> "
-        f"{len(strong)} strong + {len(lean)} lean candidates"
-    )
-    return strong, lean
+        data.update(classify_nepse_signal(data, sector))
+        all_stocks.append(data)
+
+    buys = [
+        s for s in all_stocks
+        if s.get("signal_verdict") == "BUY"
+    ]
+    buys.sort(key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0), reverse=True)
+    buys = buys[:10]
+    logger.info(f"Classified {len(all_stocks)} stocks -> {len(buys)} top BUY candidates")
+    return buys, len(all_stocks)
 
 
 def compact_for_llm(candidates: list[dict]) -> list[dict]:
@@ -200,15 +200,11 @@ def compact_for_llm(candidates: list[dict]) -> list[dict]:
     ]
 
 
-def get_llm_reasons(strong: list[dict], lean: list[dict]) -> str:
+def get_llm_picks(candidates: list[dict]) -> str:
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
-    payload = {
-        "strong_signals": compact_for_llm(strong),
-        "lean_signals": compact_for_llm(lean),
-    }
+    payload = compact_for_llm(candidates)
     user_content = json.dumps(payload, default=str)
-    total = len(strong) + len(lean)
-    logger.info(f"Sending {total} stocks to DeepSeek ({len(strong)} strong + {len(lean)} lean)")
+    logger.info(f"Sending {len(payload)} BUY candidates to DeepSeek")
 
     response = client.chat.completions.create(
         model="deepseek-reasoner",
@@ -220,11 +216,70 @@ def get_llm_reasons(strong: list[dict], lean: list[dict]) -> str:
     return response.choices[0].message.content
 
 
-def format_telegram_message(llm_output: str, n_candidates: int) -> str:
+def _npt_now() -> str:
     npt = timezone(timedelta(hours=5, minutes=45))
-    now = datetime.now(npt).strftime("%Y-%m-%d %H:%M NPT")
-    header = f"*NEPSE Signal Report — {now}*\n_{n_candidates} stocks screened_\n\n"
-    return header + llm_output
+    return datetime.now(npt).strftime("%Y-%m-%d %H:%M NPT")
+
+
+def format_top_picks_message(llm_output: str, n_screened: int) -> str:
+    lines = [
+        f"🔥 *Top NEPSE Picks — {_npt_now()}*",
+        f"_{n_screened} stocks screened_",
+        "",
+    ]
+
+    picks = [l.strip() for l in llm_output.strip().splitlines() if l.strip()]
+    if picks and picks[0].lower().startswith("no strong"):
+        lines.append("No strong picks today.")
+    else:
+        for p in picks:
+            parts = [x.strip() for x in p.split("|", 2)]
+            if len(parts) == 3:
+                sym, price, reason = parts
+                lines.append(f"✅ *{sym}* — {price}")
+                lines.append(f"    _{reason}_")
+                lines.append("")
+            else:
+                lines.append(p)
+
+    lines.append("_Not financial advice. DYOR._")
+    return "\n".join(lines)
+
+
+def format_all_buys_message(buys: list[dict]) -> str:
+    lines = [
+        f"📊 *All BUY Signals — {_npt_now()}*",
+        "",
+    ]
+    for s in buys:
+        sym = s.get("symbol", "?")
+        price = s.get("latesttransactionprice", "—")
+        pe = s.get("pe")
+        roe = s.get("roe")
+        eps = s.get("eps_ttm")
+        promo = s.get("promoter_percentage")
+        buy_sc = s.get("signal_buy_score", 0)
+        sell_sc = s.get("signal_sell_score", 0)
+        reasons = s.get("signal_reasons", [])
+
+        stats = []
+        if pe is not None:
+            stats.append(f"PE {pe}")
+        if roe is not None:
+            stats.append(f"ROE {roe}%")
+        if eps is not None:
+            stats.append(f"EPS {eps}")
+        if promo is not None:
+            stats.append(f"Promo {promo}%")
+        stats_str = " | ".join(stats) if stats else "—"
+
+        lines.append(f"*{sym}* — Rs {price}  (Score +{buy_sc}/−{sell_sc})")
+        lines.append(f"    {stats_str}")
+        if reasons:
+            lines.append(f"    _{', '.join(reasons[:4])}_")
+        lines.append("")
+
+    return "\n".join(lines)
 
 
 def send_telegram(message: str) -> None:
@@ -248,16 +303,13 @@ def send_telegram(message: str) -> None:
 
 
 if __name__ == "__main__":
-    strong, lean = get_classified_stocks()
+    buys, n_screened = get_classified_stocks()
 
-    if not strong and not lean:
-        msg = "No actionable signals found today."
-        logger.info(msg)
-        send_telegram(msg)
+    if not buys:
+        send_telegram("No strong BUY signals found today.")
     else:
-        llm_output = get_llm_reasons(strong, lean)
+        llm_output = get_llm_picks(buys)
         logger.info(f"LLM output:\n{llm_output}")
 
-        total = len(strong) + len(lean)
-        tg_msg = format_telegram_message(llm_output, total)
-        send_telegram(tg_msg)
+        send_telegram(format_top_picks_message(llm_output, n_screened))
+        send_telegram(format_all_buys_message(buys))

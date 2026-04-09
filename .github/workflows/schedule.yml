@@ -8,19 +8,12 @@ on:
 jobs:
   signal:
     runs-on: ubuntu-latest
+    container: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
     environment: Prod
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-
-      - name: Install uv
-        run: pip install uv
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: uv sync
