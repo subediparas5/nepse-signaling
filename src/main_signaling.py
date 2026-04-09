@@ -28,7 +28,7 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
     "Accept": "application/json, text/plain, */*",
     "Accept-Language": "en",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Encoding": "gzip, deflate",
     "Origin": "https://www.nepsetrading.com",
     "Connection": "keep-alive",
     "Referer": "https://www.nepsetrading.com/",
