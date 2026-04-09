@@ -1,9 +1,18 @@
+import json
 import os
+import sys
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
+
 import requests
-import pandas as pd
 from openai import OpenAI
+
+_SRC_DIR = Path(__file__).resolve().parent
+if str(_SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SRC_DIR))
+
+from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,6 +20,9 @@ logger = logging.getLogger(__name__)
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
 if not OPEN_AI_API_KEY:
     raise ValueError("OPEN_AI_API_KEY environment variable is not set.")
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
@@ -34,68 +46,56 @@ STOCK_DETAILS_URL = "https://api.nepsetrading.com/sidebar?code={stock_symbol}"
 SECTOR_DETAILS_BASE_URL = "https://api.nepsetrading.com/stocks-listed"
 FUNDAMENTAL_DETAILS_URL = "https://api.nepsetrading.com/recent-report?"
 
-unnecessary_metrics = [
-    "share_float",  # Not directly relevant for fundamental/technical analysis
-    "latesttransactionprice",  # Redundant with LTP
-    # "volume",  # Already covered by avg_volume_3_days
-    "beta_yearly",  # Not a priority for low-cap stock selection
-    "support_zone_lower",  # Technical analysis can be derived from other indicators
-    "support_zone_upper",  # Technical analysis can be derived from other indicators
-    "resistance_zone_lower",  # Technical analysis can be derived from other indicators
-    "resistance_zone_upper",  # Technical analysis can be derived from other indicators
-    "macd_signal",  # Covered by technical_rating
-    "rsi_signal",  # Covered by technical_rating
-    "bb_signal",  # Covered by technical_rating
-    "fib_signal",  # Covered by technical_rating
-    "fib_range",  # Covered by technical_rating
-    "supertrend_signal",  # Covered by technical_rating
-    "ema_signal",  # Covered by technical_rating
-    "sar_signal",  # Covered by technical_rating
-    "market_trend",  # Covered by market_sentiment
-    "trade_signal",  # Covered by technical_rating
-    "market_sentiment",  # Redundant with other sentiment indicators
-    "ma_signal",  # Covered by technical_rating
-    "trend_confirmation",  # Covered by technical_rating
-    "obv_price_divergence",  # Covered by technical_rating
-    "obv_breakout",  # Covered by technical_rating
-    "daily_volatility_rs",  # Not a priority for low-cap stock selection
-    "weekly_volatility_rs",  # Not a priority for low-cap stock selection
-    "monthly_volatility_rs",  # Not a priority for low-cap stock selection
-    "avg_volume_3_days",  # Redundant with volume
-    "week_52_high",  # Not directly relevant for analysis
-    "week_52_low",  # Not directly relevant for analysis
-    "divident_yeild",  # Typo, and not a priority for low-cap stocks
-    "eps",  # Redundant with eps_ttm
-    # "bv",  # Redundant with other metrics
-    "dpps",  # Not directly relevant for analysis
-    # "npl",  # Not directly relevant for analysis
-    "ltp",  # Redundant with latesttransactionprice
+UNNECESSARY_SIDEBAR_KEYS = frozenset({
+    "bb_signal", "fib_signal", "fib_range",
+    "ema_signal", "sar_signal",
+    "trade_signal", "trend_confirmation", "obv_breakout",
+    "daily_volatility_rs", "weekly_volatility_rs", "monthly_volatility_rs",
+    "avg_volume_3_days",
+    "eps", "dpps", "ltp",
+})
+
+LLM_FIELDS = [
+    "symbol", "sector", "latesttransactionprice",
+    "signal_verdict", "signal_buy_score", "signal_sell_score", "signal_reasons",
+    "pe", "pb", "roe", "npl", "eps_ttm",
+    "promoter_percentage", "share_float",
+    "week_52_high", "week_52_low",
+    "one_month_perf", "three_month_perf",
+    "technical_rating", "supertrend_signal",
+    "market_sentiment", "market_trend",
+    "obv_price_divergence", "divident_yeild",
+    "beta_yearly",
+    "volume", "avg_volume_30_days",
 ]
 
-def shorten_value(value: str) -> str:
-    if "Below" in value:
-        value = value.replace("Below", "<")
-    elif "Above" in value:
-        value = value.replace("Above", ">")
-    elif "Neutral" in value:
-        value = value.replace("Neutral", "-")
-    elif "Strong" in value:
-        value = value.replace("Strong", "S")
-    elif "No Breakout" == value:
-        value = value.replace("No Breakout", "NO")
-    elif "Confirmed" == value:
-        value = value.replace("Confirmed", "CONF")
-    if "Bearish" in value:
-        value = value.replace("Bearish", "BEAR")
-    elif "Bullish" in value:
-        value = value.replace("Bullish", "BULL")
-    if "Sell" in value:
-        value = value.replace("Sell", "SL")
-    elif "Buy" in value:
-        value = value.replace("Buy", "BY")
-    return value
+SYSTEM_PROMPT = """\
+You are an expert Nepal stock market analyst. You receive two groups of NEPSE stocks:
 
-# Functions
+**STRONG signals** (BUY/SELL) — high-conviction picks from the rule engine.
+**LEAN signals** (LEAN_BUY/LEAN_SELL) — weaker/mixed signals worth a second look.
+
+For each stock you get: signal_verdict, buy/sell scores, reasons, P/E, P/B, ROE, \
+NPL, EPS, promoter %, 52-week range, momentum, volume, market sentiment, etc.
+
+Your job:
+1. For STRONG BUY — confirm or downgrade to HOLD. Red flags: negative EPS, \
+high NPL (>5%), weak momentum, low promoter (<25%), near 52w high.
+2. For STRONG SELL — confirm or upgrade to HOLD. Look for contrarian value: \
+near 52w low + improving EPS + accumulation.
+3. For LEAN signals — promote to BUY/SELL only if the data strongly supports it. \
+Otherwise mark HOLD.
+4. If promoter holding is high (>50%), remind reader to check lock-in expiry.
+5. Never recommend a stock with negative EPS as BUY unless there's a clear \
+turnaround story in the metrics.
+
+Output format — return ONLY lines in this exact format, nothing else:
+SYMBOL (BUY|SELL|HOLD): <concise 10-20 word reason>
+
+Group BUY first, then SELL, then HOLD. No markdown, no headers, no extra text.\
+"""
+
+
 def get_listed_stocks_with_sector() -> list:
     for attempt in range(5):
         try:
@@ -103,166 +103,161 @@ def get_listed_stocks_with_sector() -> list:
             response.raise_for_status()
             return response.json().get("data", [])
         except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - Error fetching stock info: {str(e)}")
-            logger.error(f"Response: {response.text if 'response' in locals() else 'No response'}")
+            logger.error(f"Attempt {attempt + 1} - Error fetching stock info: {e}")
     return []
 
-def get_fundamental_details() -> list:
+
+def get_fundamental_lookup() -> dict[str, dict]:
     for attempt in range(5):
         try:
             response = NEPSE_TRADING_SESSION.get(FUNDAMENTAL_DETAILS_URL)
             response.raise_for_status()
-            return response.json()
+            rows = response.json()
+            return {
+                row["symbol"].strip(): row
+                for row in rows
+                if row.get("symbol")
+            }
         except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - Error fetching fundamental data: {str(e)}")
-            logger.error(f"Response: {response.text if 'response' in locals() else 'No response'}")
-    return []
+            logger.error(f"Attempt {attempt + 1} - Error fetching fundamental data: {e}")
+    return {}
+
 
 def get_stock_info(stock_symbol: str) -> dict:
     for attempt in range(5):
         try:
             response = NEPSE_TRADING_SESSION.get(STOCK_DETAILS_URL.format(stock_symbol=stock_symbol))
             response.raise_for_status()
-            response_json = response.json()
-
-            new_dict = {}
-            for key, value in response_json.items():
-                if key in unnecessary_metrics:
+            raw = response.json()
+            cleaned: dict = {}
+            for key, value in raw.items():
+                if key in UNNECESSARY_SIDEBAR_KEYS:
                     continue
                 if isinstance(value, float):
-                    new_dict[key] = round(value, 2)
+                    cleaned[key] = round(value, 2)
                 elif isinstance(value, str):
                     try:
-                        new_dict[key] = round(float(value), 2)
-                    except:
-                        new_dict[key] = shorten_value(value)
+                        cleaned[key] = round(float(value), 2)
+                    except ValueError:
+                        cleaned[key] = value
                 else:
-                    new_dict[key] = value
-            return new_dict
+                    cleaned[key] = value
+            return cleaned
         except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - Error fetching stock info, {stock_symbol}: {str(e)}")
+            logger.error(f"Attempt {attempt + 1} - Error fetching sidebar for {stock_symbol}: {e}")
             if attempt == 4:
                 return {}
+    return {}
 
-def join_fundamental_and_technical_data():
-    fundamental_data = get_fundamental_details()
-    combined_data = []
 
-    for stock in fundamental_data:
-        stock_symbol = stock.get("symbol")
-        if not stock_symbol:
-            continue
-
-        stock_details = get_stock_info(stock_symbol)
-        if not stock_details:
-            continue
-
-        # Merge fundamental and technical data
-        for key, value in stock.items():
-            if key not in stock_details:
-                stock_details[key] = value
-
-        combined_data.append(stock_details)
-
-    return combined_data
-
-def get_sector_wise_stocks():
-    sector_wise_stocks = {}
+def get_classified_stocks() -> list[dict]:
     listed_stocks = get_listed_stocks_with_sector()
-    combined_data = join_fundamental_and_technical_data()
+    fund_lookup = get_fundamental_lookup()
+    all_stocks: list[dict] = []
 
     for stock in listed_stocks:
         sector = stock.get("sector")
-        if not sector:
-            logger.info(f"Skipping {stock['code']}")
+        symbol = stock.get("symbol")
+        if not sector or not symbol:
+            continue
+        if sector not in TRADABLE_SECTORS:
             continue
 
-        symbol_details = get_stock_info(stock["symbol"])
-        if not symbol_details:
+        sidebar = get_stock_info(symbol)
+        if not sidebar:
             continue
 
-        # Merge with fundamental data
-        for combined_stock in combined_data:
-            if combined_stock.get("symbol") == stock["symbol"]:
-                for key, value in combined_stock.items():
-                    if key not in symbol_details:
-                        symbol_details[key] = value
+        fund_row = fund_lookup.get(symbol, {})
+        for k, v in fund_row.items():
+            if k not in sidebar:
+                sidebar[k] = v
 
-        if sector not in sector_wise_stocks:
-            sector_wise_stocks[sector] = []
-        sector_wise_stocks[sector].append(symbol_details)
+        sidebar["sector"] = sector
+        sidebar["promoter_percentage"] = stock.get("promoter_percentage")
+        sidebar["public_percentage"] = stock.get("public_percentage")
 
-    return sector_wise_stocks
+        sidebar.update(classify_nepse_signal(sidebar, sector))
+        all_stocks.append(sidebar)
 
-def analyze_sector_wise_stocks(stocks):
-    return "Analysis not implemented yet."
+    strong = [s for s in all_stocks if s.get("signal_verdict") in ("BUY", "SELL")]
+    lean = [s for s in all_stocks if s.get("signal_verdict") in ("LEAN_BUY", "LEAN_SELL")]
+    lean.sort(
+        key=lambda s: abs(s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0)),
+        reverse=True,
+    )
+    lean = lean[:30]
+    logger.info(
+        f"Classified {len(all_stocks)} stocks -> "
+        f"{len(strong)} strong + {len(lean)} lean candidates"
+    )
+    return strong, lean
+
+
+def compact_for_llm(candidates: list[dict]) -> list[dict]:
+    return [
+        {k: s.get(k) for k in LLM_FIELDS if s.get(k) is not None}
+        for s in candidates
+    ]
+
+
+def get_llm_reasons(strong: list[dict], lean: list[dict]) -> str:
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
+    payload = {
+        "strong_signals": compact_for_llm(strong),
+        "lean_signals": compact_for_llm(lean),
+    }
+    user_content = json.dumps(payload, default=str)
+    total = len(strong) + len(lean)
+    logger.info(f"Sending {total} stocks to DeepSeek ({len(strong)} strong + {len(lean)} lean)")
 
     response = client.chat.completions.create(
-        model="deepseek-reasoning",
+        model="deepseek-reasoner",
         messages=[
-            {
-                "role": "system",
-                "content": """
-                    You are an expert stock analyst specializing in identifying undervalued, low market capitalization stocks with strong growth potential. Your task is to analyze the provided list of stocks and recommend the best stocks to buy based on the following criteria:
-
-                    **1. Fundamental Analysis**:
-                    - **Promoter Holding**: Prefer stocks with high promoter holding (>50%), indicating strong insider confidence.
-                    - **Institutional Interest**: Look for significant FII/DII holding (>3.5%), signaling institutional trust.
-                    - **Profitability**: Prioritize stocks with positive Return on Equity (ROE) and Return on Assets (ROA).
-                    - **Valuation**: Favor stocks with a reasonable Price-to-Earnings (P/E) ratio relative to their sector.
-
-                    **2. Technical Analysis**:
-                    - **Trend Indicators**: Use Supertrend, EMA, MACD, RSI, and Bollinger Bands to identify bullish trends.
-                    - **Support/Resistance**: Focus on stocks trading near support zones or breaking out of resistance zones.
-                    - **Avoid Sell Signals**: Exclude stocks with strong sell signals unless there is a compelling contrarian opportunity.
-
-                    **3. Market Sentiment**:
-                    - **Recent Performance**: Favor stocks with positive one-month and three-month returns.
-                    - **Market Sentiment**: Consider overall market conditions (bullish/bearish) and their impact on the stock.
-
-                    **4. Low Market Cap**:
-                    - **Market Capitalization**: Prioritize stocks with a market capitalization below NRs 200,000,000.
-
-                    **Output Format**:
-                    For each recommended stock, provide the following details in JSON format:
-                    - "symbol": Stock symbol.
-                    - "name": Company name.
-                    - "market_cap": Market capitalization.
-                    - "fii_dii_holding": Percentage of institutional holding.
-                    - "pe_ratio": Price-to-Earnings ratio.
-                    - "roe": Return on Equity (TTM).
-                    - "technical_rating": Overall technical rating (e.g., Buy, Neutral, Sell).
-                    - "buy_reason": A concise explanation of why this stock is recommended.
-
-                    Return the results as a JSON array of recommended stocks.
-                """,
-            },
-            {"role": "user", "content": f"{stocks}"},
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_content},
         ],
-        stream=False,
     )
     return response.choices[0].message.content
 
-def convert_to_csv(overall_file_name, is_first, sector, stocks):
-    sector_file_path = os.path.join("data", f"{sector}.csv")
-    pd.DataFrame(stocks).to_csv(sector_file_path, index=False)
 
-    mode = 'w' if is_first else 'a'
-    header = is_first
-    pd.DataFrame(stocks).to_csv(overall_file_name, mode=mode, header=header, index=False)
+def format_telegram_message(llm_output: str, n_candidates: int) -> str:
+    npt = timezone(timedelta(hours=5, minutes=45))
+    now = datetime.now(npt).strftime("%Y-%m-%d %H:%M NPT")
+    header = f"*NEPSE Signal Report — {now}*\n_{n_candidates} stocks screened_\n\n"
+    return header + llm_output
+
+
+def send_telegram(message: str) -> None:
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        logger.warning("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set — skipping")
+        return
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    max_len = 4096
+    chunks = [message[i:i + max_len] for i in range(0, len(message), max_len)]
+    for chunk in chunks:
+        resp = requests.post(url, json={
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": chunk,
+            "parse_mode": "Markdown",
+        })
+        if not resp.ok:
+            logger.error(f"Telegram send failed: {resp.status_code} {resp.text}")
+        else:
+            logger.info("Telegram message sent")
+
 
 if __name__ == "__main__":
-    stocks = get_sector_wise_stocks()
-    output_dir = os.path.join("data", datetime.now().isoformat())
-    os.makedirs(output_dir, exist_ok=True)
-    overall_file_name = os.path.join(output_dir, "overall.csv")
+    strong, lean = get_classified_stocks()
 
-    is_first = True
-    for sector, sector_stocks in stocks.items():
-        convert_to_csv(overall_file_name, is_first, sector, sector_stocks)
-        is_first = False
+    if not strong and not lean:
+        msg = "No actionable signals found today."
+        logger.info(msg)
+        send_telegram(msg)
+    else:
+        llm_output = get_llm_reasons(strong, lean)
+        logger.info(f"LLM output:\n{llm_output}")
 
-    # Analyze stocks using OpenAI
-    analysis_result = analyze_sector_wise_stocks(stocks)
-    logger.info(f"Analysis Result: {analysis_result}")
+        total = len(strong) + len(lean)
+        tg_msg = format_telegram_message(llm_output, total)
+        send_telegram(tg_msg)

@@ -1,22 +1,19 @@
-name: Run Python Script and Commit Changes
+name: NEPSE Daily Signal
 
 on:
   schedule:
-    - cron: "30 09 * * *"
+    - cron: "15 3 * * 1-5"
+  workflow_dispatch:
 
 jobs:
-  run-and-commit:
+  signal:
     runs-on: ubuntu-latest
     environment: Prod
 
     steps:
-      # Check out the repository.
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          persist-credentials: false
 
-      # Set up Python.
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -25,23 +22,12 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name: Install dependencies with uv
+      - name: Install dependencies
         run: uv sync
 
-      - name: Run Python script
+      - name: Run signal pipeline
         run: uv run src/main_signaling.py
         env:
           OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
-
-      - name: Commit changes
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .
-          git commit -m "Update analyzed data on sheet via GitHub Actions"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.PAT_TOKEN }}
-          branch: master
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
