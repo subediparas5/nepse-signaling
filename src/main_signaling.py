@@ -317,10 +317,23 @@ def _npt_now() -> str:
     return datetime.now(npt).strftime("%Y-%m-%d %H:%M NPT")
 
 
-def format_top_picks_message(llm_output: str, n_screened: int) -> str:
+def _fmt_num(val, decimals=1) -> str:
+    if val is None:
+        return "—"
+    try:
+        return f"{float(val):.{decimals}f}"
+    except (ValueError, TypeError):
+        return str(val)
+
+
+def format_buy_message(
+    llm_output: str, buys: list[dict], n_screened: int,
+) -> str:
     lines = [
-        f"🔥 *Top NEPSE Picks — {_npt_now()}*",
+        f"🔥 *NEPSE BUY Signals — {_npt_now()}*",
         f"_{n_screened} stocks screened_",
+        "",
+        "━━━  *TOP PICKS*  ━━━",
         "",
     ]
 
@@ -333,78 +346,50 @@ def format_top_picks_message(llm_output: str, n_screened: int) -> str:
             if len(parts) == 3:
                 sym, price, reason = parts
                 lines.append(f"✅ *{sym}* — {price}")
-                lines.append(f"    _{reason}_")
-                lines.append("")
+                lines.append(f"     _{reason}_")
             else:
                 lines.append(p)
 
-    lines.append("_Not financial advice. DYOR._")
-    return "\n".join(lines)
+    lines += ["", "━━━  *ALL BUY CANDIDATES*  ━━━", ""]
 
-
-def _fmt_num(val, decimals=1) -> str:
-    """Safely format a number, handling raw API floats."""
-    if val is None:
-        return "—"
-    try:
-        return f"{float(val):.{decimals}f}"
-    except (ValueError, TypeError):
-        return str(val)
-
-
-def _format_stock_block(s: dict) -> list[str]:
-    sym = s.get("symbol", "?")
-    price = _fmt_num(s.get("ltp"), 1)
-    pe = s.get("pe")
-    roe = s.get("roe")
-    eps = s.get("eps_ttm")
-    promo = s.get("promoter_percentage")
-    dy = s.get("dividend_yield")
-    mcap = s.get("market_cap_category")
-    buy_sc = s.get("signal_buy_score", 0)
-    sell_sc = s.get("signal_sell_score", 0)
-    conf = s.get("signal_confidence", 0)
-    reasons = s.get("signal_reasons", "")
-
-    stats = []
-    if pe is not None:
-        stats.append(f"PE {_fmt_num(pe)}")
-    if roe is not None:
-        stats.append(f"ROE {_fmt_num(roe)}%")
-    if eps is not None:
-        stats.append(f"EPS {_fmt_num(eps, 2)}")
-    if promo is not None:
-        stats.append(f"Promo {_fmt_num(promo, 0)}%")
-    if dy is not None and dy > 0:
-        stats.append(f"DY {dy:.1f}%")
-    stats_str = " | ".join(stats) if stats else "—"
-
-    cap_tag = f" [{mcap}]" if mcap else ""
-    lines = [
-        f"*{sym}*{cap_tag} — Rs {price}  (+{buy_sc}/−{sell_sc}, {conf}% conf)",
-        f"    {stats_str}",
-    ]
-    if reasons:
-        top_reasons = reasons.split(" | ")[:5]
-        lines.append(f"    _{', '.join(top_reasons)}_")
-    lines.append("")
-    return lines
-
-
-def format_all_buys_message(buys: list[dict]) -> str:
-    lines = [f"📊 *All BUY Signals — {_npt_now()}*", ""]
     for s in buys:
-        lines.extend(_format_stock_block(s))
-    return "\n".join(lines)
+        sym = s.get("symbol", "?")
+        price = _fmt_num(s.get("ltp"), 1)
+        sector = s.get("sector", "")
+        mcap = s.get("market_cap_category")
+        conf = s.get("signal_confidence", 0)
 
+        pe = s.get("pe")
+        eps = s.get("eps_ttm") or s.get("eps")
+        promo = s.get("promoter_percentage")
+        dy = s.get("dividend_yield")
+        roe = s.get("roe")
+        reasons = s.get("signal_reasons", "")
 
-def format_sell_watchlist_message(sells: list[dict]) -> str:
-    if not sells:
-        return ""
-    lines = [f"⚠️ *SELL Watchlist — {_npt_now()}*", ""]
-    for s in sells:
-        lines.extend(_format_stock_block(s))
-    lines.append("_Stocks to avoid or consider exiting._")
+        cap = f" · {mcap} Cap" if mcap else ""
+        lines.append(f"📌 *{sym}* — Rs {price}")
+        lines.append(f"     {sector}{cap} · {conf}% confidence")
+
+        stats = []
+        if pe is not None:
+            stats.append(f"PE {_fmt_num(pe)}")
+        if eps is not None:
+            stats.append(f"EPS {_fmt_num(eps, 2)}")
+        if roe is not None and float(roe) > 0:
+            stats.append(f"ROE {_fmt_num(roe)}%")
+        if promo is not None:
+            stats.append(f"Promo {_fmt_num(promo, 0)}%")
+        if dy is not None and dy > 0:
+            stats.append(f"DY {dy:.1f}%")
+        if stats:
+            lines.append(f"     {' · '.join(stats)}")
+
+        if reasons:
+            for r in reasons.split(" | ")[:5]:
+                lines.append(f"     ▸ {r}")
+        lines.append("")
+
+    lines.append("_Not financial advice. DYOR._")
     return "\n".join(lines)
 
 
@@ -480,13 +465,7 @@ if __name__ == "__main__":
     else:
         llm_output = get_llm_picks(buys)
         logger.info(f"LLM output:\n{llm_output}")
-
-        send_telegram(format_top_picks_message(llm_output, n_screened))
-        send_telegram(format_all_buys_message(buys))
-
-    sell_msg = format_sell_watchlist_message(sells)
-    if sell_msg:
-        send_telegram(sell_msg)
+        send_telegram(format_buy_message(llm_output, buys, n_screened))
 
     low_msg = format_52w_low_alert(near_lows)
     if low_msg:
