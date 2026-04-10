@@ -171,8 +171,25 @@ def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
     return {sec: median(vals) for sec, vals in sector_vals.items() if vals}
 
 
-def get_classified_stocks() -> tuple[list[dict], list[dict], int]:
-    """Returns (top_buys, top_sells, total_screened)."""
+def _near_52w_low(stock: dict) -> bool:
+    """Established stock within bottom 10% of 52-week range, with positive EPS."""
+    try:
+        ltp = float(stock.get("ltp", 0))
+        hi = float(stock.get("week_52_high", 0))
+        lo = float(stock.get("week_52_low", 0))
+        ma120 = float(stock.get("ma120", 0))
+    except (ValueError, TypeError):
+        return False
+    if ma120 == 0 or hi <= lo or ltp <= 0:
+        return False
+    pct_from_low = (ltp - lo) / (hi - lo)
+    eps = stock.get("eps")
+    eps_ok = eps is not None and float(eps) > 0 if eps else False
+    return pct_from_low <= 0.10 and eps_ok
+
+
+def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
+    """Returns (top_buys, top_sells, near_52w_lows, total_screened)."""
     listed_stocks = get_listed_stocks()
     fund_lookup = get_fundamental_lookup()
     ss_data = get_sharesansar_data()
@@ -231,30 +248,45 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], int]:
     sector_medians = _compute_sector_medians(pre_stocks)
 
     all_stocks: list[dict] = []
+    ipo_count = 0
     for data in pre_stocks:
         data["_sector_median_diff"] = sector_medians.get(data["sector"])
         data.update(classify_nepse_signal(data, data["sector"]))
+        if data.get("signal_verdict") == "IPO":
+            ipo_count += 1
         all_stocks.append(data)
 
-    buys = [s for s in all_stocks if s.get("signal_verdict") == "BUY"]
+    established = [s for s in all_stocks if s.get("signal_verdict") != "IPO"]
+
+    buys = [s for s in established if s.get("signal_verdict") == "BUY"]
     buys.sort(
         key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0),
         reverse=True,
     )
     buys = buys[:10]
 
-    sells = [s for s in all_stocks if s.get("signal_verdict") == "SELL"]
+    sells = [s for s in established if s.get("signal_verdict") == "SELL"]
     sells.sort(
         key=lambda s: s.get("signal_sell_score", 0) - s.get("signal_buy_score", 0),
         reverse=True,
     )
     sells = sells[:5]
 
-    logger.info(
-        f"Classified {len(all_stocks)} stocks -> "
-        f"{len(buys)} top BUY, {len(sells)} top SELL"
+    near_lows = [s for s in established if _near_52w_low(s)]
+    near_lows.sort(
+        key=lambda s: (
+            (float(s.get("ltp", 0)) - float(s.get("week_52_low", 0)))
+            / (float(s.get("week_52_high", 1)) - float(s.get("week_52_low", 0)))
+            if float(s.get("week_52_high", 0)) > float(s.get("week_52_low", 0))
+            else 1
+        ),
     )
-    return buys, sells, len(all_stocks)
+
+    logger.info(
+        f"Classified {len(all_stocks)} stocks ({ipo_count} IPO excluded) -> "
+        f"{len(buys)} BUY, {len(sells)} SELL, {len(near_lows)} near 52w low"
+    )
+    return buys, sells, near_lows, len(established)
 
 
 def compact_for_llm(candidates: list[dict]) -> list[dict]:
@@ -376,6 +408,50 @@ def format_sell_watchlist_message(sells: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def format_52w_low_alert(stocks: list[dict]) -> str:
+    if not stocks:
+        return ""
+    lines = [
+        f"📉 *Near 52-Week Lows — {_npt_now()}*",
+        "_Established stocks with positive EPS near yearly lows — potential accumulation_",
+        "",
+    ]
+    for s in stocks:
+        sym = s.get("symbol", "?")
+        price = _fmt_num(s.get("ltp"), 1)
+        lo = _fmt_num(s.get("week_52_low"), 1)
+        hi = _fmt_num(s.get("week_52_high"), 1)
+        pe = s.get("pe")
+        eps = s.get("eps")
+        dy = s.get("dividend_yield")
+        mcap = s.get("market_cap_category")
+        sector = s.get("sector", "")
+
+        try:
+            ltp_f = float(s.get("ltp", 0))
+            lo_f = float(s.get("week_52_low", 0))
+            hi_f = float(s.get("week_52_high", 1))
+            pct = (ltp_f - lo_f) / (hi_f - lo_f) * 100 if hi_f > lo_f else 0
+        except (ValueError, TypeError):
+            pct = 0
+
+        stats = [f"{sector}"]
+        if pe is not None:
+            stats.append(f"PE {_fmt_num(pe)}")
+        if eps is not None:
+            stats.append(f"EPS {_fmt_num(eps, 2)}")
+        if dy is not None and dy > 0:
+            stats.append(f"DY {dy:.1f}%")
+
+        cap_tag = f" [{mcap}]" if mcap else ""
+        lines.append(f"*{sym}*{cap_tag} — Rs {price}  ({pct:.0f}% from 52w low)")
+        lines.append(f"    52w: {lo} — {hi} | {' | '.join(stats)}")
+        lines.append("")
+
+    lines.append("_Watch for accumulation. Not financial advice._")
+    return "\n".join(lines)
+
+
 def send_telegram(message: str) -> None:
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         logger.warning("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set — skipping")
@@ -397,7 +473,7 @@ def send_telegram(message: str) -> None:
 
 
 if __name__ == "__main__":
-    buys, sells, n_screened = get_classified_stocks()
+    buys, sells, near_lows, n_screened = get_classified_stocks()
 
     if not buys:
         send_telegram("No strong BUY signals found today.")
@@ -411,3 +487,7 @@ if __name__ == "__main__":
     sell_msg = format_sell_watchlist_message(sells)
     if sell_msg:
         send_telegram(sell_msg)
+
+    low_msg = format_52w_low_alert(near_lows)
+    if low_msg:
+        send_telegram(low_msg)

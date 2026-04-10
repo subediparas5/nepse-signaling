@@ -104,7 +104,7 @@ def _ma_position_vote(
 def _week52_vote(
     ltp: Any, high52: Any, low52: Any, turnover: Any = None,
 ) -> tuple[int, int, str | None]:
-    """Weight 1-2: 52-week range position with breakout/capitulation detection."""
+    """Weight 1-2: Value-at-lows strategy — NEPSE rewards buying low, not chasing highs."""
     px = _to_float(ltp)
     hi = _to_float(high52)
     lo = _to_float(low52)
@@ -115,20 +115,18 @@ def _week52_vote(
     vol = _to_float(turnover)
     has_volume = vol is not None and vol > 5_000_000
 
+    if pct_from_low <= 0.10:
+        if has_volume:
+            return 2, 0, f"At 52w low ({pct_from_low:.0%}) with volume — accumulation signal"
+        return 2, 0, f"At 52w low ({pct_from_low:.0%} of range — deep value)"
+
+    if pct_from_low <= 0.25:
+        return 1, 0, f"Near 52w low ({pct_from_low:.0%} of range — value zone)"
+
     if pct_from_low >= 0.98:
-        if has_volume:
-            return 2, 0, f"52w high breakout on volume (Rs {vol/1e6:.1f}M)"
-        return 1, 0, "52w high breakout (momentum)"
-
-    if pct_from_low <= 0.02:
-        if has_volume:
-            return 2, 0, f"At 52w low with volume (Rs {vol/1e6:.1f}M) — capitulation buy?"
-        return 1, 0, "At 52w low (potential capitulation/value)"
-
-    if pct_from_low <= 0.20:
-        return 1, 0, f"Near 52w low ({pct_from_low:.0%} of range)"
+        return 0, 2, f"At 52w high ({pct_from_low:.0%} — extreme overextension)"
     if pct_from_low >= 0.85:
-        return 0, 1, f"Near 52w high ({pct_from_low:.0%} of range)"
+        return 0, 1, f"Near 52w high ({pct_from_low:.0%} — overextended)"
     return 0, 0, None
 
 
@@ -397,7 +395,29 @@ def _technical_votes(stock: dict[str, Any]) -> tuple[int, int, list[str]]:
     return b, s, reasons
 
 
+def _is_ipo(stock: dict[str, Any]) -> bool:
+    """IPO/new listing if ShareSansar reports MA120 = 0 (insufficient history)."""
+    ma120 = _to_float(stock.get("ma120"))
+    return ma120 is not None and ma120 == 0
+
+
+_IPO_RESULT: dict[str, Any] = {
+    "signal_verdict": "IPO",
+    "signal_buy_score": 0,
+    "signal_sell_score": 0,
+    "signal_confidence": 0,
+    "signal_fundamental_buy": 0,
+    "signal_fundamental_sell": 0,
+    "signal_technical_buy": 0,
+    "signal_technical_sell": 0,
+    "signal_reasons": "New listing — insufficient history for technical analysis",
+}
+
+
 def classify_nepse_signal(stock: dict[str, Any], sector: str) -> dict[str, Any]:
+    if _is_ipo(stock):
+        return dict(_IPO_RESULT)
+
     fb, fs, fr = _fundamental_votes(stock, sector)
     tb, ts, tr = _technical_votes(stock)
 
