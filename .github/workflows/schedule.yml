@@ -2,7 +2,8 @@ name: NEPSE Daily Signal
 
 on:
   schedule:
-    - cron: "15 3 * * 1-5"
+    - cron: "0 9 * * 1-5"
+      timezone: Asia/Kathmandu
   workflow_dispatch:
 
 jobs:
