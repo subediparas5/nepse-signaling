@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import textwrap
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -296,6 +297,73 @@ def _pct_from_52w_low(s: dict) -> float:
         return 0.0
 
 
+def _llm_mono_rows(raw: str) -> list[str]:
+    """
+    Monospace rows for <pre>: pipe-separated lines become a padded column layout;
+    otherwise long lines are wrapped to fit phones.
+    """
+    lines = raw.splitlines()
+    nonempty = [ln for ln in lines if ln.strip()]
+    if not nonempty:
+        return []
+
+    pipe_lines = [ln for ln in nonempty if "|" in ln]
+    use_table = bool(pipe_lines) and (
+        len(pipe_lines) >= 2
+        or (len(pipe_lines) == 1 and pipe_lines[0].count("|") >= 2)
+        or len(pipe_lines) * 2 >= len(nonempty)
+    )
+
+    if not use_table:
+        width = 44
+        out: list[str] = []
+        for ln in lines:
+            if not ln:
+                out.append("")
+                continue
+            if len(ln) <= width:
+                out.append(ln)
+            else:
+                wrapped = textwrap.wrap(
+                    ln,
+                    width=width,
+                    replace_whitespace=False,
+                    break_long_words=True,
+                )
+                out.extend(wrapped or [ln[:width]])
+        return out
+
+    max_cell = 24
+    max_cols = 8
+    cell_matrix: list[list[str]] = []
+    for ln in lines:
+        if "|" not in ln or not ln.strip():
+            continue
+        cells = [c.strip()[:max_cell] for c in ln.split("|")]
+        cell_matrix.append(cells)
+    ncols = min(max(len(r) for r in cell_matrix), max_cols) if cell_matrix else 1
+    widths = [2] * ncols
+    for r in cell_matrix:
+        for i in range(ncols):
+            cell = r[i] if i < len(r) else ""
+            widths[i] = min(max(widths[i], len(cell)), max_cell)
+
+    out: list[str] = []
+    for ln in lines:
+        if not ln.strip():
+            out.append("")
+            continue
+        if "|" in ln:
+            cells = [c.strip()[:max_cell] for c in ln.split("|")]
+            while len(cells) < ncols:
+                cells.append("")
+            cells = cells[:ncols]
+            out.append(" | ".join(c.ljust(widths[i]) for i, c in enumerate(cells)))
+        else:
+            out.append(ln.rstrip())
+    return out
+
+
 def _mono_block(lines: list[str]) -> str:
     body = "\n".join(html.escape(line, quote=False) for line in lines)
     return f"<pre>{body}</pre>"
@@ -306,7 +374,7 @@ def format_telegram_digest(
     buys: list[dict],
     near_lows: list[dict],
 ) -> str:
-    """Telegram HTML: full LLM prose + strict BUY <pre> table + near-52w-low <pre> table only."""
+    """Telegram HTML: LLM in <pre> (pipe-table or wrapped) + strict BUY + near-52w-low tables."""
     ts = html.escape(_npt_now(), quote=False)
     parts = [f"<b>NEPSE</b> · <code>{ts}</code>", ""]
 
@@ -319,8 +387,7 @@ def format_telegram_digest(
     elif first_nonempty.lower().startswith("no strong"):
         parts.append("<i>No picks.</i>")
     else:
-        for line in lines:
-            parts.append(html.escape(line, quote=False) if line else "")
+        parts.append(_mono_block(_llm_mono_rows(raw)))
 
     parts.extend(["", "<b>Strict BUY</b> ({})".format(len(buys))])
     if buys:
