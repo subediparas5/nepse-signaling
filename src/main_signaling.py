@@ -1,6 +1,6 @@
+import html
 import json
 import os
-import re
 import sys
 import logging
 from datetime import datetime, timezone, timedelta
@@ -13,6 +13,7 @@ _SRC_DIR = Path(__file__).resolve().parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
+from nepse_official import get_official_listed_stocks, get_official_share_price_lookup
 from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal
 
 logging.basicConfig(level=logging.INFO)
@@ -24,20 +25,13 @@ if not OPEN_AI_API_KEY:
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TELEGRAM_DM_CHAT_ID = os.getenv("TELEGRAM_DM_CHAT_ID")
+_raw_send = (os.getenv("TELEGRAM_SEND_TO") or "both").strip().lower()
+TELEGRAM_SEND_TO = _raw_send if _raw_send in ("group", "dm", "both") else "both"
+if _raw_send not in ("group", "dm", "both", ""):
+    logger.warning("Unknown TELEGRAM_SEND_TO=%r; using both.", _raw_send)
 
-NEPSE_TRADING_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Encoding": "gzip, deflate",
-    "Origin": "https://www.nepsetrading.com",
-    "Referer": "https://www.nepsetrading.com/",
-}
-
-NEPSE_TRADING_SESSION = requests.Session()
-NEPSE_TRADING_SESSION.headers.update(NEPSE_TRADING_HEADERS)
-
-STOCKS_LISTED_URL = "https://api.nepsetrading.com/stocks-listed"
-FUNDAMENTALS_URL = "https://api.nepsetrading.com/recent-report?"
+GROUP_BUY_TOP_N = 5
 
 LLM_FIELDS = [
     "symbol", "sector", "market_cap_category", "ltp",
@@ -51,23 +45,18 @@ LLM_FIELDS = [
 ]
 
 SYSTEM_PROMPT = """\
-You are an expert Nepal stock market analyst. You receive the top BUY candidates \
-from NEPSE that passed a strict rule-based screen.
+You are an expert Nepal stock market analyst. You receive BUY candidates from NEPSE \
+that passed a rule-based screen using official exchange price data (no P/E or EPS in the feed).
 
-For each stock you get: buy/sell scores, reasons, P/E, P/B, ROE, NPL, EPS, \
-promoter %, dividend yield, 52-week range, moving averages, volume, turnover, \
-VWAP, and market cap category (Large/Mid/Small).
+For each stock you get: buy/sell scores, reasons, 52-week range, OHLC, VWAP, volume, turnover, \
+and sector. Moving averages may be absent.
 
 Your job:
 1. Review each candidate and either CONFIRM or REJECT.
-2. REJECT if: negative EPS, NPL > 5%, near 52-week high, low promoter (<25%), \
-price well above 120d/180d MA (overextended), or very low turnover (illiquid).
-3. PREFER stocks with: good dividend yield (>2%), high liquidity, MAs converging \
-bullishly, and strong fundamentals.
+2. REJECT if: near 52-week high, very low turnover (illiquid), or price far above VWAP (chase risk).
+3. PREFER stocks with: good liquidity, constructive price vs 52-week range, sensible sector context.
 4. For confirmed picks, write a short reason a retail trader can act on.
-5. If promoter > 50%, add "check lock-in expiry" to the reason.
-6. Factor in market cap: small caps carry higher risk, note if relevant.
-7. Return at most 5 confirmed picks — quality over quantity.
+5. Return at most 5 confirmed picks — quality over quantity.
 
 Output format — return ONLY this, nothing else:
 
@@ -78,87 +67,10 @@ If no stock passes your review, return exactly: "No strong picks today."\
 """
 
 
-def get_listed_stocks() -> list[dict]:
-    """Stock listing with sector codes + promoter % from nepsetrading.com."""
-    for attempt in range(3):
-        try:
-            resp = NEPSE_TRADING_SESSION.get(STOCKS_LISTED_URL)
-            resp.raise_for_status()
-            return resp.json().get("data", [])
-        except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - stocks-listed: {e}")
-    return []
-
-
-def get_fundamental_lookup() -> dict[str, dict]:
-    """Fundamentals (PE, PB, ROE, NPL, EPS) from nepsetrading.com."""
-    for attempt in range(3):
-        try:
-            resp = NEPSE_TRADING_SESSION.get(FUNDAMENTALS_URL)
-            resp.raise_for_status()
-            rows = resp.json()
-            return {
-                row["symbol"].strip(): row
-                for row in rows
-                if row.get("symbol")
-            }
-        except Exception as e:
-            logger.error(f"Attempt {attempt + 1} - fundamentals: {e}")
-    return {}
-
-
-_SS_COL_MAP = {
-    3: "open", 4: "high", 5: "low", 6: "close", 7: "ltp",
-    10: "vwap", 11: "volume", 12: "prev_close",
-    13: "turnover", 14: "transactions",
-    16: "range", 17: "diff_pct", 18: "range_pct",
-    20: "ma120", 21: "ma180",
-    22: "week_52_high", 23: "week_52_low",
-}
-
-
-def get_sharesansar_data() -> dict[str, dict]:
-    """OHLCV + 52-week range + MAs from ShareSansar (single bulk request)."""
-    url = "https://www.sharesansar.com/today-share-price"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0",
-    }
-    try:
-        resp = requests.get(url, headers=headers, timeout=15)
-        resp.raise_for_status()
-        table_m = re.search(
-            r'<table[^>]*id="headFixed"[^>]*>(.*?)</table>', resp.text, re.DOTALL
-        )
-        if not table_m:
-            logger.warning("ShareSansar: table not found")
-            return {}
-        lookup: dict[str, dict] = {}
-        for row in re.findall(r'<tr[^>]*>(.*?)</tr>', table_m.group(1), re.DOTALL):
-            cells = re.findall(r'<td[^>]*>(.*?)</td>', row, re.DOTALL)
-            if len(cells) < 24:
-                continue
-            clean = [re.sub(r'<[^>]+>', '', c).strip().replace(",", "") for c in cells]
-            symbol = clean[1]
-            if not symbol or not symbol[0].isalpha():
-                continue
-            entry: dict = {}
-            for idx, key in _SS_COL_MAP.items():
-                try:
-                    entry[key] = float(clean[idx])
-                except (ValueError, IndexError):
-                    pass
-            lookup[symbol] = entry
-        logger.info(f"ShareSansar: {len(lookup)} stocks")
-        return lookup
-    except Exception as e:
-        logger.warning(f"ShareSansar failed: {e}")
-        return {}
-
-
 def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
     """Compute median diff_pct per sector for relative-strength scoring."""
     from statistics import median
+
     sector_vals: dict[str, list[float]] = {}
     for s in stocks:
         dp = s.get("diff_pct")
@@ -172,31 +84,52 @@ def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
 
 
 def _near_52w_low(stock: dict) -> bool:
-    """Established stock within bottom 10% of 52-week range, with positive EPS."""
+    """Within bottom 10% of 52-week range; skips IPO when MA120 is present and zero."""
     try:
         ltp = float(stock.get("ltp", 0))
         hi = float(stock.get("week_52_high", 0))
         lo = float(stock.get("week_52_low", 0))
-        ma120 = float(stock.get("ma120", 0))
     except (ValueError, TypeError):
         return False
-    if ma120 == 0 or hi <= lo or ltp <= 0:
+    if hi <= lo or ltp <= 0:
         return False
+    ma120 = stock.get("ma120")
+    if ma120 is not None:
+        try:
+            if float(ma120) == 0:
+                return False
+        except (ValueError, TypeError):
+            pass
     pct_from_low = (ltp - lo) / (hi - lo)
-    eps = stock.get("eps")
-    eps_ok = eps is not None and float(eps) > 0 if eps else False
-    return pct_from_low <= 0.10 and eps_ok
+    eps = stock.get("eps_ttm") or stock.get("eps")
+    if eps is not None:
+        try:
+            if float(eps) <= 0:
+                return False
+        except (ValueError, TypeError):
+            return False
+    return pct_from_low <= 0.10
 
 
 def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
-    """Returns (top_buys, top_sells, near_52w_lows, total_screened)."""
-    listed_stocks = get_listed_stocks()
-    fund_lookup = get_fundamental_lookup()
-    ss_data = get_sharesansar_data()
+    """Returns (top_buys, top_sells, near_52w_lows, total_screened).
+
+    Data: Nepal Stock Exchange NOTS only (www.nepalstock.com.np via nepse-data-api).
+    """
+    listed_stocks = get_official_listed_stocks()
+    listed_symbols = {s["symbol"] for s in listed_stocks if s.get("symbol")}
 
     logger.info(
-        f"Data sources: {len(listed_stocks)} listed, "
-        f"{len(fund_lookup)} fundamentals, {len(ss_data)} ShareSansar"
+        "Fetching official NEPSE market detail per symbol (~1–3 min first run)."
+    )
+    market_by_symbol = get_official_share_price_lookup(
+        listed_symbols if listed_symbols else None
+    )
+
+    logger.info(
+        "Data: NEPSE NOTS — %s listed, %s with market fields",
+        len(listed_stocks),
+        len(market_by_symbol),
     )
 
     pre_stocks: list[dict] = []
@@ -208,40 +141,13 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
         if sector not in TRADABLE_SECTORS:
             continue
 
-        ss = ss_data.get(symbol, {})
-        fund = fund_lookup.get(symbol, {})
-
-        data: dict = {**fund, **ss}
+        mkt = market_by_symbol.get(symbol, {})
+        data: dict = {**mkt}
         data["sector"] = sector
         data["symbol"] = symbol
         data["promoter_percentage"] = stock.get("promoter_percentage")
         data["public_percentage"] = stock.get("public_percentage")
         data.setdefault("ltp", stock.get("latesttransactionprice"))
-
-        mcap = stock.get("market_capitalization")
-        if mcap:
-            data["market_capitalization"] = mcap
-            try:
-                mc = float(mcap)
-                if mc >= 20_000_000_000:
-                    data["market_cap_category"] = "Large"
-                elif mc >= 5_000_000_000:
-                    data["market_cap_category"] = "Mid"
-                else:
-                    data["market_cap_category"] = "Small"
-            except (ValueError, TypeError):
-                pass
-
-        dpps = fund.get("dpps")
-        if dpps is not None:
-            data["dpps"] = dpps
-            try:
-                ltp_val = float(data.get("ltp", 0))
-                dpps_val = float(dpps)
-                if ltp_val > 0:
-                    data["dividend_yield"] = round(dpps_val / ltp_val * 100, 2)
-            except (ValueError, TypeError):
-                pass
 
         pre_stocks.append(data)
 
@@ -283,8 +189,12 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
     )
 
     logger.info(
-        f"Classified {len(all_stocks)} stocks ({ipo_count} IPO excluded) -> "
-        f"{len(buys)} BUY, {len(sells)} SELL, {len(near_lows)} near 52w low"
+        "Classified %s stocks (%s IPO excluded) -> %s BUY, %s SELL, %s near 52w low",
+        len(all_stocks),
+        ipo_count,
+        len(buys),
+        len(sells),
+        len(near_lows),
     )
     return buys, sells, near_lows, len(established)
 
@@ -300,7 +210,7 @@ def get_llm_picks(candidates: list[dict]) -> str:
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
     payload = compact_for_llm(candidates)
     user_content = json.dumps(payload, default=str)
-    logger.info(f"Sending {len(payload)} BUY candidates to DeepSeek")
+    logger.info("Sending %s BUY candidates to DeepSeek", len(payload))
 
     response = client.chat.completions.create(
         model="deepseek-reasoner",
@@ -326,147 +236,207 @@ def _fmt_num(val, decimals=1) -> str:
         return str(val)
 
 
-def format_buy_message(
-    llm_output: str, buys: list[dict], n_screened: int,
+def _pct_from_52w_low(s: dict) -> float:
+    try:
+        ltp_f = float(s.get("ltp", 0))
+        lo_f = float(s.get("week_52_low", 0))
+        hi_f = float(s.get("week_52_high", 1))
+        if hi_f <= lo_f:
+            return 0.0
+        return (ltp_f - lo_f) / (hi_f - lo_f) * 100.0
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def _mono_block(lines: list[str]) -> str:
+    body = "\n".join(html.escape(line, quote=False) for line in lines)
+    return f"<pre>{body}</pre>"
+
+
+def format_group_digest(
+    buys: list[dict],
+    near_lows: list[dict],
+    llm_output: str,
+    top_n: int = GROUP_BUY_TOP_N,
 ) -> str:
-    lines = [
-        f"🔥 *NEPSE BUY Signals — {_npt_now()}*",
-        f"_{n_screened} stocks screened_",
-        "",
-        "━━━  *TOP PICKS*  ━━━",
+    """Short HTML: top BUY rows + 52w-low table for the group chat."""
+    ts = html.escape(_npt_now(), quote=False)
+    parts = [f"<b>NEPSE</b> · <code>{ts}</code>"]
+
+    if buys:
+        rows = [f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'%':>3}"]
+        rows.append("-" * 26)
+        for s in buys[:top_n]:
+            sym = str(s.get("symbol", "?"))[:7]
+            ltp = _fmt_num(s.get("ltp"), 1)
+            b = int(s.get("signal_buy_score", 0) or 0)
+            sl = int(s.get("signal_sell_score", 0) or 0)
+            cf = int(s.get("signal_confidence", 0) or 0)
+            bs = f"{b}/{sl}"
+            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}")
+        llm_syms: list[str] = []
+        for line in llm_output.strip().splitlines():
+            line = line.strip()
+            if not line or line.lower().startswith("no strong"):
+                continue
+            seg = [x.strip() for x in line.split("|", 1)]
+            if seg and seg[0]:
+                llm_syms.append(seg[0].split()[0][:7])
+        if llm_syms:
+            parts.append("<b>LLM</b> " + " ".join(f"<code>{html.escape(x)}</code>" for x in llm_syms[:5]))
+        parts.append("<b>BUY</b> (top {})".format(min(top_n, len(buys))))
+        parts.append(_mono_block(rows))
+    else:
+        parts.append("<b>BUY</b> — none today.")
+
+    if near_lows:
+        rows = [f"{'SYM':<7} {'Rs':>7} {'rng%':>4}"]
+        rows.append("-" * 22)
+        for s in near_lows[:8]:
+            sym = str(s.get("symbol", "?"))[:7]
+            ltp = _fmt_num(s.get("ltp"), 1)
+            p = int(round(_pct_from_52w_low(s)))
+            rows.append(f"{sym:<7} {ltp:>7} {p:>4}")
+        shown = min(8, len(near_lows))
+        parts.append(f"<b>52W LOW</b> ({shown}/{len(near_lows)})")
+        parts.append(_mono_block(rows))
+    else:
+        parts.append("<b>52W LOW</b> — none.")
+
+    parts.append("<i>Not advice.</i>")
+    return "\n".join(parts)
+
+
+def format_personal_report(
+    llm_output: str,
+    buys: list[dict],
+    near_lows: list[dict],
+    n_screened: int,
+) -> str:
+    """Full HTML report for DM: LLM text, all BUY rows, 52w list."""
+    ts = html.escape(_npt_now(), quote=False)
+    parts = [
+        f"<b>NEPSE — full report</b>",
+        f"<code>{ts}</code> · screened <b>{n_screened}</b>",
         "",
     ]
 
     picks = [l.strip() for l in llm_output.strip().splitlines() if l.strip()]
+    parts.append("<b>1 · LLM</b>")
     if picks and picks[0].lower().startswith("no strong"):
-        lines.append("No strong picks today.")
+        parts.append("<i>No picks.</i>")
     else:
-        for p in picks:
-            parts = [x.strip() for x in p.split("|", 2)]
-            if len(parts) == 3:
-                sym, price, reason = parts
-                lines.append(f"✅ *{sym}* — {price}")
-                lines.append(f"     _{reason}_")
-            else:
-                lines.append(p)
+        for p in picks[:8]:
+            parts.append("· " + html.escape(p, quote=False))
+    parts.append("")
 
-    lines += ["", "━━━  *ALL BUY CANDIDATES*  ━━━", ""]
+    parts.append("<b>2 · BUY candidates</b> ({})".format(len(buys)))
+    if buys:
+        rows = [
+            f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
+            "-" * 44,
+        ]
+        for s in buys:
+            sym = str(s.get("symbol", "?"))[:7]
+            ltp = _fmt_num(s.get("ltp"), 1)
+            b = int(s.get("signal_buy_score", 0) or 0)
+            sl = int(s.get("signal_sell_score", 0) or 0)
+            cf = int(s.get("signal_confidence", 0) or 0)
+            sec = str(s.get("sector", ""))[:12]
+            bs = f"{b}/{sl}"
+            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}  {sec}")
+        parts.append(_mono_block(rows))
+        for s in buys[:12]:
+            sym = html.escape(str(s.get("symbol", "?")), quote=False)
+            rs = s.get("signal_reasons") or ""
+            if rs:
+                rshort = html.escape(rs[:220] + ("…" if len(rs) > 220 else ""), quote=False)
+                parts.append(f"<b>{sym}</b> <code>{rshort}</code>")
+        parts.append("")
+    else:
+        parts.append("<i>None.</i>\n")
 
-    for s in buys:
-        sym = s.get("symbol", "?")
-        price = _fmt_num(s.get("ltp"), 1)
-        sector = s.get("sector", "")
-        mcap = s.get("market_cap_category")
-        conf = s.get("signal_confidence", 0)
+    parts.append("<b>3 · Near 52-week low</b> ({})".format(len(near_lows)))
+    if near_lows:
+        rows = [f"{'SYM':<7} {'Rs':>7} {'rng%':>4}  {'52w lo':>7} {'hi':>7}"]
+        rows.append("-" * 40)
+        for s in near_lows:
+            sym = str(s.get("symbol", "?"))[:7]
+            ltp = _fmt_num(s.get("ltp"), 1)
+            p = int(round(_pct_from_52w_low(s)))
+            lo = _fmt_num(s.get("week_52_low"), 0)
+            hi = _fmt_num(s.get("week_52_high"), 0)
+            rows.append(f"{sym:<7} {ltp:>7} {p:>4}  {lo:>7} {hi:>7}")
+        parts.append(_mono_block(rows))
+    else:
+        parts.append("<i>None.</i>")
 
-        pe = s.get("pe")
-        eps = s.get("eps_ttm") or s.get("eps")
-        promo = s.get("promoter_percentage")
-        dy = s.get("dividend_yield")
-        roe = s.get("roe")
-        reasons = s.get("signal_reasons", "")
-
-        cap = f" · {mcap} Cap" if mcap else ""
-        lines.append(f"📌 *{sym}* — Rs {price}")
-        lines.append(f"     {sector}{cap} · {conf}% confidence")
-
-        stats = []
-        if pe is not None:
-            stats.append(f"PE {_fmt_num(pe)}")
-        if eps is not None:
-            stats.append(f"EPS {_fmt_num(eps, 2)}")
-        if roe is not None and float(roe) > 0:
-            stats.append(f"ROE {_fmt_num(roe)}%")
-        if promo is not None:
-            stats.append(f"Promo {_fmt_num(promo, 0)}%")
-        if dy is not None and dy > 0:
-            stats.append(f"DY {dy:.1f}%")
-        if stats:
-            lines.append(f"     {' · '.join(stats)}")
-
-        if reasons:
-            for r in reasons.split(" | ")[:5]:
-                lines.append(f"     ▸ {r}")
-        lines.append("")
-
-    lines.append("_Not financial advice. DYOR._")
-    return "\n".join(lines)
+    parts.extend(["", "<i>Not financial advice.</i>"])
+    return "\n".join(parts)
 
 
-def format_52w_low_alert(stocks: list[dict]) -> str:
-    if not stocks:
-        return ""
-    lines = [
-        f"📉 *Near 52-Week Lows — {_npt_now()}*",
-        "_Established stocks with positive EPS near yearly lows — potential accumulation_",
-        "",
-    ]
-    for s in stocks:
-        sym = s.get("symbol", "?")
-        price = _fmt_num(s.get("ltp"), 1)
-        lo = _fmt_num(s.get("week_52_low"), 1)
-        hi = _fmt_num(s.get("week_52_high"), 1)
-        pe = s.get("pe")
-        eps = s.get("eps")
-        dy = s.get("dividend_yield")
-        mcap = s.get("market_cap_category")
-        sector = s.get("sector", "")
-
-        try:
-            ltp_f = float(s.get("ltp", 0))
-            lo_f = float(s.get("week_52_low", 0))
-            hi_f = float(s.get("week_52_high", 1))
-            pct = (ltp_f - lo_f) / (hi_f - lo_f) * 100 if hi_f > lo_f else 0
-        except (ValueError, TypeError):
-            pct = 0
-
-        stats = [f"{sector}"]
-        if pe is not None:
-            stats.append(f"PE {_fmt_num(pe)}")
-        if eps is not None:
-            stats.append(f"EPS {_fmt_num(eps, 2)}")
-        if dy is not None and dy > 0:
-            stats.append(f"DY {dy:.1f}%")
-
-        cap_tag = f" [{mcap}]" if mcap else ""
-        lines.append(f"*{sym}*{cap_tag} — Rs {price}  ({pct:.0f}% from 52w low)")
-        lines.append(f"    52w: {lo} — {hi} | {' | '.join(stats)}")
-        lines.append("")
-
-    lines.append("_Watch for accumulation. Not financial advice._")
-    return "\n".join(lines)
-
-
-def send_telegram(message: str) -> None:
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        logger.warning("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set — skipping")
+def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -> None:
+    if not TELEGRAM_BOT_TOKEN or not chat_id:
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     max_len = 4096
     chunks = [message[i:i + max_len] for i in range(0, len(message), max_len)]
     for chunk in chunks:
-        resp = requests.post(url, json={
-            "chat_id": TELEGRAM_CHAT_ID,
-            "text": chunk,
-            "parse_mode": "Markdown",
-        })
+        resp = requests.post(
+            url,
+            json={
+                "chat_id": chat_id,
+                "text": chunk,
+                "parse_mode": parse_mode,
+            },
+        )
         if not resp.ok:
-            logger.error(f"Telegram send failed: {resp.status_code} {resp.text}")
+            logger.error(
+                "Telegram send failed chat=%s: %s %s",
+                chat_id,
+                resp.status_code,
+                resp.text,
+            )
         else:
-            logger.info("Telegram message sent")
+            logger.info("Telegram sent → %s", chat_id)
 
 
 if __name__ == "__main__":
     buys, sells, near_lows, n_screened = get_classified_stocks()
 
-    if not buys:
-        send_telegram("No strong BUY signals found today.")
-    else:
+    llm_output = ""
+    if buys:
         llm_output = get_llm_picks(buys)
-        logger.info(f"LLM output:\n{llm_output}")
-        send_telegram(format_buy_message(llm_output, buys, n_screened))
+        logger.info("LLM output:\n%s", llm_output)
 
-    low_msg = format_52w_low_alert(near_lows)
-    if low_msg:
-        send_telegram(low_msg)
+    send_group = TELEGRAM_SEND_TO in ("group", "both")
+    send_dm = TELEGRAM_SEND_TO in ("dm", "both")
+
+    if not TELEGRAM_BOT_TOKEN:
+        logger.warning("TELEGRAM_BOT_TOKEN not set — skipping Telegram")
+    else:
+        logger.info("TELEGRAM_SEND_TO=%s", TELEGRAM_SEND_TO)
+
+        if send_group:
+            if TELEGRAM_CHAT_ID:
+                group_body = format_group_digest(buys, near_lows, llm_output or "")
+                send_telegram(group_body, chat_id=TELEGRAM_CHAT_ID)
+            else:
+                logger.warning(
+                    "TELEGRAM_SEND_TO includes group but TELEGRAM_CHAT_ID is unset"
+                )
+
+        if send_dm:
+            if TELEGRAM_DM_CHAT_ID:
+                detail = format_personal_report(
+                    llm_output or "",
+                    buys,
+                    near_lows,
+                    n_screened,
+                )
+                send_telegram(detail, chat_id=TELEGRAM_DM_CHAT_ID)
+            else:
+                logger.warning(
+                    "TELEGRAM_SEND_TO includes dm but TELEGRAM_DM_CHAT_ID is unset"
+                )

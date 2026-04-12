@@ -264,7 +264,7 @@ def _sector_relative_vote(
 
 
 # ---------------------------------------------------------------------------
-# Fundamental votes — from nepsetrading recent-report + stocks-listed
+# Fundamental votes — optional fields (e.g. from a future local ratio feed)
 # ---------------------------------------------------------------------------
 
 def _dividend_yield_vote(
@@ -396,7 +396,7 @@ def _technical_votes(stock: dict[str, Any]) -> tuple[int, int, list[str]]:
 
 
 def _is_ipo(stock: dict[str, Any]) -> bool:
-    """IPO/new listing if ShareSansar reports MA120 = 0 (insufficient history)."""
+    """IPO / new listing when MA120 is present and zero (insufficient history)."""
     ma120 = _to_float(stock.get("ma120"))
     return ma120 is not None and ma120 == 0
 
