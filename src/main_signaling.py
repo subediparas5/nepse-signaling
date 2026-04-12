@@ -476,13 +476,135 @@ def format_personal_report(
     return "\n".join(parts)
 
 
+def _split_oversized_pre_block(block: str, max_len: int) -> list[str]:
+    """Telegram <pre> blocks must stay intact per message; split inner lines across messages."""
+    open_t, close_t = "<pre>", "</pre>"
+    if not (block.startswith(open_t) and block.endswith(close_t)):
+        return [block[:max_len]] if len(block) > max_len else [block]
+    inner = block[len(open_t) : -len(close_t)]
+    lines = inner.split("\n")
+    out: list[str] = []
+    chunk_lines: list[str] = []
+    overhead = len(open_t) + len(close_t)
+
+    def flush() -> None:
+        nonlocal chunk_lines
+        if chunk_lines:
+            out.append(open_t + "\n".join(chunk_lines) + close_t)
+            chunk_lines = []
+
+    for line in lines:
+        candidate = "\n".join(chunk_lines + [line]) if chunk_lines else line
+        if overhead + len(candidate) <= max_len:
+            chunk_lines.append(line)
+        else:
+            flush()
+            if overhead + len(line) <= max_len:
+                chunk_lines = [line]
+            else:
+                for i in range(0, len(line), max_len - overhead - 1):
+                    slice_ = line[i : i + max_len - overhead - 1]
+                    out.append(open_t + slice_ + close_t)
+                chunk_lines = []
+    flush()
+    return out or [open_t + close_t]
+
+
+def _split_long_plain_html(frag: str, max_len: int) -> list[str]:
+    """Split non-<pre> HTML on newlines so tags are not cut mid-token."""
+    if len(frag) <= max_len:
+        return [frag]
+    out: list[str] = []
+    buf = ""
+    for line in frag.split("\n"):
+        extra = len(line) + (1 if buf else 0)
+        if len(buf) + extra > max_len and buf:
+            out.append(buf)
+            buf = ""
+        if len(line) > max_len:
+            if buf:
+                out.append(buf)
+                buf = ""
+            for i in range(0, len(line), max_len):
+                out.append(line[i : i + max_len])
+            continue
+        buf = buf + "\n" + line if buf else line
+    if buf:
+        out.append(buf)
+    return out
+
+
+def _telegram_html_chunks(message: str, max_len: int = 4096) -> list[str]:
+    """
+    Split for Telegram sendMessage without breaking HTML.
+    Naive fixed-size splits corrupt <pre>...</pre> and trigger parse errors.
+    """
+    if len(message) <= max_len:
+        return [message]
+
+    fragments: list[str] = []
+    i = 0
+    while i < len(message):
+        j = message.find("<pre>", i)
+        if j == -1:
+            fragments.append(message[i:])
+            break
+        if j > i:
+            fragments.append(message[i:j])
+        k = message.find("</pre>", j)
+        if k == -1:
+            fragments.append(message[j:])
+            break
+        k += len("</pre>")
+        fragments.append(message[j:k])
+        i = k
+
+    chunks: list[str] = []
+    buf = ""
+
+    def flush_buf() -> None:
+        nonlocal buf
+        if buf:
+            chunks.append(buf)
+            buf = ""
+
+    for frag in fragments:
+        is_pre = frag.startswith("<pre>") and frag.endswith("</pre>")
+        pieces = (
+            _split_oversized_pre_block(frag, max_len)
+            if is_pre and len(frag) > max_len
+            else ([frag] if is_pre else _split_long_plain_html(frag, max_len))
+        )
+        for piece in pieces:
+            if not piece:
+                continue
+            joiner = "\n" if buf else ""
+            if len(buf) + len(joiner) + len(piece) <= max_len:
+                buf = buf + joiner + piece if buf else piece
+            else:
+                flush_buf()
+                if len(piece) > max_len:
+                    if piece.startswith("<pre>"):
+                        chunks.extend(_split_oversized_pre_block(piece, max_len))
+                    else:
+                        chunks.extend(_split_long_plain_html(piece, max_len))
+                else:
+                    buf = piece
+    flush_buf()
+    return chunks
+
+
 def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -> None:
     if not TELEGRAM_BOT_TOKEN or not chat_id:
         return
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     max_len = 4096
-    chunks = [message[i:i + max_len] for i in range(0, len(message), max_len)]
+    chunks = (
+        _telegram_html_chunks(message, max_len)
+        if parse_mode == "HTML"
+        else [message[i : i + max_len] for i in range(0, len(message), max_len)]
+    )
     for chunk in chunks:
         resp = requests.post(
             url,
@@ -537,12 +659,24 @@ if __name__ == "__main__":
     else:
         logger.info("TELEGRAM_SEND_TO=%s", TELEGRAM_SEND_TO)
 
+        need_full_report = (send_group and TELEGRAM_CHAT_ID) or (
+            send_dm and TELEGRAM_DM_CHAT_ID
+        )
+        full_report = (
+            format_personal_report(
+                llm_output or "",
+                buys,
+                near_lows,
+                n_screened,
+                lean_buys=lean_buys,
+            )
+            if need_full_report
+            else None
+        )
+
         if send_group:
             if TELEGRAM_CHAT_ID:
-                group_body = format_group_digest(
-                    buys, near_lows, llm_output or "", lean_buys=lean_buys
-                )
-                send_telegram(group_body, chat_id=TELEGRAM_CHAT_ID)
+                send_telegram(full_report, chat_id=TELEGRAM_CHAT_ID)
             else:
                 logger.warning(
                     "TELEGRAM_SEND_TO includes group but TELEGRAM_CHAT_ID is unset"
@@ -550,14 +684,7 @@ if __name__ == "__main__":
 
         if send_dm:
             if TELEGRAM_DM_CHAT_ID:
-                detail = format_personal_report(
-                    llm_output or "",
-                    buys,
-                    near_lows,
-                    n_screened,
-                    lean_buys=lean_buys,
-                )
-                send_telegram(detail, chat_id=TELEGRAM_DM_CHAT_ID)
+                send_telegram(full_report, chat_id=TELEGRAM_DM_CHAT_ID)
             else:
                 logger.warning(
                     "TELEGRAM_SEND_TO includes dm but TELEGRAM_DM_CHAT_ID is unset"
