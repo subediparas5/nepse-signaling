@@ -32,8 +32,6 @@ TELEGRAM_SEND_TO = _raw_send if _raw_send in ("group", "dm", "both") else "both"
 if _raw_send not in ("group", "dm", "both", ""):
     logger.warning("Unknown TELEGRAM_SEND_TO=%r; using both.", _raw_send)
 
-GROUP_BUY_TOP_N = 5
-
 LLM_FIELDS = [
     "symbol", "sector", "market_cap_category", "ltp",
     "signal_verdict", "signal_buy_score", "signal_sell_score",
@@ -303,115 +301,28 @@ def _mono_block(lines: list[str]) -> str:
     return f"<pre>{body}</pre>"
 
 
-def _llm_output_symbols(llm_output: str) -> list[str]:
-    syms: list[str] = []
-    for line in llm_output.strip().splitlines():
-        line = line.strip()
-        if not line or line.lower().startswith("no strong"):
-            continue
-        seg = [x.strip() for x in line.split("|", 1)]
-        if seg and seg[0]:
-            syms.append(seg[0].split()[0][:7])
-    return syms
-
-
-def format_group_digest(
-    buys: list[dict],
-    near_lows: list[dict],
-    llm_output: str,
-    lean_buys: list[dict] | None = None,
-    top_n: int = GROUP_BUY_TOP_N,
-) -> str:
-    """Short HTML: top BUY rows + 52w-low table for the group chat."""
-    lean_buys = lean_buys or []
-    ts = html.escape(_npt_now(), quote=False)
-    parts = [f"<b>NEPSE</b> · <code>{ts}</code>"]
-
-    llm_syms = _llm_output_symbols(llm_output)
-    if llm_syms:
-        parts.append(
-            "<b>LLM</b> "
-            + " ".join(f"<code>{html.escape(x)}</code>" for x in llm_syms[:5])
-        )
-
-    if buys:
-        rows = [f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'%':>3}"]
-        rows.append("-" * 26)
-        for s in buys[:top_n]:
-            sym = str(s.get("symbol", "?"))[:7]
-            ltp = _fmt_num(s.get("ltp"), 1)
-            b = int(s.get("signal_buy_score", 0) or 0)
-            sl = int(s.get("signal_sell_score", 0) or 0)
-            cf = int(s.get("signal_confidence", 0) or 0)
-            bs = f"{b}/{sl}"
-            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}")
-        parts.append("<b>BUY</b> (top {})".format(min(top_n, len(buys))))
-        parts.append(_mono_block(rows))
-    elif lean_buys:
-        parts.append(
-            "<b>BUY</b> — no strict rule-BUY (need score≥6 & +3 margin on NOTS-only data)."
-        )
-        rows = [f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}"]
-        rows.append("-" * 26)
-        for s in lean_buys[:top_n]:
-            sym = str(s.get("symbol", "?"))[:7]
-            ltp = _fmt_num(s.get("ltp"), 1)
-            b = int(s.get("signal_buy_score", 0) or 0)
-            sl = int(s.get("signal_sell_score", 0) or 0)
-            cf = int(s.get("signal_confidence", 0) or 0)
-            bs = f"{b}/{sl}"
-            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}")
-        parts.append("<b>LEAN_BUY</b> (top {})".format(min(top_n, len(lean_buys))))
-        parts.append(_mono_block(rows))
-    else:
-        parts.append("<b>BUY</b> — none today.")
-
-    if near_lows:
-        rows = [f"{'SYM':<7} {'Rs':>7} {'rng%':>4}"]
-        rows.append("-" * 22)
-        for s in near_lows[:8]:
-            sym = str(s.get("symbol", "?"))[:7]
-            ltp = _fmt_num(s.get("ltp"), 1)
-            p = int(round(_pct_from_52w_low(s)))
-            rows.append(f"{sym:<7} {ltp:>7} {p:>4}")
-        shown = min(8, len(near_lows))
-        parts.append(f"<b>52W LOW</b> ({shown}/{len(near_lows)})")
-        parts.append(_mono_block(rows))
-    else:
-        parts.append("<b>52W LOW</b> — none.")
-
-    parts.append("<i>Not advice.</i>")
-    return "\n".join(parts)
-
-
-def format_personal_report(
+def format_telegram_digest(
     llm_output: str,
     buys: list[dict],
     near_lows: list[dict],
-    n_screened: int,
-    lean_buys: list[dict] | None = None,
 ) -> str:
-    """Full HTML report for DM: LLM text, all BUY rows, 52w list."""
+    """Telegram HTML: full LLM prose + strict BUY <pre> table + near-52w-low <pre> table only."""
     ts = html.escape(_npt_now(), quote=False)
-    parts = [
-        f"<b>NEPSE — full report</b>",
-        f"<code>{ts}</code> · screened <b>{n_screened}</b>",
-        "",
-    ]
+    parts = [f"<b>NEPSE</b> · <code>{ts}</code>", ""]
 
-    lean_buys = lean_buys or []
-    picks = [l.strip() for l in llm_output.strip().splitlines() if l.strip()]
-    parts.append("<b>1 · LLM</b>")
-    if not picks:
-        parts.append("<i>No LLM output (no candidate batch was sent).</i>")
-    elif picks[0].lower().startswith("no strong"):
+    parts.append("<b>LLM</b>")
+    raw = llm_output or ""
+    lines = raw.splitlines()
+    first_nonempty = next((x.strip() for x in lines if x.strip()), "")
+    if not first_nonempty:
+        parts.append("<i>(No LLM text.)</i>")
+    elif first_nonempty.lower().startswith("no strong"):
         parts.append("<i>No picks.</i>")
     else:
-        for p in picks[:8]:
-            parts.append("· " + html.escape(p, quote=False))
-    parts.append("")
+        for line in lines:
+            parts.append(html.escape(line, quote=False) if line else "")
 
-    parts.append("<b>2 · Strict BUY</b> ({})".format(len(buys)))
+    parts.extend(["", "<b>Strict BUY</b> ({})".format(len(buys))])
     if buys:
         rows = [
             f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
@@ -427,40 +338,15 @@ def format_personal_report(
             bs = f"{b}/{sl}"
             rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}  {sec}")
         parts.append(_mono_block(rows))
-        for s in buys[:12]:
-            sym = html.escape(str(s.get("symbol", "?")), quote=False)
-            rs = s.get("signal_reasons") or ""
-            if rs:
-                rshort = html.escape(rs[:220] + ("…" if len(rs) > 220 else ""), quote=False)
-                parts.append(f"<b>{sym}</b> <code>{rshort}</code>")
-        parts.append("")
-    else:
-        parts.append("<i>None.</i>\n")
-
-    parts.append("<b>2b · LEAN_BUY</b> ({})".format(len(lean_buys)))
-    if lean_buys:
-        rows = [
-            f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
-            "-" * 44,
-        ]
-        for s in lean_buys:
-            sym = str(s.get("symbol", "?"))[:7]
-            ltp = _fmt_num(s.get("ltp"), 1)
-            b = int(s.get("signal_buy_score", 0) or 0)
-            sl = int(s.get("signal_sell_score", 0) or 0)
-            cf = int(s.get("signal_confidence", 0) or 0)
-            sec = str(s.get("sector", ""))[:12]
-            bs = f"{b}/{sl}"
-            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}  {sec}")
-        parts.append(_mono_block(rows))
     else:
         parts.append("<i>None.</i>")
-    parts.append("")
 
-    parts.append("<b>3 · Near 52-week low</b> ({})".format(len(near_lows)))
+    parts.extend(["", "<b>Near 52-week low</b> ({})".format(len(near_lows))])
     if near_lows:
-        rows = [f"{'SYM':<7} {'Rs':>7} {'rng%':>4}  {'52w lo':>7} {'hi':>7}"]
-        rows.append("-" * 40)
+        rows = [
+            f"{'SYM':<7} {'Rs':>7} {'rng%':>4}  {'52w lo':>7} {'hi':>7}",
+            "-" * 40,
+        ]
         for s in near_lows:
             sym = str(s.get("symbol", "?"))[:7]
             ltp = _fmt_num(s.get("ltp"), 1)
@@ -626,7 +512,7 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
 
 
 if __name__ == "__main__":
-    buys, sells, near_lows, n_screened, lean_buys = get_classified_stocks()
+    buys, sells, near_lows, _n_screened, lean_buys = get_classified_stocks()
 
     llm_output = ""
     if buys:
@@ -659,24 +545,18 @@ if __name__ == "__main__":
     else:
         logger.info("TELEGRAM_SEND_TO=%s", TELEGRAM_SEND_TO)
 
-        need_full_report = (send_group and TELEGRAM_CHAT_ID) or (
+        need_telegram_body = (send_group and TELEGRAM_CHAT_ID) or (
             send_dm and TELEGRAM_DM_CHAT_ID
         )
-        full_report = (
-            format_personal_report(
-                llm_output or "",
-                buys,
-                near_lows,
-                n_screened,
-                lean_buys=lean_buys,
-            )
-            if need_full_report
+        telegram_body = (
+            format_telegram_digest(llm_output or "", buys, near_lows)
+            if need_telegram_body
             else None
         )
 
         if send_group:
             if TELEGRAM_CHAT_ID:
-                send_telegram(full_report, chat_id=TELEGRAM_CHAT_ID)
+                send_telegram(telegram_body, chat_id=TELEGRAM_CHAT_ID)
             else:
                 logger.warning(
                     "TELEGRAM_SEND_TO includes group but TELEGRAM_CHAT_ID is unset"
@@ -684,7 +564,7 @@ if __name__ == "__main__":
 
         if send_dm:
             if TELEGRAM_DM_CHAT_ID:
-                send_telegram(full_report, chat_id=TELEGRAM_DM_CHAT_ID)
+                send_telegram(telegram_body, chat_id=TELEGRAM_DM_CHAT_ID)
             else:
                 logger.warning(
                     "TELEGRAM_SEND_TO includes dm but TELEGRAM_DM_CHAT_ID is unset"
