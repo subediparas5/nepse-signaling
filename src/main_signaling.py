@@ -1,8 +1,9 @@
 import html
 import json
+import logging
 import os
 import sys
-import logging
+from collections import Counter
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -66,6 +67,34 @@ One stock per line. No numbering, no markdown, no headers. \
 If no stock passes your review, return exactly: "No strong picks today."\
 """
 
+SYSTEM_PROMPT_NEAR_LOW = """\
+You are an expert Nepal stock market analyst. These names trade **near the 52-week low** on official \
+NEPSE NOTS data (no P/E or EPS in the feed). Review for dip-buy quality vs traps; reject illiquid \
+chase setups. Prefer sensible turnover vs price. At most 5 lines.
+
+Output format — return ONLY this, nothing else:
+
+SYMBOL | Rs PRICE | reason (15 words max)
+
+One stock per line. No numbering, no markdown, no headers. \
+If none pass, return exactly: "No strong picks today."\
+"""
+
+SYSTEM_PROMPT_LEAN = """\
+You are an expert Nepal stock market analyst. These stocks are **LEAN_BUY** from a rule screen: \
+buy edge over sell but **below** the strict BUY threshold (rules need buy_score≥6 and +3 margin; \
+NOTS-only feeds often lack fundamentals so strict BUY is rare). Data: official prices/volume/52w.
+
+Pick the best risk/reward names anyway; reject obvious illiquidity. At most 5 lines.
+
+Output format — return ONLY this, nothing else:
+
+SYMBOL | Rs PRICE | reason (15 words max)
+
+One stock per line. No numbering, no markdown, no headers. \
+If none pass, return exactly: "No strong picks today."\
+"""
+
 
 def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
     """Compute median diff_pct per sector for relative-strength scoring."""
@@ -111,8 +140,8 @@ def _near_52w_low(stock: dict) -> bool:
     return pct_from_low <= 0.10
 
 
-def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
-    """Returns (top_buys, top_sells, near_52w_lows, total_screened).
+def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int, list[dict]]:
+    """Returns (top_buys, top_sells, near_52w_lows, total_screened, lean_buys_for_llm).
 
     Data: Nepal Stock Exchange NOTS only (www.nepalstock.com.np via nepse-data-api).
     """
@@ -164,6 +193,19 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
 
     established = [s for s in all_stocks if s.get("signal_verdict") != "IPO"]
 
+    vcounts = Counter(s.get("signal_verdict") for s in established)
+    logger.info(
+        "Rule verdict mix (established, NOTS-only): %s — strict BUY needs buy≥6 and +3 vs sell",
+        dict(vcounts.most_common()),
+    )
+
+    lean_buys = [s for s in established if s.get("signal_verdict") == "LEAN_BUY"]
+    lean_buys.sort(
+        key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0),
+        reverse=True,
+    )
+    lean_buys = lean_buys[:12]
+
     buys = [s for s in established if s.get("signal_verdict") == "BUY"]
     buys.sort(
         key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0),
@@ -196,7 +238,7 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int]:
         len(sells),
         len(near_lows),
     )
-    return buys, sells, near_lows, len(established)
+    return buys, sells, near_lows, len(established), lean_buys
 
 
 def compact_for_llm(candidates: list[dict]) -> list[dict]:
@@ -206,16 +248,24 @@ def compact_for_llm(candidates: list[dict]) -> list[dict]:
     ]
 
 
-def get_llm_picks(candidates: list[dict]) -> str:
+def get_llm_picks(
+    candidates: list[dict],
+    *,
+    system_prompt: str | None = None,
+    log_label: str = "BUY",
+) -> str:
+    if not candidates:
+        logger.warning("get_llm_picks(%s): empty candidate list — skipping API", log_label)
+        return "No strong picks today."
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
     payload = compact_for_llm(candidates)
     user_content = json.dumps(payload, default=str)
-    logger.info("Sending %s BUY candidates to DeepSeek", len(payload))
+    logger.info("Calling DeepSeek (%s) with %s candidates", log_label, len(payload))
 
     response = client.chat.completions.create(
         model="deepseek-reasoner",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt or SYSTEM_PROMPT},
             {"role": "user", "content": user_content},
         ],
     )
@@ -253,15 +303,36 @@ def _mono_block(lines: list[str]) -> str:
     return f"<pre>{body}</pre>"
 
 
+def _llm_output_symbols(llm_output: str) -> list[str]:
+    syms: list[str] = []
+    for line in llm_output.strip().splitlines():
+        line = line.strip()
+        if not line or line.lower().startswith("no strong"):
+            continue
+        seg = [x.strip() for x in line.split("|", 1)]
+        if seg and seg[0]:
+            syms.append(seg[0].split()[0][:7])
+    return syms
+
+
 def format_group_digest(
     buys: list[dict],
     near_lows: list[dict],
     llm_output: str,
+    lean_buys: list[dict] | None = None,
     top_n: int = GROUP_BUY_TOP_N,
 ) -> str:
     """Short HTML: top BUY rows + 52w-low table for the group chat."""
+    lean_buys = lean_buys or []
     ts = html.escape(_npt_now(), quote=False)
     parts = [f"<b>NEPSE</b> · <code>{ts}</code>"]
+
+    llm_syms = _llm_output_symbols(llm_output)
+    if llm_syms:
+        parts.append(
+            "<b>LLM</b> "
+            + " ".join(f"<code>{html.escape(x)}</code>" for x in llm_syms[:5])
+        )
 
     if buys:
         rows = [f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'%':>3}"]
@@ -274,17 +345,23 @@ def format_group_digest(
             cf = int(s.get("signal_confidence", 0) or 0)
             bs = f"{b}/{sl}"
             rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}")
-        llm_syms: list[str] = []
-        for line in llm_output.strip().splitlines():
-            line = line.strip()
-            if not line or line.lower().startswith("no strong"):
-                continue
-            seg = [x.strip() for x in line.split("|", 1)]
-            if seg and seg[0]:
-                llm_syms.append(seg[0].split()[0][:7])
-        if llm_syms:
-            parts.append("<b>LLM</b> " + " ".join(f"<code>{html.escape(x)}</code>" for x in llm_syms[:5]))
         parts.append("<b>BUY</b> (top {})".format(min(top_n, len(buys))))
+        parts.append(_mono_block(rows))
+    elif lean_buys:
+        parts.append(
+            "<b>BUY</b> — no strict rule-BUY (need score≥6 & +3 margin on NOTS-only data)."
+        )
+        rows = [f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}"]
+        rows.append("-" * 26)
+        for s in lean_buys[:top_n]:
+            sym = str(s.get("symbol", "?"))[:7]
+            ltp = _fmt_num(s.get("ltp"), 1)
+            b = int(s.get("signal_buy_score", 0) or 0)
+            sl = int(s.get("signal_sell_score", 0) or 0)
+            cf = int(s.get("signal_confidence", 0) or 0)
+            bs = f"{b}/{sl}"
+            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}")
+        parts.append("<b>LEAN_BUY</b> (top {})".format(min(top_n, len(lean_buys))))
         parts.append(_mono_block(rows))
     else:
         parts.append("<b>BUY</b> — none today.")
@@ -312,6 +389,7 @@ def format_personal_report(
     buys: list[dict],
     near_lows: list[dict],
     n_screened: int,
+    lean_buys: list[dict] | None = None,
 ) -> str:
     """Full HTML report for DM: LLM text, all BUY rows, 52w list."""
     ts = html.escape(_npt_now(), quote=False)
@@ -321,16 +399,19 @@ def format_personal_report(
         "",
     ]
 
+    lean_buys = lean_buys or []
     picks = [l.strip() for l in llm_output.strip().splitlines() if l.strip()]
     parts.append("<b>1 · LLM</b>")
-    if picks and picks[0].lower().startswith("no strong"):
+    if not picks:
+        parts.append("<i>No LLM output (no candidate batch was sent).</i>")
+    elif picks[0].lower().startswith("no strong"):
         parts.append("<i>No picks.</i>")
     else:
         for p in picks[:8]:
             parts.append("· " + html.escape(p, quote=False))
     parts.append("")
 
-    parts.append("<b>2 · BUY candidates</b> ({})".format(len(buys)))
+    parts.append("<b>2 · Strict BUY</b> ({})".format(len(buys)))
     if buys:
         rows = [
             f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
@@ -355,6 +436,26 @@ def format_personal_report(
         parts.append("")
     else:
         parts.append("<i>None.</i>\n")
+
+    parts.append("<b>2b · LEAN_BUY</b> ({})".format(len(lean_buys)))
+    if lean_buys:
+        rows = [
+            f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
+            "-" * 44,
+        ]
+        for s in lean_buys:
+            sym = str(s.get("symbol", "?"))[:7]
+            ltp = _fmt_num(s.get("ltp"), 1)
+            b = int(s.get("signal_buy_score", 0) or 0)
+            sl = int(s.get("signal_sell_score", 0) or 0)
+            cf = int(s.get("signal_confidence", 0) or 0)
+            sec = str(s.get("sector", ""))[:12]
+            bs = f"{b}/{sl}"
+            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}  {sec}")
+        parts.append(_mono_block(rows))
+    else:
+        parts.append("<i>None.</i>")
+    parts.append("")
 
     parts.append("<b>3 · Near 52-week low</b> ({})".format(len(near_lows)))
     if near_lows:
@@ -403,12 +504,30 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
 
 
 if __name__ == "__main__":
-    buys, sells, near_lows, n_screened = get_classified_stocks()
+    buys, sells, near_lows, n_screened, lean_buys = get_classified_stocks()
 
     llm_output = ""
     if buys:
-        llm_output = get_llm_picks(buys)
+        llm_output = get_llm_picks(buys, log_label="BUY")
         logger.info("LLM output:\n%s", llm_output)
+    elif near_lows:
+        llm_output = get_llm_picks(
+            near_lows[:12],
+            system_prompt=SYSTEM_PROMPT_NEAR_LOW,
+            log_label="52W_LOW",
+        )
+        logger.info("LLM (near 52w low) output:\n%s", llm_output)
+    elif lean_buys:
+        llm_output = get_llm_picks(
+            lean_buys,
+            system_prompt=SYSTEM_PROMPT_LEAN,
+            log_label="LEAN_BUY",
+        )
+        logger.info("LLM (LEAN_BUY) output:\n%s", llm_output)
+    else:
+        logger.info(
+            "DeepSeek not called: 0 strict BUY, 0 near-52w-low, 0 LEAN_BUY after screening."
+        )
 
     send_group = TELEGRAM_SEND_TO in ("group", "both")
     send_dm = TELEGRAM_SEND_TO in ("dm", "both")
@@ -420,7 +539,9 @@ if __name__ == "__main__":
 
         if send_group:
             if TELEGRAM_CHAT_ID:
-                group_body = format_group_digest(buys, near_lows, llm_output or "")
+                group_body = format_group_digest(
+                    buys, near_lows, llm_output or "", lean_buys=lean_buys
+                )
                 send_telegram(group_body, chat_id=TELEGRAM_CHAT_ID)
             else:
                 logger.warning(
@@ -434,6 +555,7 @@ if __name__ == "__main__":
                     buys,
                     near_lows,
                     n_screened,
+                    lean_buys=lean_buys,
                 )
                 send_telegram(detail, chat_id=TELEGRAM_DM_CHAT_ID)
             else:

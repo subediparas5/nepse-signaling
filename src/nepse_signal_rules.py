@@ -123,10 +123,12 @@ def _week52_vote(
     if pct_from_low <= 0.25:
         return 1, 0, f"Near 52w low ({pct_from_low:.0%} of range — value zone)"
 
-    if pct_from_low >= 0.98:
-        return 0, 2, f"At 52w high ({pct_from_low:.0%} — extreme overextension)"
-    if pct_from_low >= 0.85:
-        return 0, 1, f"Near 52w high ({pct_from_low:.0%} — overextended)"
+    if pct_from_low >= 0.95:
+        return 0, 3, f"At 52w high ({pct_from_low:.0%} — extreme overextension)"
+    if pct_from_low >= 0.80:
+        return 0, 2, f"Near 52w high ({pct_from_low:.0%} — overextended)"
+    if pct_from_low >= 0.70:
+        return 0, 1, f"Upper 52w range ({pct_from_low:.0%})"
     return 0, 0, None
 
 
@@ -144,9 +146,9 @@ def _daily_momentum_vote(
 
     closed_above_open = op is not None and cl > op
 
-    if day_chg_pct > 3 and closed_above_open:
+    if day_chg_pct > 1.5 and closed_above_open:
         return 1, 0, f"Bullish day (+{day_chg_pct:.1f}%, closed above open)"
-    if day_chg_pct < -3 and op is not None and cl < op:
+    if day_chg_pct < -1.5 and op is not None and cl < op:
         return 0, 1, f"Bearish day ({day_chg_pct:.1f}%, closed below open)"
     return 0, 0, None
 
@@ -160,9 +162,9 @@ def _gap_vote(
     if op is None or pc is None or pc == 0:
         return 0, 0, None
     gap_pct = (op - pc) / pc * 100
-    if gap_pct > 2:
+    if gap_pct > 1:
         return 1, 0, f"Gap up +{gap_pct:.1f}% (bullish sentiment)"
-    if gap_pct < -2:
+    if gap_pct < -1:
         return 0, 1, f"Gap down {gap_pct:.1f}% (bearish sentiment)"
     return 0, 0, None
 
@@ -174,9 +176,9 @@ def _vwap_vote(ltp: Any, vwap: Any) -> tuple[int, int, str | None]:
     if px is None or vw is None or vw == 0:
         return 0, 0, None
     diff_pct = (px - vw) / vw * 100
-    if diff_pct > 1.5:
+    if diff_pct > 0.5:
         return 1, 0, f"Closed above VWAP (+{diff_pct:.1f}%)"
-    if diff_pct < -1.5:
+    if diff_pct < -0.5:
         return 0, 1, f"Closed below VWAP ({diff_pct:.1f}%)"
     return 0, 0, None
 
@@ -195,8 +197,8 @@ def _liquidity_vote(
     if tx is not None and tx < 50:
         return 0, 1, f"Only {int(tx)} transactions (illiquid)"
 
-    if to is not None and to > 10_000_000 and tx is not None and tx > 500:
-        return 1, 0, f"High activity: Rs {to/1e6:.1f}M, {int(tx)} txns"
+    if to is not None and to > 5_000_000 and tx is not None and tx > 100:
+        return 1, 0, f"Good activity: Rs {to/1e6:.1f}M, {int(tx)} txns"
     return 0, 0, None
 
 
@@ -231,9 +233,9 @@ def _range_confirmation_vote(
     if cl is None or op is None or rp is None:
         return 0, 0, None
 
-    if rp > 3 and cl > op:
+    if rp > 1.5 and cl > op:
         return 1, 0, f"Wide range ({rp:.1f}%) bullish bar"
-    if rp > 3 and cl < op:
+    if rp > 1.5 and cl < op:
         return 0, 1, f"Wide range ({rp:.1f}%) bearish bar"
     return 0, 0, None
 
@@ -256,9 +258,9 @@ def _sector_relative_vote(
     if dp is None or sector_median is None:
         return 0, 0, None
     delta = dp - sector_median
-    if delta > 3:
+    if delta > 1.5:
         return 1, 0, f"Outperforming sector by +{delta:.1f}pp"
-    if delta < -3:
+    if delta < -1.5:
         return 0, 1, f"Underperforming sector by {delta:.1f}pp"
     return 0, 0, None
 
@@ -425,14 +427,21 @@ def classify_nepse_signal(stock: dict[str, Any], sector: str) -> dict[str, Any]:
     sell_score = fs + ts
     reasons = fr + tr
 
-    margin = 3
-    if buy_score >= 6 and buy_score >= sell_score + margin:
+    has_fundamentals = (fb + fs) > 0
+    if has_fundamentals:
+        buy_thresh, sell_thresh, margin = 6, 6, 3
+        lean_thresh = 4
+    else:
+        buy_thresh, sell_thresh, margin = 4, 4, 3
+        lean_thresh = 3
+
+    if buy_score >= buy_thresh and buy_score >= sell_score + margin:
         verdict = "BUY"
-    elif sell_score >= 6 and sell_score >= buy_score + margin:
+    elif sell_score >= sell_thresh and sell_score >= buy_score + margin:
         verdict = "SELL"
-    elif buy_score >= 4 and buy_score > sell_score:
+    elif buy_score >= lean_thresh and buy_score >= sell_score + 1:
         verdict = "LEAN_BUY"
-    elif sell_score >= 4 and sell_score > buy_score:
+    elif sell_score >= lean_thresh and sell_score >= buy_score + 1:
         verdict = "LEAN_SELL"
     else:
         verdict = "HOLD"
