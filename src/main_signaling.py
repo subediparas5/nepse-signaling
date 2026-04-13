@@ -27,11 +27,7 @@ if not OPEN_AI_API_KEY:
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-TELEGRAM_DM_CHAT_ID = os.getenv("TELEGRAM_DM_CHAT_ID")
-_raw_send = (os.getenv("TELEGRAM_SEND_TO") or "both").strip().lower()
-TELEGRAM_SEND_TO = _raw_send if _raw_send in ("group", "dm", "both") else "both"
-if _raw_send not in ("group", "dm", "both", ""):
-    logger.warning("Unknown TELEGRAM_SEND_TO=%r; using both.", _raw_send)
+
 
 LLM_FIELDS = [
     "symbol", "sector", "market_cap_category", "ltp",
@@ -81,8 +77,8 @@ If none pass, return exactly: "No strong picks today."\
 
 SYSTEM_PROMPT_LEAN = """\
 You are an expert Nepal stock market analyst. These stocks are **LEAN_BUY** from a rule screen: \
-buy edge over sell but **below** the strict BUY threshold (rules need buy_score≥6 and +3 margin; \
-NOTS-only feeds often lack fundamentals so strict BUY is rare). Data: official prices/volume/52w.
+buy edge over sell but **below** the strict BUY bar (with NOTS-only data that is typically buy≥4 \
+and +3 margin vs sell; higher thresholds apply when fundamentals are present). Data: official prices/volume/52w.
 
 Pick the best risk/reward names anyway; reject obvious illiquidity. At most 5 lines.
 
@@ -194,7 +190,8 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int, li
 
     vcounts = Counter(s.get("signal_verdict") for s in established)
     logger.info(
-        "Rule verdict mix (established, NOTS-only): %s — strict BUY needs buy≥6 and +3 vs sell",
+        "Rule verdict mix (established, NOTS-only): %s — "
+        "NOTS-only: BUY buy≥4 & +3 vs sell; with fundamentals: buy≥6 & +3",
         dict(vcounts.most_common()),
     )
 
@@ -604,35 +601,15 @@ if __name__ == "__main__":
             "DeepSeek not called: 0 strict BUY, 0 near-52w-low, 0 LEAN_BUY after screening."
         )
 
-    send_group = TELEGRAM_SEND_TO in ("group", "both")
-    send_dm = TELEGRAM_SEND_TO in ("dm", "both")
-
     if not TELEGRAM_BOT_TOKEN:
         logger.warning("TELEGRAM_BOT_TOKEN not set — skipping Telegram")
     else:
-        logger.info("TELEGRAM_SEND_TO=%s", TELEGRAM_SEND_TO)
+        telegram_body = format_telegram_digest(llm_output or "", buys, near_lows)
 
-        need_telegram_body = (send_group and TELEGRAM_CHAT_ID) or (
-            send_dm and TELEGRAM_DM_CHAT_ID
-        )
-        telegram_body = (
-            format_telegram_digest(llm_output or "", buys, near_lows)
-            if need_telegram_body
-            else None
-        )
+        if TELEGRAM_CHAT_ID:
+            send_telegram(telegram_body, chat_id=TELEGRAM_CHAT_ID)
+        else:
+            logger.warning(
+                "TELEGRAM_CHAT_ID is unset"
+            )
 
-        if send_group:
-            if TELEGRAM_CHAT_ID:
-                send_telegram(telegram_body, chat_id=TELEGRAM_CHAT_ID)
-            else:
-                logger.warning(
-                    "TELEGRAM_SEND_TO includes group but TELEGRAM_CHAT_ID is unset"
-                )
-
-        if send_dm:
-            if TELEGRAM_DM_CHAT_ID:
-                send_telegram(telegram_body, chat_id=TELEGRAM_DM_CHAT_ID)
-            else:
-                logger.warning(
-                    "TELEGRAM_SEND_TO includes dm but TELEGRAM_DM_CHAT_ID is unset"
-                )

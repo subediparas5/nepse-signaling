@@ -19,7 +19,6 @@ OHLC, VWAP (average traded price), volume, turnover, transaction count, 52-week 
 ### Telegram output
 
 - **Group** (`TELEGRAM_CHAT_ID`): one short HTML message — top **5** BUY rows (monospace table), optional **LLM** tickers on one line, and up to **8** near-52w-low rows (`8/total` in the header).
-- **Your DM** (`TELEGRAM_DM_CHAT_ID`, optional): full report — LLM lines, all BUY candidates table + reasons (first 12), full 52w-low table.
 
 ## Setup
 
@@ -37,7 +36,6 @@ uv sync
 export OPEN_AI_API_KEY="sk-..."
 export TELEGRAM_BOT_TOKEN="123:ABC..."
 export TELEGRAM_CHAT_ID="-100..."   # group: short digest
-export TELEGRAM_DM_CHAT_ID="123456789"   # needed for dm / both
 export TELEGRAM_SEND_TO=both   # group | dm | both (default both)
 uv run src/main_signaling.py
 ```
@@ -48,11 +46,7 @@ The first run may take **1–3 minutes** while security detail is fetched for ea
 
 Workflow: `.github/workflows/schedule.yml` (cron in **Asia/Kathmandu**).
 
-**Secrets:** `OPEN_AI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (group), optional `TELEGRAM_DM_CHAT_ID` (DM).
-
-**Where messages go:** set env `TELEGRAM_SEND_TO` to `group`, `dm`, or `both` (default `both`). Cron runs use `both` unless you change the workflow env line.
-
-**Manual run:** *Actions → NEPSE Daily Signal → Run workflow* — choose **Telegram destination** (`group` / `dm` / `both`). That maps to `TELEGRAM_SEND_TO` for that run only.
+**Secrets:** `OPEN_AI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.
 
 ## Project structure
 

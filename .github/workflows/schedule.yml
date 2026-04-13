@@ -5,16 +5,6 @@ on:
     - cron: "0 9 * * 1-5"
       timezone: Asia/Kathmandu
   workflow_dispatch:
-    inputs:
-      telegram_send_to:
-        description: "Telegram destination"
-        type: choice
-        required: false
-        default: dm
-        options:
-          - group
-          - dm
-          - both
 
 jobs:
   signal:
@@ -35,5 +25,3 @@ jobs:
           OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_DM_CHAT_ID: ${{ secrets.TELEGRAM_DM_CHAT_ID }}
-          TELEGRAM_SEND_TO: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.telegram_send_to || 'both' }}
