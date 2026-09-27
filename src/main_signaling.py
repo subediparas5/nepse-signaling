@@ -467,9 +467,10 @@ def _telegram_html_chunks(message: str, max_len: int = 4096) -> list[str]:
     return chunks
 
 
-def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -> None:
+def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -> bool:
+    """Send `message` (split into Telegram-sized chunks). True only if every chunk was accepted."""
     if not TELEGRAM_BOT_TOKEN or not chat_id:
-        return
+        return False
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     max_len = 4096
@@ -478,6 +479,7 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
         if parse_mode == "HTML"
         else [message[i : i + max_len] for i in range(0, len(message), max_len)]
     )
+    ok = True
     for chunk in chunks:
         resp = requests.post(
             url,
@@ -488,6 +490,7 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
             },
         )
         if not resp.ok:
+            ok = False
             logger.error(
                 "Telegram send failed chat=%s: %s %s",
                 chat_id,
@@ -496,6 +499,7 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
             )
         else:
             logger.info("Telegram sent → %s", chat_id)
+    return ok
 
 
 def persist_market_snapshot(
@@ -545,8 +549,13 @@ def persist_signals(
 
 
 if __name__ == "__main__":
-    all_stocks, listed_stocks = fetch_market_snapshot()
     business_date = get_business_date()
+    # The workflow has a backup schedule; a business date gets one digest (also skips holidays,
+    # when the business date does not change).
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID and history_store.digest_sent(business_date):
+        logger.info("Digest for %s already sent — nothing to do", business_date)
+        sys.exit(0)
+    all_stocks, listed_stocks = fetch_market_snapshot()
     try:
         persist_market_snapshot(business_date, all_stocks, listed_stocks)
         history_store.upsert_index(get_index_history())
@@ -584,5 +593,5 @@ if __name__ == "__main__":
         logger.warning("TELEGRAM_BOT_TOKEN not set — skipping Telegram")
     elif not TELEGRAM_CHAT_ID:
         logger.warning("TELEGRAM_CHAT_ID is unset")
-    else:
-        send_telegram(format_telegram_digest(notes, setups, context, class_counts), chat_id=TELEGRAM_CHAT_ID)
+    elif send_telegram(format_telegram_digest(notes, setups, context, class_counts), chat_id=TELEGRAM_CHAT_ID):
+        history_store.record_digest_sent(business_date, datetime.now(timezone.utc).isoformat(timespec="seconds"))

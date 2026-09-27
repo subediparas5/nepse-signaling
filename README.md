@@ -163,7 +163,11 @@ uv run pytest
 
 ### GitHub Actions
 
-Workflow: `.github/workflows/schedule.yml` (cron in **Asia/Kathmandu**). After the digest it
+Workflow: `.github/workflows/schedule.yml`, Monday–Friday (covering the Sunday–Thursday sessions) at
+**03:37 NPT with a 06:37 NPT backup** (cron in Asia/Kathmandu). GitHub has started scheduled runs 4–5 h
+late, so this keeps the digest ahead of the 11:00 open. Each business date gets one digest: sent dates
+are recorded in `data/digests.csv`, and a later run for the same date exits early (this also skips
+holidays, when the business date does not change). After the digest it
 backfills the last 30 days and commits any `data/` changes back to the branch (`contents: write`).
 
 **Secrets:** `OPEN_AI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.

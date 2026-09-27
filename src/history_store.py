@@ -8,6 +8,7 @@ Layout (under DATA_DIR, default `<repo>/data`):
   securities.csv       one row per symbol — id, sector, first/last seen
   corporate_actions.csv one row per (date, symbol) — bonus/rights/dividend price adjustments
   events.csv           one row per (alert, symbol) — typed NOTS exchange notices (events.py)
+  digests.csv          one row per business date whose Telegram digest was sent (dedupes runs)
 
 Prices are stored raw (as traded). features.build_panel applies corporate_actions on load.
 
@@ -45,6 +46,7 @@ SIGNAL_FIELDS = [
 SECURITY_FIELDS = ["symbol", "security_id", "sector", "first_seen", "last_seen"]
 ACTION_FIELDS = ["date", "symbol", "prev_close", "adjusted_price", "factor", "reason", "alert_id"]
 EVENT_FIELDS = ["date", "symbol", "event", "alert_id", "title"]
+DIGEST_FIELDS = ["date", "sent_at"]
 
 
 def fmt(value: Any) -> str:
@@ -168,6 +170,14 @@ def upsert_events(rows: Iterable[dict[str, Any]], data_dir: Path = DATA_DIR) -> 
 
 def load_events(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:
     return _read(data_dir / "events.csv")
+
+
+def record_digest_sent(business_date: str, sent_at: str, data_dir: Path = DATA_DIR) -> int:
+    return _upsert(data_dir / "digests.csv", DIGEST_FIELDS, ("date",), [{"date": business_date, "sent_at": sent_at}])
+
+
+def digest_sent(business_date: str, data_dir: Path = DATA_DIR) -> bool:
+    return any(r["date"] == business_date for r in _read(data_dir / "digests.csv"))
 
 
 def load_prices(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:

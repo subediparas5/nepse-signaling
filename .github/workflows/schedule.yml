@@ -1,8 +1,12 @@
 name: NEPSE Daily Signal
 
 on:
+  # Scheduled runs have started 4-5 h late (and can be dropped), so aim well before the 11:00 NPT open,
+  # off the busy top-of-hour slot, with a backup run. A business date gets one digest (data/digests.csv).
   schedule:
-    - cron: "0 8 * * 1-5"
+    - cron: "37 3 * * 1-5"
+      timezone: Asia/Kathmandu
+    - cron: "37 6 * * 1-5"
       timezone: Asia/Kathmandu
   workflow_dispatch:
 

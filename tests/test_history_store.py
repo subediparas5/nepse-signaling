@@ -66,3 +66,11 @@ def test_signals_and_index_roundtrip(tmp_path):
     [sig] = hs._read(tmp_path / "signals" / "2026-09.csv")
     assert (sig["classification"], sig["score"], sig["regime"]) == ("STRONG_SETUP", "91.5", "NEUTRAL")
     assert "verdict" not in sig
+
+
+def test_digest_sent_records_business_dates(tmp_path):
+    assert not hs.digest_sent("2026-09-24", tmp_path)
+    hs.record_digest_sent("2026-09-24", "2026-09-24T22:00:00+00:00", tmp_path)
+    assert hs.digest_sent("2026-09-24", tmp_path)
+    assert not hs.digest_sent("2026-09-25", tmp_path)
+    assert hs.record_digest_sent("2026-09-24", "2026-09-24T22:00:00+00:00", tmp_path) == 0  # idempotent

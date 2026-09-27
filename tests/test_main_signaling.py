@@ -153,3 +153,29 @@ def test_persist_snapshot_and_signals(tmp_path):
     assert (sig["classification"], sig["score"], sig["regime"]) == ("STRONG_SETUP", "91.2346", "NEUTRAL")
     assert sig["close"] == "569" and "verdict" not in sig
     assert hs._read(tmp_path / "securities.csv")[0]["security_id"] == "131"
+
+
+class _Resp:
+    def __init__(self, ok):
+        self.ok, self.status_code, self.text = ok, 200 if ok else 400, ""
+
+
+def test_send_telegram_reports_success_only_if_all_chunks_ok(monkeypatch):
+    monkeypatch.setattr(ms, "TELEGRAM_BOT_TOKEN", "t")
+    calls = []
+
+    def post(url, json):
+        calls.append(json["text"])
+        return _Resp(len(calls) != 2)  # second chunk fails
+
+    monkeypatch.setattr(ms.requests, "post", post)
+    long_msg = "<pre>" + "\n".join("x" * 80 for _ in range(120)) + "</pre>"
+    assert ms.send_telegram("hello", chat_id="c") is True
+    calls.clear()
+    assert ms.send_telegram(long_msg, chat_id="c") is False
+    assert len(calls) > 1
+
+
+def test_send_telegram_without_token_is_false(monkeypatch):
+    monkeypatch.setattr(ms, "TELEGRAM_BOT_TOKEN", None)
+    assert ms.send_telegram("x", chat_id="c") is False
