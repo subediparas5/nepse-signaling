@@ -6,7 +6,6 @@ Daily ranking engine for the Nepal Stock Exchange (NEPSE). Runs on a schedule, r
 
 ```
 NOTS (listing + prices + 52w + index) ─▶ data/ history ─▶ features ─▶ scoring model ─▶ DeepSeek notes ─▶ Telegram
-                                                                    └▶ legacy vote engine (recorded only)
 ```
 
 Market data is read through the open-source [`nepse-data-api`](https://pypi.org/project/nepse-data-api/) package, which implements NEPSE’s authenticated WASM token flow. Traffic goes to **nepalstock.com.np**, not aggregator websites.
@@ -48,8 +47,10 @@ The market regime (`src/regime.py`: NEPSE vs SMA20/50 plus breadth) is shown as 
 found no reliable benefit from gating on it. Scores are **relative** — a STRONG_SETUP can still fall in a
 falling market.
 
-The legacy vote engine (`nepse_signal_rules.py`, table under [Legacy scoring](#legacy-scoring)) still runs and
-is recorded in `data/signals/` so its open/VWAP-based votes can be evaluated once enough snapshots exist.
+The original buy/sell vote engine was removed after its backtest showed no edge (its BUY signals trailed
+the average stock by about 1.9% over 20 days); the evidence is archived in `reports/legacy_rules_backtest.md`.
+Its open/VWAP ideas live on as features (`gap_1d`, `close_vs_open`, `close_vs_vwap`) that the backtest
+evaluates once daily snapshots accumulate.
 
 ### Telegram output
 
@@ -99,7 +100,7 @@ Every run appends to plain CSVs committed to the repo — the research record fo
 |------|------|--------|
 | `data/prices/YYYY-MM.csv` | one per (date, symbol): OHLC, VWAP, volume, turnover, trades, 52w | backfill + daily snapshot |
 | `data/index/nepse.csv` | one per date: NEPSE index OHLC, turnover, trades | backfill |
-| `data/signals/YYYY-MM.csv` | one per (date, symbol): verdict, scores, reasons, close | daily run |
+| `data/signals/YYYY-MM.csv` | one per (date, symbol): class, score, opportunity, risk, regime, close | daily run |
 | `data/securities.csv` | one per symbol: NOTS id, sector, first/last seen | both |
 | `data/corporate_actions.csv` | one per (date, symbol): bonus/rights/cash-dividend adjustment factor | NOTS news notices |
 
@@ -129,8 +130,7 @@ Features (`src/features.py`) are point-in-time: returns, SMA distances, RSI, ATR
 relative volume/turnover, trailing range position, drawdown, sector/market-relative strength.
 The backtest enters at the **next day's close** (history has no opens), skips limit-up-locked and
 no-trade days, reports returns in excess of the same-day universe average, and excludes each new
-listing's first 120 sessions. Only votes reconstructable from history are replayed (52w position,
-liquidity, sector-relative); open/VWAP votes stay neutral until daily snapshots accumulate.
+listing's first 120 sessions. Open/VWAP features exist only from daily snapshots onward.
 See the header of `reports/backtest.md` for how to read it.
 
 ### Dashboard
@@ -140,8 +140,8 @@ uv run src/build_dashboard.py     # writes reports/dashboard.html (self-containe
 ```
 
 One offline HTML page built from `data/` with the same code as the backtest: today's sortable ranking,
-per-stock adjusted price / daily class / score history, growth of Rs 100 for the model vs the legacy
-engine, the average stock and the NEPSE index (out-of-sample sessions, net of an estimated 0.4% per trade
+per-stock adjusted price / daily class / score history, growth of Rs 100 for the model vs the average
+stock and the NEPSE index (out-of-sample sessions, net of an estimated 0.4% per trade
 side), class track record, feature correlations and component weights over time. It is not committed;
 the scheduled workflow uploads it as the `nepse-dashboard` build artifact.
 
@@ -168,7 +168,6 @@ backfills the last 30 days and commits any `data/` changes back to the branch (`
 src/
   main_signaling.py     # Orchestration, LLM, Telegram
   nepse_official.py     # NOTS listing + per-symbol market merge
-  nepse_signal_rules.py # Legacy vote engine (recorded, not used for ranking)
   scoring.py            # Walk-forward scoring model and classes
   regime.py             # NEPSE market regime
   history_store.py      # CSV history store (upserts, deterministic output)
@@ -179,28 +178,12 @@ src/
   build_dashboard.py     # Dashboard data + HTML render
   dashboard_template.html
 reports/backtest.md     # Latest backtest output
+reports/legacy_rules_backtest.md  # Archived evidence for removing the old vote engine
 data/                   # Committed history (see above)
 .github/workflows/
   schedule.yml
 tests/                  # pytest, no network
 ```
-
-## Legacy scoring
-
-Independent buy/sell scores from weighted votes. Thresholds depend on whether any fundamental field
-(P/E, EPS, P/B, dividend, promoter %, ROE, NPL — see `FUNDAMENTAL_FIELDS`) is present on the stock.
-The NOTS feed carries none, so the **price-only** column is what runs today.
-
-| Verdict | Price-only | With fundamentals |
-|---------|------------|-------------------|
-| **BUY** | buy ≥ 4 and buy ≥ sell + 3 | buy ≥ 6 and buy ≥ sell + 3 |
-| **SELL** | sell ≥ 4 and sell ≥ buy + 3 | sell ≥ 6 and sell ≥ buy + 3 |
-| **LEAN_BUY** | buy ≥ 3 and buy ≥ sell + 1 | buy ≥ 4 and buy ≥ sell + 1 |
-| **LEAN_SELL** | sell ≥ 3 and sell ≥ buy + 1 | sell ≥ 4 and sell ≥ buy + 1 |
-| **HOLD** | Otherwise | Otherwise |
-| **IPO** | `ma120` present and equal to 0 | same |
-
-Confidence: `round(abs(buy - sell) / (buy + sell) * 100)` when the denominator is positive.
 
 ## License
 

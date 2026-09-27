@@ -139,3 +139,15 @@ def test_actions_outside_window_or_unknown_symbol_are_ignored():
         {"date": traded.index[1], "symbol": "ZZZ", "factor": 0.5},
     ])
     assert (F.adjustment_factors(acts, traded) == 1.0).all().all()
+
+
+def test_snapshot_features_need_open_and_vwap():
+    p = _panel({"A": [100.0, 102.0, 104.0]})
+    f = F.compute_features(p)
+    assert f["gap_1d"]["A"].isna().all() and f["close_vs_vwap"]["A"].isna().all()
+    p.open.loc[p.open.index[2], "A"] = 103.0
+    p.vwap.loc[p.vwap.index[2], "A"] = 103.5
+    f = F.compute_features(p)
+    assert f["gap_1d"]["A"].iloc[2] == pytest.approx(103 / 102 - 1)
+    assert f["close_vs_open"]["A"].iloc[2] == pytest.approx(104 / 103 - 1)
+    assert f["close_vs_vwap"]["A"].iloc[2] == pytest.approx(104 / 103.5 - 1)

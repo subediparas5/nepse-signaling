@@ -27,13 +27,14 @@ def _write_history(data_dir, n_days=150, n_syms=40, seed=3):
 def test_backtest_runs_end_to_end_and_baseline_excess_is_zero(tmp_path):
     _write_history(tmp_path)
     report = B.run(tmp_path)
-    assert "## Individual rule votes" in report and "## Feature information coefficients" in report
+    assert "## Feature information coefficients" in report
 
-    df = B.replay_rules(B.F.build_dataset(B.F.load_panel(tmp_path)))
+    assert "## Scoring model (walk-forward)" in report and "Legacy" not in report
+
+    df = B.F.build_dataset(B.F.load_panel(tmp_path))
     everything = df["close"].notna()
     s = B.group_stats(df, everything, 5, df.index.get_level_values("date")[len(df) // 2])
     assert abs(s["excess"]) < 1e-12
-    assert set(df["verdict"]) <= {"BUY", "LEAN_BUY", "HOLD", "LEAN_SELL", "SELL"}
-    # Range votes need >= RANGE_MIN_OBS sessions
+    # Trailing range needs >= RANGE_MIN_OBS sessions
     early = df.index.get_level_values("date") < sorted(set(df.index.get_level_values("date")))[B.F.RANGE_MIN_OBS - 1]
-    assert (df.loc[early, "vote_week52"] == "none").all()
+    assert df.loc[early, "range_pos"].isna().all()

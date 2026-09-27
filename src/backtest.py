@@ -1,5 +1,5 @@
 """
-Replay the rule engine over committed history and measure what happened next.
+Walk-forward backtest of the scoring model on committed history.
 
     uv run src/backtest.py                      # writes reports/backtest.md
     uv run src/backtest.py --out -              # print only
@@ -9,8 +9,10 @@ Method (see README "Backtest"):
 - Returns are reported raw and as *excess* over the same-day equal-weight universe.
 - Significance uses one mean per date on non-overlapping dates (every h-th), because
   stocks on the same day and overlapping windows are not independent observations.
-- Only votes reconstructable from history are replayed; open/VWAP-based votes stay
-  neutral until daily snapshots accumulate (history has no open or VWAP).
+- Open/VWAP-based features exist only from daily snapshots onward (history has neither);
+  they appear in the feature table once enough dates accumulate.
+
+The removed legacy vote engine's results are archived in reports/legacy_rules_backtest.md.
 """
 
 from __future__ import annotations
@@ -18,7 +20,6 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
@@ -33,21 +34,15 @@ import features as F
 import history_store
 import regime as R
 import scoring as S
-from nepse_signal_rules import _liquidity_vote, _sector_relative_vote, _week52_vote, classify_nepse_signal
 
 REPORT_PATH = Path(__file__).resolve().parent.parent / "reports" / "backtest.md"
-
-# Replayable votes: name -> fn(row) -> (buy, sell, reason)
-VOTES: dict[str, Callable[[pd.Series], tuple[int, int, str | None]]] = {
-    "week52": lambda r: _week52_vote(r["close"], r["range_hi"], r["range_lo"], r["turnover"]),
-    "liquidity": lambda r: _liquidity_vote(r["turnover"], r["trades"]),
-    "sector_rel": lambda r: _sector_relative_vote(r["diff_pct"], r["sector_median_diff"]),
-}
 
 IC_FEATURES = [
     "ret_5d", "ret_20d", "ret_60d", "dist_sma20", "dist_sma50", "dist_sma120",
     "rsi14", "macd_hist_pct", "range_pos", "drawdown_120", "atr14_pct", "vol_20d",
     "rvol_20", "rturnover_20", "sector_rel_20d",
+    # Snapshot-only (need open / VWAP): gap, close vs open, close vs VWAP.
+    "gap_1d", "close_vs_open", "close_vs_vwap",
 ]
 # market_rel_20d is ret_20d minus a per-date constant, so its cross-sectional rank IC is identical.
 MIN_NAMES_PER_DATE = 30
@@ -55,36 +50,6 @@ MIN_NAMES_PER_DATE = 30
 # Classifier adoption margins over the step-4 score (20-day horizon).
 ADOPT_IC_MARGIN = 0.02
 ADOPT_EXCESS_MARGIN = 0.0025
-
-
-def replay_rules(df: pd.DataFrame) -> pd.DataFrame:
-    """Add per-vote (buy, sell) columns and the rule verdict using only reconstructable fields."""
-    out = df.copy()
-    for name, fn in VOTES.items():
-        res = [fn(r) for _, r in out.iterrows()]
-        out[f"vote_{name}"] = [f"buy{b}" if b else (f"sell{s}" if s else "none") for b, s, _ in res]
-
-    verdicts, buys, sells = [], [], []
-    for (_, _sym), r in out.iterrows():
-        stock = {
-            "ltp": r["close"], "close": r["close"], "open": _nan_none(r["open"]), "vwap": _nan_none(r["vwap"]),
-            "prev_close": r["close"] / (1 + r["ret_1d"]) if pd.notna(r["ret_1d"]) else None,
-            "high": r["high"], "low": r["low"], "turnover": r["turnover"], "transactions": r["trades"],
-            "week_52_high": _nan_none(r["range_hi"]), "week_52_low": _nan_none(r["range_lo"]),
-            "diff_pct": _nan_none(r["diff_pct"]), "_sector_median_diff": _nan_none(r["sector_median_diff"]),
-        }
-        if stock["prev_close"] and stock["open"] is not None:
-            stock["range_pct"] = (r["high"] - r["low"]) / stock["prev_close"] * 100
-        res = classify_nepse_signal(stock, r["sector"] or "")
-        verdicts.append(res["signal_verdict"])
-        buys.append(res["signal_buy_score"])
-        sells.append(res["signal_sell_score"])
-    out["verdict"], out["buy_score"], out["sell_score"] = verdicts, buys, sells
-    return out
-
-
-def _nan_none(x):
-    return None if x is None or (isinstance(x, float) and math.isnan(x)) else x
 
 
 def _nonoverlap_t(per_date: pd.Series, h: int) -> float:
@@ -182,10 +147,9 @@ def build_report(df: pd.DataFrame, horizons: tuple[int, ...] = (5, 20)) -> str:
     labelled = df[df["fwd_ret_1"].notna()]
     split = dates[len(dates) // 2]
     idx_first, idx_last = df.attrs.get("index_first"), df.attrs.get("index_last")
-    everything = pd.Series(True, index=df.index)
 
     lines = [
-        "# NEPSE rule backtest",
+        "# NEPSE scoring backtest",
         "",
         f"History {dates[0]} → {dates[-1]} ({len(dates)} trading days, "
         f"{df.index.get_level_values('symbol').nunique()} symbols, {len(labelled):,} labelled observations). "
@@ -199,9 +163,8 @@ def build_report(df: pd.DataFrame, horizons: tuple[int, ...] = (5, 20)) -> str:
         "It is the number that matters; raw returns mostly reflect the market's direction.",
         "- *t* uses one average per date on every h-th date (non-overlapping). |t| < 2 is "
         "indistinguishable from noise. One year of data is a single market regime.",
-        "- Replayed votes: 52-week position (trailing ≤240-day range, ≥120 days required), liquidity, "
-        "sector-relative day move. Gap, VWAP, open-vs-close and range votes need opens, which "
-        "history lacks, so they are neutral here — replayed verdicts are **not** identical to live ones.",
+        "- `gap_1d`, `close_vs_open` and `close_vs_vwap` need opening prices / VWAP, which exist only "
+        "from daily snapshots onward, so they show few or no dates until those accumulate.",
         f"- Universe excludes each new listing's first {F.NEW_LISTING_SESSIONS} sessions "
         "(symbols trading on the first stored day count as seasoned). "
         + _new_listing_note(df.attrs.get("new_listings")),
@@ -210,30 +173,7 @@ def build_report(df: pd.DataFrame, horizons: tuple[int, ...] = (5, 20)) -> str:
         f"- Prices are back-adjusted for {df.attrs.get('n_actions', 0)} NOTS bonus/rights/cash-dividend notices "
         "(data/corporate_actions.csv), so those events do not show up as losses.",
         "- Survivorship: only currently listed symbols are in the data.",
-        "",
-        "## Individual rule votes",
-        "",
-    ]
-    for h in horizons:
-        rows = [("All observations (baseline)", group_stats(df, everything, h, split))]
-        for name in VOTES:
-            col = f"vote_{name}"
-            for val in sorted(df[col].unique()):
-                rows.append((f"`{name}` {val}", group_stats(df, df[col] == val, h, split)))
-        lines += _stats_table("Votes", rows, h)
-
-    lines += ["## Replayed verdicts", ""]
-    for h in horizons:
-        rows = [("All observations (baseline)", group_stats(df, everything, h, split))]
-        for v in ["BUY", "LEAN_BUY", "HOLD", "LEAN_SELL", "SELL"]:
-            if (df["verdict"] == v).any():
-                rows.append((v, group_stats(df, df["verdict"] == v, h, split)))
-        lines += _stats_table("Verdicts", rows, h)
-
-    share = df["verdict"].value_counts(normalize=True)
-    lines += [
-        "Verdict mix over all replayed observations: "
-        + ", ".join(f"{k} {v * 100:.0f}%" for k, v in share.items()),
+        "- The removed legacy vote engine is evaluated in `reports/legacy_rules_backtest.md` (archived).",
         "",
         "## Feature information coefficients",
         "",
@@ -270,7 +210,6 @@ def score_dataset(df: pd.DataFrame, p: F.Panel) -> tuple[pd.DataFrame, pd.DataFr
     scored, weights = S.score_frame(df, calendar)
     reg = R.compute_regime(p.index_close, df["dist_sma50"].unstack()).reindex(calendar)
     scored["regime"] = scored.index.get_level_values("date").map(reg["regime"])
-    scored["legacy_net"] = scored["buy_score"] - scored["sell_score"]
     return scored, weights, reg
 
 
@@ -303,7 +242,6 @@ def build_scoring_report(df: pd.DataFrame, weights: pd.DataFrame, reg: pd.DataFr
         "- `score` = walk-forward weights: each day uses only ICs whose outcome had finished by then.",
         "- `score_prior` = fixed prior weights chosen after looking at the full year in step 3 — "
         "**in-sample**, shown for reference only.",
-        "- Legacy = the replayed old vote engine on the same dates.",
         "",
         "Weights (signed, sum of |w| = 1):",
         "",
@@ -324,7 +262,7 @@ def build_scoring_report(df: pd.DataFrame, weights: pd.DataFrame, reg: pd.DataFr
         "|---|" + "---:|---:|---:|" * len(h_list),
     ]
     for col, label in [("score", "Walk-forward score"), ("score_prior", "Prior score (in-sample)"),
-                       ("risk_score", "Risk score (higher = riskier)"), ("legacy_net", "Legacy buy − sell")]:
+                       ("risk_score", "Risk score (higher = riskier)")]:
         res = [feature_ic(oos, col, h) for h in h_list]
         lines.append(f"| {label} | " + " | ".join(
             f"{_num(r['ic'], 3)} | {_num(r['ic_t'])} | {_pct(r['q5_q1'])}" for r in res) + " |")
@@ -340,10 +278,6 @@ def build_scoring_report(df: pd.DataFrame, weights: pd.DataFrame, reg: pd.DataFr
             m = oos["classification_prior"] == c
             if m.any():
                 rows.append((f"{c} (prior weights, in-sample)", group_stats(oos, m, h, split)))
-        for v in ("BUY", "LEAN_BUY"):
-            m = oos["verdict"] == v
-            if m.any():
-                rows.append((f"Legacy {v}", group_stats(oos, m, h, split)))
         lines += _stats_table("Classifications", rows, h)
 
     counts = reg.loc[o_dates, "regime"].value_counts()
@@ -471,7 +405,7 @@ def build_classifier_report(df: pd.DataFrame, retrains: list[str], h_list=(5, 20
 
 def run(data_dir: Path = history_store.DATA_DIR) -> str:
     p = F.load_panel(data_dir)
-    df = replay_rules(F.build_dataset(p))
+    df = F.build_dataset(p)
     df.attrs["index_first"] = f"{p.index_close.dropna().iloc[0]:.0f}"
     df.attrs["index_last"] = f"{p.index_close.dropna().iloc[-1]:.0f}"
     df.attrs["n_actions"] = len(history_store.load_corporate_actions(data_dir))

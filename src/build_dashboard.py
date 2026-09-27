@@ -103,7 +103,7 @@ def _staggered_hold(p: F.Panel, picks: dict[str, list[str]], dates: list[str], h
 
 def build_payload(data_dir: Path = history_store.DATA_DIR) -> dict:
     p = F.load_panel(data_dir)
-    df = B.replay_rules(F.build_dataset(p))
+    df = F.build_dataset(p)
     scored, weights, reg = B.score_dataset(df, p)
     calendar = [str(d) for d in weights.index]
     last = calendar[-1]
@@ -124,7 +124,6 @@ def build_payload(data_dir: Path = history_store.DATA_DIR) -> dict:
             "rsi": _r(r["rsi14"], 1), "turn20": _r(r["turnover_med_20"], 0),
             "comp": {k: _r(r[k], 3) for k in S.COMPONENTS},
             "sessions": run.get("sessions"), "since": _r(run.get("since_ret")), "flagged": run.get("flagged_since"),
-            "legacy": r.get("verdict"),
         })
     stocks.sort(key=lambda s: -(s["score"] or -1))
 
@@ -145,13 +144,11 @@ def build_payload(data_dir: Path = history_store.DATA_DIR) -> dict:
     # --- strategies (out-of-sample dates only) -----------------------------------------------
     oos = scored[scored.index.get_level_values("date").isin(learned)]
     strong = oos["classification"] == "STRONG_SETUP"
-    legacy = oos["verdict"].isin(["BUY", "LEAN_BUY"])
 
     def picks(mask: pd.Series) -> dict[str, list[str]]:
         return {d: list(g.index.get_level_values("symbol")) for d, g in oos[mask].groupby(level="date")}
 
     strong_hold = _staggered_hold(p, picks(strong), learned, HOLD_SESSIONS, COST_PER_SIDE)
-    legacy_hold = _staggered_hold(p, picks(legacy), learned, HOLD_SESSIONS, COST_PER_SIDE)
     strong_daily_net, strong_turn = _daily_rebalanced(oos, strong, learned, COST_PER_SIDE)
     strong_daily_gross, _ = _daily_rebalanced(oos, strong, learned, 0.0)
     everyone = oos["close"].notna()
@@ -175,20 +172,12 @@ def build_payload(data_dir: Path = history_store.DATA_DIR) -> dict:
             "recent_hit20": _r((rec_recent.get(c) or {}).get("hit"), 3),
             "recent_excess20": _r((rec_recent.get(c) or {}).get("excess")),
         })
-    legacy_rows = []
-    for v in ("BUY", "LEAN_BUY"):
-        m = oos["verdict"] == v
-        if m.any():
-            st = B.group_stats(oos, m, 20, split)
-            legacy_rows.append({"cls": f"Legacy {v}", "n": st["n"], "excess20": _r(st["excess"]),
-                                "hit20": _r(st["hit"], 3)})
     ics = []
     for feat in B.IC_FEATURES:
         res = B.feature_ic(scored, feat, 20)
         ics.append({"feature": feat, "ic": _r(res["ic"], 3), "t": _r(res["ic_t"], 2), "q5q1": _r(res["q5_q1"])})
     ics.sort(key=lambda r: -(r["ic"] or 0))
     ic_score = B.feature_ic(oos, "score", 20)
-    ic_legacy = B.feature_ic(oos, "legacy_net", 20)
 
     counts = today["classification"].value_counts().to_dict()
     r_last = reg.loc[last]
@@ -218,8 +207,6 @@ def build_payload(data_dir: Path = history_store.DATA_DIR) -> dict:
             "series": [
                 {"key": "strong_hold", "label": f"Strong setups, {HOLD_SESSIONS}-day hold (net)",
                  "values": strong_hold},
-                {"key": "legacy_hold", "label": f"Legacy BUY + LEAN_BUY, {HOLD_SESSIONS}-day hold (net)",
-                 "values": legacy_hold},
                 {"key": "universe", "label": f"All stocks, {HOLD_SESSIONS}-day hold (no costs)", "values": univ_hold},
                 {"key": "index", "label": "NEPSE index", "values": idx_curve},
                 {"key": "strong_daily_net", "label": "Strong setups, rebuilt daily (net)", "values": strong_daily_net},
@@ -228,15 +215,13 @@ def build_payload(data_dir: Path = history_store.DATA_DIR) -> dict:
             ],
         },
         "classes": classes,
-        "legacy_classes": legacy_rows,
         "weights": {
             "dates": calendar,
             "learned_from": learned[0] if learned else None,
             "series": {k: [_r(v, 3) for v in weights[k]] for k in S.COMPONENTS},
         },
         "ics": ics,
-        "score_ic": {"model": _r(ic_score["ic"], 3), "model_t": _r(ic_score["ic_t"], 2),
-                     "legacy": _r(ic_legacy["ic"], 3), "legacy_t": _r(ic_legacy["ic_t"], 2)},
+        "score_ic": {"model": _r(ic_score["ic"], 3), "model_t": _r(ic_score["ic_t"], 2)},
         "n_actions": len(history_store.load_corporate_actions(data_dir)),
     }
 

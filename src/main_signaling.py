@@ -19,13 +19,13 @@ if str(_SRC_DIR) not in sys.path:
 import history_store
 import scoring
 from nepse_official import (
+    TRADABLE_SECTORS,
     get_business_date,
     get_index_history,
     get_price_adjustments,
     get_official_listed_stocks,
     get_official_share_price_lookup,
 )
-from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -73,24 +73,8 @@ LLM_RISK_MAX = 90
 LLM_RISKS = 3
 
 
-def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
-    """Compute median diff_pct per sector for relative-strength scoring."""
-    from statistics import median
-
-    sector_vals: dict[str, list[float]] = {}
-    for s in stocks:
-        dp = s.get("diff_pct")
-        sec = s.get("sector")
-        if dp is not None and sec:
-            try:
-                sector_vals.setdefault(sec, []).append(float(dp))
-            except (ValueError, TypeError):
-                pass
-    return {sec: median(vals) for sec, vals in sector_vals.items() if vals}
-
-
-def classify_all_stocks() -> tuple[list[dict], list[dict]]:
-    """Returns (all_classified_stocks, listed_stocks).
+def fetch_market_snapshot() -> tuple[list[dict], list[dict]]:
+    """Returns (today's market fields per tradable stock, listed_stocks).
 
     Data: Nepal Stock Exchange NOTS only (www.nepalstock.com.np via nepse-data-api).
     """
@@ -129,14 +113,7 @@ def classify_all_stocks() -> tuple[list[dict], list[dict]]:
 
         pre_stocks.append(data)
 
-    sector_medians = _compute_sector_medians(pre_stocks)
-
-    all_stocks: list[dict] = []
-    for data in pre_stocks:
-        data["_sector_median_diff"] = sector_medians.get(data["sector"])
-        data.update(classify_nepse_signal(data, data["sector"]))
-        all_stocks.append(data)
-    return all_stocks, listed_stocks
+    return pre_stocks, listed_stocks
 
 
 SCORE_FIELDS = [
@@ -547,7 +524,7 @@ def persist_signals(
     context: dict | None,
     data_dir: Path = history_store.DATA_DIR,
 ) -> None:
-    """Record every stock's model classification and the legacy vote verdict for later evaluation."""
+    """Record every stock's model classification and scores for later evaluation."""
     regime = (context or {}).get("regime")
     rows = [
         {
@@ -559,16 +536,7 @@ def persist_signals(
             "opportunity_score": s.get("opportunity_score"),
             "risk_score": s.get("risk_score"),
             "regime": regime,
-            "verdict": s.get("signal_verdict"),
-            "buy_score": s.get("signal_buy_score"),
-            "sell_score": s.get("signal_sell_score"),
-            "confidence": s.get("signal_confidence"),
-            "technical_buy": s.get("signal_technical_buy"),
-            "technical_sell": s.get("signal_technical_sell"),
-            "fundamental_buy": s.get("signal_fundamental_buy"),
-            "fundamental_sell": s.get("signal_fundamental_sell"),
             "close": s.get("close") if s.get("close") is not None else s.get("ltp"),
-            "reasons": s.get("signal_reasons"),
         }
         for s in all_stocks
     ]
@@ -576,7 +544,7 @@ def persist_signals(
 
 
 if __name__ == "__main__":
-    all_stocks, listed_stocks = classify_all_stocks()
+    all_stocks, listed_stocks = fetch_market_snapshot()
     business_date = get_business_date()
     try:
         persist_market_snapshot(business_date, all_stocks, listed_stocks)
@@ -598,8 +566,7 @@ if __name__ == "__main__":
             s["classification"] = "INSUFFICIENT_DATA"
 
     class_counts = dict(Counter(s.get("classification") for s in all_stocks))
-    logger.info("Classification mix: %s · legacy verdicts: %s", class_counts,
-                dict(Counter(s.get("signal_verdict") for s in all_stocks)))
+    logger.info("Classification mix: %s", class_counts)
     try:
         persist_signals(business_date, all_stocks, context)
     except Exception:

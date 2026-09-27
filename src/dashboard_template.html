@@ -566,7 +566,7 @@ const DATA = /*__DASHBOARD_DATA__*/null;
     [["Close Rs", num(s.close, 2)], ["Score", s.score == null ? "—" : s.score.toFixed(1)], ["Risk", s.risk == null ? "—" : s.risk.toFixed(0)],
      ["20d return", pct(s.ret20)], ["60d return", pct(s.ret60)], ["vs SMA50", pct(s.sma50)], ["From 120d high", pct(s.dd120)],
      ["20d volatility", pct(s.vol20, 2, false)], ["RSI 14", s.rsi == null ? "—" : s.rsi.toFixed(0)],
-     ["Turnover 20d med", s.turn20 == null ? "—" : `Rs ${(s.turn20 / 1e6).toFixed(1)}M`], ["Legacy verdict", s.legacy || "—"]]
+     ["Turnover 20d med", s.turn20 == null ? "—" : `Rs ${(s.turn20 / 1e6).toFixed(1)}M`]]
       .forEach(([k, v]) => { const d = el("div"); d.append(el("dt", null, k), el("dd", null, v)); kv.append(d); });
     const comp = $("#detail-comp"); comp.replaceChildren();
     Object.entries(s.comp).forEach(([k, v]) => {
@@ -603,7 +603,7 @@ const DATA = /*__DASHBOARD_DATA__*/null;
 
   // ---------------------------------------------------------------- evidence
   const st = DATA.strategies;
-  const SER = { strong_hold: "var(--s1)", legacy_hold: "var(--s2)", universe: "var(--s3)", index: "var(--s4)", strong_daily_net: "var(--s5)", strong_daily_gross: "var(--s6)" };
+  const SER = { strong_hold: "var(--s1)", universe: "var(--s2)", index: "var(--s3)", strong_daily_net: "var(--s4)", strong_daily_gross: "var(--s5)" };
   const series = st.series.map((s) => ({ label: s.label, values: s.values, color: SER[s.key], key: s.key, width: s.key.startsWith("strong_daily") ? 1.5 : 2 }));
   const sLeg = $("#strat-legend");
   series.forEach((s) => { const it = el("span"); const i = el("i", { class: "line" }); i.style.background = s.color; it.append(i, s.label); sLeg.append(it); });
@@ -615,7 +615,6 @@ const DATA = /*__DASHBOARD_DATA__*/null;
     .forEach(([v, lbl]) => { const d = el("div"); d.append(el("b", null, v == null ? "—" : `Rs ${v.toFixed(1)}`), el("span", null, lbl)); co.append(d); });
 
   const classRows = DATA.classes.map((c) => ({ label: CLASS_LABEL[c.cls], value: c.excess20, color: `var(${CLASS_VAR[c.cls]})`, sub: `${Math.round(c.hit20 * 100)}% · ${c.n.toLocaleString("en-IN")}`, tip: `5-day ${pct(c.excess5, 2)} · avg worst dip ${pct(c.mdd20)}` }));
-  (DATA.legacy_classes || []).forEach((c) => classRows.push({ label: c.cls, value: c.excess20, color: "var(--muted)", sub: `${Math.round(c.hit20 * 100)}% · ${c.n.toLocaleString("en-IN")}` }));
   barRows($("#class-bars"), classRows, (v) => pct(v, 2));
   barRows($("#ic-bars"), DATA.ics.map((r) => ({ label: r.feature, value: r.ic, color: r.ic >= 0 ? "var(--pos)" : "var(--neg)", sub: r.t == null ? "" : `t ${r.t.toFixed(1)}`, tip: `top-minus-bottom fifth: ${pct(r.q5q1, 2)}` })), (v) => (v == null ? "—" : v.toFixed(3)));
 
@@ -625,7 +624,7 @@ const DATA = /*__DASHBOARD_DATA__*/null;
   const wLeg = $("#w-legend");
   wKeys.forEach((k, i) => { const it = el("span"); const ii = el("i", { class: "line" }); ii.style.background = wColors[i]; it.append(ii, k.replace("_", " ")); wLeg.append(it); });
   lineChart($("#weights-chart"), { dates: W.dates, height: 220, series: wKeys.map((k, i) => ({ label: k.replace("_", " "), values: W.series[k], color: wColors[i] })), yFmt: (v) => v.toFixed(1), tipFmt: (v) => (v >= 0 ? "+" : "") + v.toFixed(2), aria: "Component weights over time" });
-  $("#weights-sub").textContent = `Each day the score blends five components. Before ${W.learned_from ? fmtDate(W.learned_from) : "enough history"} fixed starting weights apply; after that each weight is the component's average past rank correlation with 20-day outcomes that had already played out. Model score correlation with the next 20 days: ${DATA.score_ic.model} (t ${DATA.score_ic.model_t}); legacy vote engine: ${DATA.score_ic.legacy} (t ${DATA.score_ic.legacy_t}).`;
+  $("#weights-sub").textContent = `Each day the score blends five components. Before ${W.learned_from ? fmtDate(W.learned_from) : "enough history"} fixed starting weights apply; after that each weight is the component's average past rank correlation with 20-day outcomes that had already played out. Model score correlation with the next 20 days: ${DATA.score_ic.model} (t ${DATA.score_ic.model_t}).`;
 
   // ---------------------------------------------------------------- notes
   [

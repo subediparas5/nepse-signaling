@@ -4,7 +4,7 @@ Git-friendly on-disk history: plain CSV, deterministic ordering and number forma
 Layout (under DATA_DIR, default `<repo>/data`):
   prices/YYYY-MM.csv   one row per (date, symbol) — daily OHLCV
   index/nepse.csv      one row per date — NEPSE index
-  signals/YYYY-MM.csv  one row per (date, symbol) — rule verdicts from the daily run
+  signals/YYYY-MM.csv  one row per (date, symbol) — model class and scores from the daily run
   securities.csv       one row per symbol — id, sector, first/last seen
   corporate_actions.csv one row per (date, symbol) — bonus/rights/dividend price adjustments
 
@@ -39,10 +39,7 @@ INDEX_FIELDS = [
     "turnover", "volume", "trades", "week_52_high", "week_52_low",
 ]
 SIGNAL_FIELDS = [
-    "date", "symbol", "sector", "classification", "score", "opportunity_score", "risk_score", "regime",
-    # Legacy vote engine, kept so its open/VWAP votes can be evaluated once snapshots accumulate.
-    "verdict", "buy_score", "sell_score", "confidence",
-    "technical_buy", "technical_sell", "fundamental_buy", "fundamental_sell", "close", "reasons",
+    "date", "symbol", "sector", "classification", "score", "opportunity_score", "risk_score", "regime", "close",
 ]
 SECURITY_FIELDS = ["symbol", "security_id", "sector", "first_seen", "last_seen"]
 ACTION_FIELDS = ["date", "symbol", "prev_close", "adjusted_price", "factor", "reason", "alert_id"]

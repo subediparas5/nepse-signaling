@@ -204,6 +204,11 @@ def compute_features(p: Panel) -> dict[str, pd.DataFrame]:
     first_day = p.traded.iloc[0] if len(p.traded) else pd.Series(dtype=bool)
     f["new_listing"] = (p.traded.cumsum() <= NEW_LISTING_SESSIONS) & ~first_day
 
+    # Snapshot-only: NOTS history has no open or VWAP, so these are NaN before daily snapshots.
+    f["gap_1d"] = (p.open / prev - 1).where(p.traded)
+    f["close_vs_open"] = (c / p.open - 1).where(p.traded)
+    f["close_vs_vwap"] = (c / p.vwap - 1).where(p.traded)
+
     f["sector_rel_1d"] = _sector_demean(ret_1d, p.sector)
     f["sector_rel_20d"] = _sector_demean(f["ret_20d"], p.sector)
     idx_ret_20 = p.index_close / p.index_close.shift(20) - 1

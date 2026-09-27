@@ -59,8 +59,10 @@ def test_signals_and_index_roundtrip(tmp_path):
     hs.upsert_index([{"date": "2026-09-24", "close": 2629.81, "pct_change": 0.44}], tmp_path)
     assert hs.load_index(tmp_path)[0]["close"] == "2629.81"
     hs.upsert_signals(
-        [{"date": "2026-09-24", "symbol": "NABIL", "verdict": "BUY", "buy_score": 5, "reasons": "a | b, c"}],
+        [{"date": "2026-09-24", "symbol": "NABIL", "classification": "STRONG_SETUP", "score": 91.5,
+          "regime": "NEUTRAL"}],
         tmp_path,
     )
     [sig] = hs._read(tmp_path / "signals" / "2026-09.csv")
-    assert (sig["verdict"], sig["buy_score"], sig["reasons"]) == ("BUY", "5", "a | b, c")
+    assert (sig["classification"], sig["score"], sig["regime"]) == ("STRONG_SETUP", "91.5", "NEUTRAL")
+    assert "verdict" not in sig

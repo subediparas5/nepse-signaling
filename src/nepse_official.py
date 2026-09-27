@@ -41,6 +41,7 @@ OFFICIAL_SECTOR_TO_CODE: dict[str, str] = {
     "Investment": "INVESTMENT",
     "Others": "OTHERS",
 }
+TRADABLE_SECTORS = frozenset(OFFICIAL_SECTOR_TO_CODE.values())
 
 _nepse: Any = None
 
@@ -224,7 +225,7 @@ def _fetch_security_detail(n: Any, security_id: int, symbol: str) -> tuple[dict,
 
 def get_official_share_price_lookup(symbols: set[str] | None = None) -> dict[str, dict]:
     """
-    Per-symbol OHLCV-style fields for `main_signaling` / `nepse_signal_rules`.
+    Per-symbol OHLCV-style fields for the daily snapshot in `main_signaling`.
 
     Merges `get_stocks()` with `get_security_details()` for 52-week range and
     trade counts.
