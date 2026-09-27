@@ -64,6 +64,20 @@ uv run src/backfill_history.py              # full available window (~3 min, one
 uv run src/backfill_history.py --days 30    # recent window, fills missed days
 ```
 
+### Backtest
+
+```bash
+uv run src/backtest.py        # replays the rules over data/, writes reports/backtest.md
+```
+
+Features (`src/features.py`) are point-in-time: returns, SMA distances, RSI, ATR, MACD, volatility,
+relative volume/turnover, trailing range position, drawdown, sector/market-relative strength.
+The backtest enters at the **next day's close** (history has no opens), skips limit-up-locked and
+no-trade days, reports returns in excess of the same-day universe average, and excludes each new
+listing's first 120 sessions. Only votes reconstructable from history are replayed (52w position,
+liquidity, sector-relative); open/VWAP votes stay neutral until daily snapshots accumulate.
+See the header of `reports/backtest.md` for how to read it.
+
 ### Tests
 
 ```bash
@@ -86,6 +100,9 @@ src/
   nepse_signal_rules.py # Scoring and verdicts
   history_store.py      # CSV history store (upserts, deterministic output)
   backfill_history.py   # Pull NOTS price/index history into data/
+  features.py           # Point-in-time features + forward-return labels
+  backtest.py           # Rule replay, vote/feature statistics, report
+reports/backtest.md     # Latest backtest output
 data/                   # Committed history (see above)
 .github/workflows/
   schedule.yml
