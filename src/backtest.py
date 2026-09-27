@@ -185,7 +185,8 @@ def _stats_table(title: str, rows: list[tuple[str, dict]], h: int) -> list[str]:
     for label, s in rows:
         out.append(
             f"| {label} | {s['n']} | {s['dates']} | {_pct(s['ret'])} | {_pct(s['excess'])} | {_num(s['t'])} "
-            f"| {_pct(s['median'])} | {_num(s['hit'] * 100, 0)}% | {_pct(s['mdd'], 1)} | {_pct(s['excess_h1'])} | {_pct(s['excess_h2'])} |"
+            f"| {_pct(s['median'])} | {_num(s['hit'] * 100, 0)}% | {_pct(s['mdd'], 1)} "
+            f"| {_pct(s['excess_h1'])} | {_pct(s['excess_h2'])} |"
         )
     return out + [""]
 
