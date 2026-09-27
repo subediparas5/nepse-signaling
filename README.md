@@ -133,6 +133,22 @@ listing's first 120 sessions. Only votes reconstructable from history are replay
 liquidity, sector-relative); open/VWAP votes stay neutral until daily snapshots accumulate.
 See the header of `reports/backtest.md` for how to read it.
 
+### Dashboard
+
+```bash
+uv run src/build_dashboard.py     # writes reports/dashboard.html (self-contained, ~1.3 MB)
+```
+
+One offline HTML page built from `data/` with the same code as the backtest: today's sortable ranking,
+per-stock adjusted price / daily class / score history, growth of Rs 100 for the model vs the legacy
+engine, the average stock and the NEPSE index (out-of-sample sessions, net of an estimated 0.4% per trade
+side), class track record, feature correlations and component weights over time. It is not committed;
+the scheduled workflow uploads it as the `nepse-dashboard` build artifact.
+
+The strategy comparison uses a staggered 20-session hold (each day's picks get 1/20 of capital), the
+horizon the model is evaluated on. Rebuilding the list daily is shown too: at ~33% daily turnover,
+costs outweigh the edge.
+
 ### Tests
 
 ```bash
@@ -160,6 +176,8 @@ src/
   features.py           # Point-in-time features + forward-return labels
   backtest.py           # Rule replay, vote/feature statistics, model comparisons, report
   classifier.py         # Walk-forward logistic / gradient-boosting benchmark (not used live)
+  build_dashboard.py     # Dashboard data + HTML render
+  dashboard_template.html
 reports/backtest.md     # Latest backtest output
 data/                   # Committed history (see above)
 .github/workflows/

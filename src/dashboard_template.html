@@ -1,0 +1,644 @@
+<meta charset="utf-8">
+<title>NEPSE Setup Desk</title>
+<meta name="description" content="Daily NEPSE stock ranking, per-stock signal history and walk-forward evidence for the model.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f6f5f1;
+  --surface: #fcfcfb;
+  --surface-2: #f0efea;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #7d7b75;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --ring: rgba(11, 11, 11, 0.10);
+  --accent: #2a78d6;
+  --accent-ink: #1c5cab;
+  --focus: #2a78d6;
+  --good-ink: #006300;
+  --bad-ink: #b3261e;
+  /* class scale: diverging blue <-> red, lightness mirrors realised excess */
+  --c-strong: #184f95; --c-setup: #3987e5; --c-watch: #86b6ef; --c-neutral: #e4e3dd;
+  --c-avoid: #da5450; --c-high: #980a19; --c-none: transparent;
+  --c-strong-ink: #ffffff; --c-setup-ink: #ffffff; --c-watch-ink: #0b0b0b; --c-neutral-ink: #0b0b0b;
+  --c-avoid-ink: #ffffff; --c-high-ink: #ffffff;
+  /* categorical series, fixed order */
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300;
+  --pos: #3987e5; --neg: #da5450;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f0f0e; --surface: #1a1a19; --surface-2: #232321; --ink: #f4f3ee; --ink-2: #c3c2b7; --muted: #8f8d86;
+    --grid: #2c2c2a; --axis: #45443f; --ring: rgba(255, 255, 255, 0.10); --accent: #3987e5; --accent-ink: #86b6ef;
+    --focus: #86b6ef; --good-ink: #3fbf3f; --bad-ink: #ff817a;
+    --c-strong: #86b6ef; --c-setup: #3987e5; --c-watch: #1c5cab; --c-neutral: #383835; --c-avoid: #da5450; --c-high: #ff817a;
+    --c-strong-ink: #0b0b0b; --c-setup-ink: #ffffff; --c-watch-ink: #ffffff; --c-neutral-ink: #f4f3ee;
+    --c-avoid-ink: #ffffff; --c-high-ink: #0b0b0b;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+    --pos: #3987e5; --neg: #da5450;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f0f0e; --surface: #1a1a19; --surface-2: #232321; --ink: #f4f3ee; --ink-2: #c3c2b7; --muted: #8f8d86;
+  --grid: #2c2c2a; --axis: #45443f; --ring: rgba(255, 255, 255, 0.10); --accent: #3987e5; --accent-ink: #86b6ef;
+  --focus: #86b6ef; --good-ink: #3fbf3f; --bad-ink: #ff817a;
+  --c-strong: #86b6ef; --c-setup: #3987e5; --c-watch: #1c5cab; --c-neutral: #383835; --c-avoid: #da5450; --c-high: #ff817a;
+  --c-strong-ink: #0b0b0b; --c-setup-ink: #ffffff; --c-watch-ink: #ffffff; --c-neutral-ink: #f4f3ee;
+  --c-avoid-ink: #ffffff; --c-high-ink: #0b0b0b;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+  --pos: #3987e5; --neg: #da5450;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 56px; display: grid; gap: 28px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
+h2 { font-size: 17px; font-weight: 650; }
+h3 { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent-ink); }
+.mono { font-family: var(--mono); }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.ink2 { color: var(--ink-2); }
+.eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+header.top .meta { color: var(--ink-2); font-size: 13px; }
+nav.jump { display: flex; flex-wrap: wrap; gap: 6px; }
+nav.jump a { font-size: 13px; text-decoration: none; color: var(--ink-2); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--ring); background: var(--surface); }
+nav.jump a:hover { color: var(--ink); border-color: var(--axis); }
+
+.panel { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.section-head { display: grid; gap: 4px; }
+
+/* summary */
+.summary { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.summary .panel { gap: 8px; }
+.hero { font-size: 52px; font-weight: 650; line-height: 1; letter-spacing: -0.02em; }
+.stat-row { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
+.stat-row b { color: var(--ink); font-weight: 600; }
+.regime { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; font-size: 20px; }
+.regime .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+.regime[data-r="BULLISH"] .dot { background: var(--c-setup); }
+.regime[data-r="BEARISH"] .dot { background: var(--c-avoid); }
+.class-bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--surface); }
+.class-bar span { display: block; height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.legend i.line { height: 2px; width: 14px; border-radius: 1px; vertical-align: 3px; }
+
+/* chips */
+.chip { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; padding: 1px 7px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; }
+.chip[data-c="STRONG_SETUP"] { background: var(--c-strong); color: var(--c-strong-ink); }
+.chip[data-c="SETUP"] { background: var(--c-setup); color: var(--c-setup-ink); }
+.chip[data-c="WATCH"] { background: var(--c-watch); color: var(--c-watch-ink); }
+.chip[data-c="NEUTRAL"] { background: var(--c-neutral); color: var(--c-neutral-ink); }
+.chip[data-c="AVOID"] { background: var(--c-avoid); color: var(--c-avoid-ink); }
+.chip[data-c="HIGH_RISK"] { background: var(--c-high); color: var(--c-high-ink); }
+.chip[data-c="INSUFFICIENT_DATA"] { background: transparent; color: var(--ink-2); border-color: var(--axis); }
+
+/* table */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters input, .filters select { font: inherit; font-size: 13px; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 6px; padding: 6px 9px; min-width: 0; }
+.filters input { width: 180px; }
+.filters .count { font-size: 12px; color: var(--muted); margin-left: auto; }
+.table-scroll { overflow-x: auto; max-height: 520px; overflow-y: auto; border: 1px solid var(--ring); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid); }
+th:first-child, td:first-child, th.l, td.l { text-align: left; }
+thead th { position: sticky; top: 0; background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--ink-2); letter-spacing: 0.03em; text-transform: uppercase; z-index: 1; }
+thead th button { all: unset; cursor: pointer; }
+thead th button:focus-visible { outline: 2px solid var(--focus); }
+thead th[aria-sort="ascending"] button::after { content: " ▲"; font-size: 9px; }
+thead th[aria-sort="descending"] button::after { content: " ▼"; font-size: 9px; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--surface-2); }
+tbody tr[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+td .sym { font-family: var(--mono); font-weight: 600; }
+.up { color: var(--good-ink); } .down { color: var(--bad-ink); }
+.meter { display: inline-block; width: 56px; height: 6px; border-radius: 3px; background: var(--surface-2); vertical-align: middle; margin-left: 6px; overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+
+/* detail */
+.detail-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+.detail-head .sym { font-family: var(--mono); font-size: 24px; font-weight: 600; }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px 16px; }
+.kv div { display: grid; gap: 2px; }
+.kv dt { font-size: 11px; color: var(--muted); letter-spacing: 0.03em; text-transform: uppercase; }
+.kv dd { margin: 0; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+.comp { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
+.comp div { display: grid; grid-template-columns: 76px 1fr 34px; gap: 8px; align-items: center; font-size: 12px; color: var(--ink-2); }
+.comp .track { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.comp .track span { display: block; height: 100%; background: var(--accent); }
+.comp b { font-family: var(--mono); font-weight: 500; color: var(--ink); text-align: right; }
+
+/* charts */
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 11px; font-family: var(--sans); }
+.chart .grid line { stroke: var(--grid); stroke-width: 1; }
+.chart .baseline { stroke: var(--axis); stroke-width: 1; }
+.chart .xhair { stroke: var(--axis); stroke-width: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--ring); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); border-radius: 8px; padding: 8px 10px; font-size: 12px; min-width: 150px; z-index: 5; display: grid; gap: 3px; }
+.tip .d { color: var(--muted); font-size: 11px; }
+.tip .row { display: grid; grid-template-columns: 14px auto 1fr; gap: 6px; align-items: center; }
+.tip .row b { font-family: var(--mono); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tip .row span:last-child { color: var(--ink-2); }
+.tip .key { height: 2px; width: 12px; border-radius: 1px; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; height: 14px; border-radius: 3px; overflow: hidden; }
+.strip span { display: block; height: 100%; }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 20px; }
+.callouts div { display: grid; gap: 2px; }
+.callouts b { font-size: 20px; font-weight: 650; }
+.callouts span { font-size: 12px; color: var(--ink-2); }
+.bars { display: grid; gap: 6px; }
+.bars .row { display: grid; grid-template-columns: 140px minmax(0, 1fr) 64px 52px; gap: 10px; align-items: center; font-size: 12px; }
+.bars .row .lbl { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bars .row .val { font-family: var(--mono); text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+.bars .row .sub { font-family: var(--mono); text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bars .axis { position: relative; height: 18px; }
+.bars .track { position: relative; height: 16px; }
+.bars .track .zero { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.bars .track .bar { position: absolute; top: 2px; height: 12px; }
+.bars .row:hover .bar, .bars .row:focus-visible .bar { filter: brightness(1.08); }
+.notes { font-size: 12.5px; color: var(--ink-2); display: grid; gap: 6px; }
+.notes li { max-width: 90ch; }
+footer { font-size: 12px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .summary { grid-template-columns: minmax(0, 1fr); }
+  .two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .wrap { padding-inline: 16px; }
+  .hero { font-size: 44px; }
+  .bars .row { grid-template-columns: 96px minmax(0, 1fr) 58px; }
+  .bars .row .sub { display: none; }
+  .filters input { width: 100%; }
+  .filters .count { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">NEPSE · walk-forward ranking</div>
+      <h1>NEPSE Setup Desk</h1>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+  <nav class="jump" aria-label="Sections">
+    <a href="#today">Today</a><a href="#stock">Stock</a><a href="#evidence">Does it work</a><a href="#model">Model</a><a href="#method">Method</a>
+  </nav>
+
+  <section class="summary" aria-label="Summary">
+    <div class="panel">
+      <div class="eyebrow">Strong setups that beat the market</div>
+      <div><span class="hero" id="hero">—</span></div>
+      <p class="ink2" id="hero-sub"></p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow">Market regime</div>
+      <div class="regime" id="regime"><span class="dot"></span><span id="regime-label">—</span></div>
+      <div class="stat-row" id="regime-stats"></div>
+      <p class="muted" style="font-size:12px">Shown as context. Gating buys on it did not help in the backtest.</p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow" id="mix-title">Today's classes</div>
+      <div class="class-bar" id="class-bar" role="img"></div>
+      <div class="legend" id="class-legend"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="today" aria-labelledby="today-h">
+    <div class="section-head">
+      <h2 id="today-h">Today's ranking</h2>
+      <p class="ink2">Every seasoned stock, ranked against the rest of the market. Select a row to see its history.</p>
+    </div>
+    <div class="filters">
+      <input id="q" type="search" placeholder="Symbol" aria-label="Filter by symbol">
+      <select id="f-class" aria-label="Filter by class"><option value="">All classes</option></select>
+      <select id="f-sector" aria-label="Filter by sector"><option value="">All sectors</option></select>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="tbl">
+        <thead><tr>
+          <th class="l" data-k="symbol"><button type="button">Symbol</button></th>
+          <th class="l" data-k="cls"><button type="button">Class</button></th>
+          <th data-k="score" aria-sort="descending"><button type="button">Score</button></th>
+          <th data-k="risk"><button type="button">Risk</button></th>
+          <th data-k="close"><button type="button">Close Rs</button></th>
+          <th data-k="ret20"><button type="button">20d</button></th>
+          <th data-k="sma50"><button type="button">vs SMA50</button></th>
+          <th data-k="sessions"><button type="button">Sessions</button></th>
+          <th data-k="since"><button type="button">Since flagged</button></th>
+          <th class="l" data-k="sector"><button type="button">Sector</button></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="dropped" class="ink2" style="font-size:13px"></div>
+  </section>
+
+  <section class="panel" id="stock" aria-labelledby="stock-h">
+    <div class="detail-head" id="detail-head"><h2 id="stock-h">Stock</h2></div>
+    <dl class="kv" id="detail-kv"></dl>
+    <div class="comp" id="detail-comp"></div>
+    <div>
+      <h3>Adjusted close and 50-day average</h3>
+      <div class="legend" style="margin-top:6px"><span><i class="line" style="background:var(--s1)"></i>Adjusted close (Rs)</span><span><i class="line" style="background:var(--muted)"></i>50-day average</span></div>
+      <div class="chart" id="price-chart"></div>
+    </div>
+    <div>
+      <h3>Daily class</h3>
+      <div class="strip" id="class-strip" role="img" style="margin-top:6px"></div>
+      <div class="legend" id="strip-legend" style="margin-top:6px"></div>
+    </div>
+    <div>
+      <h3>Score (0-100, rank vs that day's market)</h3>
+      <div class="chart" id="score-chart"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="evidence" aria-labelledby="ev-h">
+    <div class="section-head">
+      <h2 id="ev-h">Does it work?</h2>
+      <p class="ink2" id="ev-sub"></p>
+    </div>
+    <div class="callouts" id="callouts"></div>
+    <div>
+      <h3>Growth of Rs 100, out-of-sample sessions only</h3>
+      <div class="legend" id="strat-legend" style="margin-top:6px"></div>
+      <div class="chart" id="strat-chart"></div>
+    </div>
+    <div class="two">
+      <div class="panel" style="padding:14px">
+        <h3>20-day return vs the average stock, by class</h3>
+        <p class="muted" style="font-size:12px">Bar = mean excess return. Right columns = share that beat the market · number of signals.</p>
+        <div class="bars" id="class-bars"></div>
+      </div>
+      <div class="panel" style="padding:14px">
+        <h3>What predicts the next 20 days</h3>
+        <p class="muted" style="font-size:12px">Rank correlation of each feature with the next 20-day relative return, averaged per day. Right column = t-statistic.</p>
+        <div class="bars" id="ic-bars"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="model" aria-labelledby="model-h">
+    <div class="section-head">
+      <h2 id="model-h">Component weights over time</h2>
+      <p class="ink2" id="weights-sub"></p>
+    </div>
+    <div class="legend" id="w-legend"></div>
+    <div class="chart" id="weights-chart"></div>
+  </section>
+
+  <section class="panel" id="method" aria-labelledby="method-h">
+    <h2 id="method-h">How to read this</h2>
+    <ul class="notes" id="notes"></ul>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const DATA = /*__DASHBOARD_DATA__*/null;
+
+(function () {
+  "use strict";
+  const CLASS_ORDER = ["STRONG_SETUP", "SETUP", "WATCH", "NEUTRAL", "AVOID", "HIGH_RISK", "INSUFFICIENT_DATA"];
+  const CLASS_LABEL = { STRONG_SETUP: "Strong setup", SETUP: "Setup", WATCH: "Watch", NEUTRAL: "Neutral", AVOID: "Avoid", HIGH_RISK: "High risk", INSUFFICIENT_DATA: "Insufficient data" };
+  const CLASS_VAR = { STRONG_SETUP: "--c-strong", SETUP: "--c-setup", WATCH: "--c-watch", NEUTRAL: "--c-neutral", AVOID: "--c-avoid", HIGH_RISK: "--c-high", INSUFFICIENT_DATA: "--c-none" };
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs, text) => {
+    const n = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  const SVG = "http://www.w3.org/2000/svg";
+  const sv = (tag, attrs) => { const n = document.createElementNS(SVG, tag); if (attrs) for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; };
+  const pct = (v, d = 1, sign = true) => v == null ? "—" : `${sign && v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+  const num = (v, d = 1) => v == null ? "—" : Number(v).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const fmtDate = (s) => { const d = new Date(s + "T00:00:00"); return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); };
+  const fmtShort = (s) => { const d = new Date(s + "T00:00:00"); return d.toLocaleDateString("en-GB", { month: "short", year: "2-digit" }); };
+  const signCls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "down" : "";
+
+  if (!DATA) { document.querySelector(".wrap").textContent = "No dashboard data embedded. Run src/build_dashboard.py."; return; }
+
+  // ---------------------------------------------------------------- header + summary
+  $("#meta").textContent = `Data to ${fmtDate(DATA.as_of)} · ${DATA.n_symbols} stocks · history from ${fmtDate(DATA.first_date)}`;
+  const tr = DATA.track_record || {};
+  const rec = tr.recent || tr.all;
+  if (rec) {
+    $("#hero").textContent = `${Math.round(rec.hit * 100)}%`;
+    const all = tr.all;
+    $("#hero-sub").textContent = `of ${rec.n.toLocaleString("en-IN")} strong-setup signals in the last ${tr.recent_sessions} scored sessions beat the average stock over the next ${rec.horizon} sessions, by ${pct(rec.excess)} on average.` + (all ? ` All history: ${Math.round(all.hit * 100)}% of ${all.n.toLocaleString("en-IN")}.` : "");
+  }
+  const rg = DATA.regime;
+  $("#regime").dataset.r = rg.label;
+  $("#regime-label").textContent = rg.label.charAt(0) + rg.label.slice(1).toLowerCase();
+  const rs = $("#regime-stats");
+  [["NEPSE", num(rg.index_close, 2)], ["20d", pct(rg.index_ret_20d)], ["Above SMA50", rg.breadth == null ? "—" : `${Math.round(rg.breadth * 100)}%`]].forEach(([k, v]) => { const s = el("span"); s.append(`${k} `); s.append(el("b", null, v)); rs.append(s); });
+  if (rg.high_vol) rs.append(el("span", null, "High volatility"));
+
+  const counts = DATA.counts;
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  $("#mix-title").textContent = `Today's classes · ${total} stocks`;
+  const bar = $("#class-bar"), leg = $("#class-legend");
+  bar.setAttribute("aria-label", CLASS_ORDER.filter((c) => counts[c]).map((c) => `${CLASS_LABEL[c]} ${counts[c]}`).join(", "));
+  CLASS_ORDER.forEach((c) => {
+    if (!counts[c]) return;
+    const seg = el("span", { title: `${CLASS_LABEL[c]}: ${counts[c]}` });
+    seg.style.flex = String(counts[c]);
+    seg.style.background = c === "INSUFFICIENT_DATA" ? "var(--surface-2)" : `var(${CLASS_VAR[c]})`;
+    bar.append(seg);
+    const item = el("span");
+    const sw = el("i"); sw.style.background = c === "INSUFFICIENT_DATA" ? "var(--surface-2)" : `var(${CLASS_VAR[c]})`;
+    item.append(sw, `${CLASS_LABEL[c]} ${counts[c]}`);
+    leg.append(item);
+  });
+
+  // ---------------------------------------------------------------- table
+  const stocks = DATA.stocks;
+  const fClass = $("#f-class"), fSector = $("#f-sector"), q = $("#q");
+  CLASS_ORDER.forEach((c) => { if (counts[c]) fClass.append(el("option", { value: c }, CLASS_LABEL[c])); });
+  [...new Set(stocks.map((s) => s.sector).filter(Boolean))].sort().forEach((s) => fSector.append(el("option", { value: s }, s)));
+  let sortKey = "score", sortDir = -1, selected = null;
+  const clsRank = (c) => CLASS_ORDER.indexOf(c);
+
+  function chip(c) { return el("span", { class: "chip", "data-c": c }, CLASS_LABEL[c] || c); }
+
+  function renderTable() {
+    const term = q.value.trim().toUpperCase();
+    const rows = stocks.filter((s) => (!term || s.symbol.includes(term)) && (!fClass.value || s.cls === fClass.value) && (!fSector.value || s.sector === fSector.value));
+    rows.sort((a, b) => {
+      let x = a[sortKey], y = b[sortKey];
+      if (sortKey === "cls") { x = clsRank(x); y = clsRank(y); }
+      if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+      return (x < y ? -1 : x > y ? 1 : 0) * sortDir;
+    });
+    const tb = $("#tbl tbody");
+    tb.replaceChildren();
+    rows.forEach((s) => {
+      const tr = el("tr", { tabindex: "0", "aria-selected": String(s.symbol === selected) });
+      const td = (content, cls) => { const t = el("td", cls ? { class: cls } : null); if (content instanceof Node) t.append(content); else t.textContent = content; return t; };
+      const sym = el("span", { class: "sym" }, s.symbol);
+      const sc = el("span", { class: "num" }, s.score == null ? "—" : s.score.toFixed(0));
+      const scWrap = el("span"); scWrap.append(sc);
+      const m = el("span", { class: "meter" }); const mi = el("span"); mi.style.width = `${s.score || 0}%`; m.append(mi); scWrap.append(m);
+      tr.append(
+        td(sym, "l"), td(chip(s.cls), "l"), td(scWrap),
+        td(s.risk == null ? "—" : s.risk.toFixed(0), "num"),
+        td(num(s.close, 1), "num mono"),
+        td(pct(s.ret20), `num ${signCls(s.ret20)}`),
+        td(pct(s.sma50), `num ${signCls(s.sma50)}`),
+        td(s.sessions == null ? "—" : String(s.sessions), "num"),
+        td(pct(s.since), `num ${signCls(s.since)}`),
+        td(s.sector || "—", "l ink2"),
+      );
+      const pick = () => { select(s.symbol); document.getElementById("stock").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); };
+      tr.addEventListener("click", pick);
+      tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      tb.append(tr);
+    });
+    $("#count").textContent = `${rows.length} of ${stocks.length}`;
+  }
+  document.querySelectorAll("#tbl thead th").forEach((th) => {
+    th.querySelector("button").addEventListener("click", () => {
+      const k = th.dataset.k;
+      if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = ["symbol", "sector", "cls"].includes(k) ? 1 : -1; }
+      document.querySelectorAll("#tbl thead th").forEach((h) => h.removeAttribute("aria-sort"));
+      th.setAttribute("aria-sort", sortDir > 0 ? "ascending" : "descending");
+      renderTable();
+    });
+  });
+  [q, fClass, fSector].forEach((c) => c.addEventListener("input", renderTable));
+
+  const dr = DATA.dropped || [];
+  if (dr.length) {
+    const d = $("#dropped");
+    d.append(el("b", null, "No longer a setup since the previous session: "));
+    d.append(dr.map((x) => `${x.symbol} (${(CLASS_LABEL[x.now] || x.now).toLowerCase()})`).join(", "));
+  }
+
+  // ---------------------------------------------------------------- chart helpers
+  const tipEl = (host) => { let t = host.querySelector(".tip"); if (!t) { t = el("div", { class: "tip", role: "status" }); t.hidden = true; host.append(t); } return t; };
+
+  function niceTicks(lo, hi, n = 4) {
+    if (!(isFinite(lo) && isFinite(hi))) return [];
+    if (lo === hi) { lo -= 1; hi += 1; }
+    const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+    const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => span / s <= n) || 10 * mag;
+    const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+
+  /**
+   * Line chart with a snapping crosshair and one tooltip listing every series.
+   * opts: {dates, series:[{label, values, color, width?}], height, yFmt, tipFmt, yMin?, yMax?, onHover?}
+   */
+  function lineChart(host, opts) {
+    host.replaceChildren();
+    const W = 1000, H = opts.height || 240, m = { l: 52, r: 16, t: 10, b: 26 };
+    const dates = opts.dates, n = dates.length;
+    const vals = opts.series.flatMap((s) => s.values).filter((v) => v != null);
+    let lo = opts.yMin != null ? opts.yMin : Math.min(...vals), hi = opts.yMax != null ? opts.yMax : Math.max(...vals);
+    const pad = (hi - lo) * 0.06 || 1; if (opts.yMin == null) lo -= pad; if (opts.yMax == null) hi += pad;
+    const x = (i) => m.l + (n <= 1 ? 0 : (i / (n - 1)) * (W - m.l - m.r));
+    const y = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
+    const svg = sv("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": opts.aria || "Line chart" });
+    const g = sv("g", { class: "grid" });
+    niceTicks(lo, hi, 4).forEach((t) => {
+      g.append(sv("line", { x1: m.l, x2: W - m.r, y1: y(t), y2: y(t) }));
+      const tx = sv("text", { x: m.l - 8, y: y(t) + 4, "text-anchor": "end" }); tx.textContent = opts.yFmt ? opts.yFmt(t) : t; svg.append(tx);
+    });
+    svg.prepend(g);
+    // x ticks: first session of each quarter-ish month
+    let lastM = "";
+    dates.forEach((d, i) => {
+      const mo = d.slice(0, 7);
+      if (mo !== lastM && (+d.slice(5, 7) % 2 === 1 || i === 0)) {
+        lastM = mo;
+        if (x(i) > W - m.r - 30) return;
+        const tx = sv("text", { x: x(i), y: H - 6, "text-anchor": "middle" }); tx.textContent = fmtShort(d); svg.append(tx);
+      } else if (mo !== lastM) lastM = mo;
+    });
+    if (lo < 0 && hi > 0) svg.append(sv("line", { class: "baseline", x1: m.l, x2: W - m.r, y1: y(0), y2: y(0) }));
+    else svg.append(sv("line", { class: "baseline", x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }));
+    if (opts.refLine != null) svg.append(sv("line", { class: "baseline", x1: m.l, x2: W - m.r, y1: y(opts.refLine), y2: y(opts.refLine) }));
+    opts.series.forEach((s) => {
+      let dStr = "", pen = false;
+      s.values.forEach((v, i) => { if (v == null) { pen = false; return; } dStr += `${pen ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`; pen = true; });
+      const path = sv("path", { d: dStr, fill: "none", "stroke-width": s.width || 2, "stroke-linejoin": "round", "stroke-linecap": "round" });
+      path.style.stroke = s.color;
+      svg.append(path);
+      const li = s.values.map((v, i) => v == null ? -1 : i).filter((i) => i >= 0).pop();
+      if (li != null && li >= 0 && s.endDot !== false) {
+        const c = sv("circle", { cx: x(li), cy: y(s.values[li]), r: 4, "stroke-width": 2 });
+        c.style.fill = s.color; c.style.stroke = "var(--surface)"; svg.append(c);
+      }
+    });
+    const xh = sv("line", { class: "xhair", y1: m.t, y2: H - m.b, visibility: "hidden" }); svg.append(xh);
+    const dots = opts.series.map((s) => { const c = sv("circle", { r: 4, "stroke-width": 2, visibility: "hidden" }); c.style.fill = s.color; c.style.stroke = "var(--surface)"; svg.append(c); return c; });
+    const hit = sv("rect", { x: m.l, y: 0, width: W - m.l - m.r, height: H, fill: "transparent", tabindex: "0" });
+    svg.append(hit);
+    host.append(svg);
+    const tip = tipEl(host);
+    function show(i) {
+      if (i < 0 || i >= n) return;
+      xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("visibility", "visible");
+      tip.replaceChildren(el("div", { class: "d" }, fmtDate(dates[i])));
+      opts.series.forEach((s, k) => {
+        const v = s.values[i];
+        if (v == null) { dots[k].setAttribute("visibility", "hidden"); return; }
+        dots[k].setAttribute("cx", x(i)); dots[k].setAttribute("cy", y(v)); dots[k].setAttribute("visibility", "visible");
+        const row = el("div", { class: "row" }); const key = el("span", { class: "key" }); key.style.background = s.color;
+        row.append(key, el("b", null, opts.tipFmt ? opts.tipFmt(v) : String(v)), el("span", null, s.label));
+        tip.append(row);
+      });
+      if (opts.tipExtra) { const ex = opts.tipExtra(i); if (ex) tip.append(el("div", { class: "d" }, ex)); }
+      tip.hidden = false;
+      const r = host.getBoundingClientRect(), px = (x(i) / W) * r.width;
+      const tw = tip.offsetWidth; tip.style.left = `${Math.min(Math.max(px + 12, 0), r.width - tw)}px`; tip.style.top = "8px";
+      if (px + 12 + tw > r.width) tip.style.left = `${Math.max(px - tw - 12, 0)}px`;
+      if (opts.onHover) opts.onHover(i);
+    }
+    function hide() { xh.setAttribute("visibility", "hidden"); dots.forEach((d) => d.setAttribute("visibility", "hidden")); tip.hidden = true; if (opts.onHover) opts.onHover(null); }
+    let cur = n - 1;
+    hit.addEventListener("pointermove", (e) => { const r = svg.getBoundingClientRect(); const vx = ((e.clientX - r.left) / r.width) * W; cur = Math.round(((vx - m.l) / (W - m.l - m.r)) * (n - 1)); show(Math.max(0, Math.min(n - 1, cur))); });
+    hit.addEventListener("pointerleave", hide);
+    hit.addEventListener("focus", () => show(cur));
+    hit.addEventListener("blur", hide);
+    hit.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") { cur = Math.max(0, cur - 1); show(cur); e.preventDefault(); } if (e.key === "ArrowRight") { cur = Math.min(n - 1, cur + 1); show(cur); e.preventDefault(); } });
+    return { show, hide };
+  }
+
+  /** Horizontal bars around zero. rows: [{label, value, color, right, sub, tip}] */
+  function barRows(host, rows, fmt) {
+    host.replaceChildren();
+    const vals = rows.map((r) => r.value).filter((v) => v != null);
+    const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals), span = hi - lo || 1;
+    const px = (v) => ((v - lo) / span) * 100;
+    rows.forEach((r) => {
+      const row = el("div", { class: "row", tabindex: "0", title: r.tip || "" });
+      const track = el("div", { class: "track" });
+      const z = el("div", { class: "zero" }); z.style.left = `${px(0)}%`; track.append(z);
+      if (r.value != null) {
+        const b = el("div", { class: "bar" });
+        const a = px(Math.min(0, r.value)), w = Math.abs(px(r.value) - px(0));
+        b.style.left = `${a}%`; b.style.width = `${Math.max(w, 0.6)}%`; b.style.background = r.color;
+        b.style.borderRadius = r.value >= 0 ? "0 4px 4px 0" : "4px 0 0 4px";
+        track.append(b);
+      }
+      row.append(el("div", { class: "lbl" }, r.label), track, el("div", { class: "val" }, fmt(r.value)), el("div", { class: "sub" }, r.sub || ""));
+      host.append(row);
+    });
+  }
+
+  // ---------------------------------------------------------------- stock detail
+  const cal = DATA.calendar;
+  function select(sym) {
+    selected = sym;
+    document.querySelectorAll("#tbl tbody tr").forEach((tr) => tr.setAttribute("aria-selected", String(tr.querySelector(".sym").textContent === sym)));
+    const s = stocks.find((x) => x.symbol === sym), h = DATA.history[sym];
+    if (!s || !h) return;
+    const head = $("#detail-head"); head.replaceChildren();
+    head.append(el("span", { class: "sym", id: "stock-h" }, s.symbol), chip(s.cls), el("span", { class: "ink2" }, s.sector || ""));
+    if (s.flagged) head.append(el("span", { class: "muted" }, `setup for ${s.sessions} sessions, since ${fmtDate(s.flagged)} (${pct(s.since)})`));
+    const kv = $("#detail-kv"); kv.replaceChildren();
+    [["Close Rs", num(s.close, 2)], ["Score", s.score == null ? "—" : s.score.toFixed(1)], ["Risk", s.risk == null ? "—" : s.risk.toFixed(0)],
+     ["20d return", pct(s.ret20)], ["60d return", pct(s.ret60)], ["vs SMA50", pct(s.sma50)], ["From 120d high", pct(s.dd120)],
+     ["20d volatility", pct(s.vol20, 2, false)], ["RSI 14", s.rsi == null ? "—" : s.rsi.toFixed(0)],
+     ["Turnover 20d med", s.turn20 == null ? "—" : `Rs ${(s.turn20 / 1e6).toFixed(1)}M`], ["Legacy verdict", s.legacy || "—"]]
+      .forEach(([k, v]) => { const d = el("div"); d.append(el("dt", null, k), el("dd", null, v)); kv.append(d); });
+    const comp = $("#detail-comp"); comp.replaceChildren();
+    Object.entries(s.comp).forEach(([k, v]) => {
+      const d = el("div"); const t = el("div", { class: "track" }); const f = el("span"); f.style.width = `${(v || 0) * 100}%`; t.append(f);
+      d.append(el("span", null, k.replace("_", " ")), t, el("b", null, v == null ? "—" : (v * 100).toFixed(0))); comp.append(d);
+    });
+    // class strip
+    const strip = $("#class-strip"); strip.replaceChildren();
+    const runs = [];
+    h.cls.forEach((c, i) => { const name = c == null ? null : CLASS_ORDER[c]; if (runs.length && runs[runs.length - 1].c === name) runs[runs.length - 1].n++; else runs.push({ c: name, n: 1, start: i }); });
+    runs.forEach((r) => {
+      const seg = el("span", { title: `${r.c ? CLASS_LABEL[r.c] : "Not scored"}: ${fmtDate(cal[r.start])} – ${fmtDate(cal[r.start + r.n - 1])}` });
+      seg.style.gridColumn = `span ${r.n}`; seg.style.background = r.c && r.c !== "INSUFFICIENT_DATA" ? `var(${CLASS_VAR[r.c]})` : "var(--surface-2)";
+      strip.append(seg);
+    });
+    strip.style.gridTemplateColumns = `repeat(${cal.length}, 1fr)`;
+    strip.setAttribute("aria-label", `Daily class for ${sym}; today ${CLASS_LABEL[s.cls]}`);
+    lineChart($("#price-chart"), {
+      dates: cal, height: 230, aria: `${sym} adjusted close`,
+      series: [{ label: "Close", values: h.close, color: "var(--s1)" }, { label: "SMA50", values: h.sma50, color: "var(--muted)", width: 1.5, endDot: false }],
+      yFmt: (v) => num(v, 0), tipFmt: (v) => `Rs ${num(v, 1)}`,
+      tipExtra: (i) => (h.cls[i] == null ? null : CLASS_LABEL[CLASS_ORDER[h.cls[i]]]),
+    });
+    lineChart($("#score-chart"), {
+      dates: cal, height: 150, yMin: 0, yMax: 100, refLine: 90, aria: `${sym} score`,
+      series: [{ label: "Score", values: h.score, color: "var(--s1)" }],
+      yFmt: (v) => v.toFixed(0), tipFmt: (v) => v.toFixed(1),
+      tipExtra: (i) => (h.cls[i] == null ? null : CLASS_LABEL[CLASS_ORDER[h.cls[i]]]),
+    });
+  }
+  const sl = $("#strip-legend");
+  ["STRONG_SETUP", "SETUP", "WATCH", "NEUTRAL", "AVOID", "HIGH_RISK"].forEach((c) => { const it = el("span"); const i = el("i"); i.style.background = `var(${CLASS_VAR[c]})`; it.append(i, CLASS_LABEL[c]); sl.append(it); });
+  { const it = el("span"); const i = el("i"); i.style.background = "var(--surface-2)"; it.append(i, "Not scored"); sl.append(it); }
+
+  // ---------------------------------------------------------------- evidence
+  const st = DATA.strategies;
+  const SER = { strong_hold: "var(--s1)", legacy_hold: "var(--s2)", universe: "var(--s3)", index: "var(--s4)", strong_daily_net: "var(--s5)", strong_daily_gross: "var(--s6)" };
+  const series = st.series.map((s) => ({ label: s.label, values: s.values, color: SER[s.key], key: s.key, width: s.key.startsWith("strong_daily") ? 1.5 : 2 }));
+  const sLeg = $("#strat-legend");
+  series.forEach((s) => { const it = el("span"); const i = el("i", { class: "line" }); i.style.background = s.color; it.append(i, s.label); sLeg.append(it); });
+  lineChart($("#strat-chart"), { dates: st.dates, series, height: 280, refLine: 100, yFmt: (v) => v.toFixed(0), tipFmt: (v) => v.toFixed(1), aria: "Growth of Rs 100 by strategy" });
+  const endOf = (k) => { const s = st.series.find((x) => x.key === k); return s ? s.values[s.values.length - 1] : null; };
+  $("#ev-sub").textContent = `Only sessions scored with weights learned from earlier outcomes (${fmtDate(st.dates[0])} to ${fmtDate(st.dates[st.dates.length - 1])}, ${st.dates.length} sessions). Net lines charge ${(st.cost_per_side * 100).toFixed(1)}% per trade side for commission and fees.`;
+  const co = $("#callouts");
+  [[endOf("strong_hold"), `Strong setups held ${st.hold} sessions, after costs`], [endOf("index"), "NEPSE index"], [endOf("universe"), "Average stock (equal weight)"], [endOf("strong_daily_net"), `Rebuilt daily after costs (${Math.round((st.strong_daily_turnover || 0) * 100)}% of the list changes each day)`]]
+    .forEach(([v, lbl]) => { const d = el("div"); d.append(el("b", null, v == null ? "—" : `Rs ${v.toFixed(1)}`), el("span", null, lbl)); co.append(d); });
+
+  const classRows = DATA.classes.map((c) => ({ label: CLASS_LABEL[c.cls], value: c.excess20, color: `var(${CLASS_VAR[c.cls]})`, sub: `${Math.round(c.hit20 * 100)}% · ${c.n.toLocaleString("en-IN")}`, tip: `5-day ${pct(c.excess5, 2)} · avg worst dip ${pct(c.mdd20)}` }));
+  (DATA.legacy_classes || []).forEach((c) => classRows.push({ label: c.cls, value: c.excess20, color: "var(--muted)", sub: `${Math.round(c.hit20 * 100)}% · ${c.n.toLocaleString("en-IN")}` }));
+  barRows($("#class-bars"), classRows, (v) => pct(v, 2));
+  barRows($("#ic-bars"), DATA.ics.map((r) => ({ label: r.feature, value: r.ic, color: r.ic >= 0 ? "var(--pos)" : "var(--neg)", sub: r.t == null ? "" : `t ${r.t.toFixed(1)}`, tip: `top-minus-bottom fifth: ${pct(r.q5q1, 2)}` })), (v) => (v == null ? "—" : v.toFixed(3)));
+
+  // ---------------------------------------------------------------- weights
+  const W = DATA.weights;
+  const wKeys = Object.keys(W.series), wColors = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)", "var(--s5)"];
+  const wLeg = $("#w-legend");
+  wKeys.forEach((k, i) => { const it = el("span"); const ii = el("i", { class: "line" }); ii.style.background = wColors[i]; it.append(ii, k.replace("_", " ")); wLeg.append(it); });
+  lineChart($("#weights-chart"), { dates: W.dates, height: 220, series: wKeys.map((k, i) => ({ label: k.replace("_", " "), values: W.series[k], color: wColors[i] })), yFmt: (v) => v.toFixed(1), tipFmt: (v) => (v >= 0 ? "+" : "") + v.toFixed(2), aria: "Component weights over time" });
+  $("#weights-sub").textContent = `Each day the score blends five components. Before ${W.learned_from ? fmtDate(W.learned_from) : "enough history"} fixed starting weights apply; after that each weight is the component's average past rank correlation with 20-day outcomes that had already played out. Model score correlation with the next 20 days: ${DATA.score_ic.model} (t ${DATA.score_ic.model_t}); legacy vote engine: ${DATA.score_ic.legacy} (t ${DATA.score_ic.legacy_t}).`;
+
+  // ---------------------------------------------------------------- notes
+  [
+    "Scores rank stocks against each other on the same day. A strong setup can still fall when the whole market falls; the evidence above is about beating the average stock.",
+    `Returns use closes adjusted for ${DATA.n_actions} bonus, right-share and cash-dividend notices, so those events do not look like crashes.`,
+    "Trades are assumed at the close after the signal (NEPSE history has no opening prices). Days locked at the upper price limit are skipped.",
+    "New listings are left out for their first 120 sessions; a few of them move many times over and would swamp every average.",
+    "Only currently listed stocks are in the data, and the history covers about one year of one market regime. Treat every number here as provisional.",
+    "Not financial advice.",
+  ].forEach((t) => $("#notes").append(el("li", null, t)));
+  $("#foot").textContent = `Built from official NEPSE (NOTS) data. As of ${fmtDate(DATA.as_of)}.`;
+
+  renderTable();
+  if (stocks.length) select(stocks[0].symbol);
+})();
+</script>
