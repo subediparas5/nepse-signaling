@@ -21,6 +21,7 @@ import scoring
 from nepse_official import (
     get_business_date,
     get_index_history,
+    get_price_adjustments,
     get_official_listed_stocks,
     get_official_share_price_lookup,
 )
@@ -322,6 +323,12 @@ def format_telegram_digest(
     n_strong = class_counts.get("STRONG_SETUP", 0)
     n_setup = class_counts.get("SETUP", 0)
     parts.append(f"<b>Top setups</b> ({n_strong} strong, {n_setup} setup)")
+    rec = ((context or {}).get("track_record") or {}).get("STRONG_SETUP")
+    if rec and rec.get("n", 0) >= 100:
+        parts.append(
+            f"<i>Past strong setups beat the market over {rec['horizon']}d in {rec['hit'] * 100:.0f}% of "
+            f"{rec['n']:,} cases (avg {rec['excess'] * 100:+.1f}% vs market).</i>"
+        )
     if setups:
         rows = [f"{'SYM':<7} {'Rs':>7} {'scr':>3} {'rsk':>3} {'20d%':>5}  cls", "-" * 36]
         for s in setups:
@@ -558,6 +565,7 @@ if __name__ == "__main__":
     try:
         persist_market_snapshot(business_date, all_stocks, listed_stocks)
         history_store.upsert_index(get_index_history())
+        history_store.upsert_corporate_actions(get_price_adjustments())
     except Exception:
         # History is for research; never let it block the daily digest.
         logger.exception("Failed to persist market snapshot")

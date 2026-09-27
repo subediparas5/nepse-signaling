@@ -26,6 +26,7 @@ import history_store
 from nepse_official import (
     get_business_date,
     get_index_history,
+    get_price_adjustments,
     get_official_listed_stocks,
     get_security_history,
 )
@@ -45,6 +46,10 @@ def backfill(days: int, symbols: set[str] | None = None) -> None:
 
     index_rows = [r for r in get_index_history() if start <= (r["date"] or "") <= end]
     logger.info("NEPSE index: %s rows, %s changed", len(index_rows), history_store.upsert_index(index_rows))
+
+    actions = get_price_adjustments()
+    changed_actions = history_store.upsert_corporate_actions(actions)
+    logger.info("Corporate actions: %s notices, %s changed", len(actions), changed_actions)
 
     listed = get_official_listed_stocks()
     if symbols:

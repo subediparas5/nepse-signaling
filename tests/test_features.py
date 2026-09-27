@@ -69,12 +69,21 @@ def test_forward_labels_entry_is_next_close():
 
 def test_forward_labels_skip_locked_limit_up_and_no_trade():
     closes = {"A": [100, 110, 111, 112, 113], "B": [100, None, 100, 100, 100]}
-    lows = {"A": [99, 109.5, 110, 111, 112]}  # day1 low >= +9% of day0 close: locked
-    lab = F.forward_labels(_panel(closes, lows=lows), horizons=(1,))
+    lows = {"A": [99, 109.8, 110, 111, 112]}  # day1 traded only at ~+10%: locked
+    p = _panel(closes, lows=lows)
+    p.high.loc[p.high.index[1], "A"] = 110.0
+    lab = F.forward_labels(p, horizons=(1,))
     assert not lab["fillable"]["A"].iloc[0]
     assert np.isnan(lab["fwd_ret_1"]["A"].iloc[0])
     assert lab["fillable"]["A"].iloc[1]
     assert not lab["fillable"]["B"].iloc[0]  # B did not trade on day1
+
+
+def test_big_up_day_with_range_is_still_fillable():
+    closes = {"A": [100, 112, 113]}  # +12% day that traded 109.5-113: buyable under a 15% band
+    p = _panel(closes, lows={"A": [99, 109.5, 112]})
+    p.high.loc[p.high.index[1], "A"] = 113.0
+    assert F.forward_labels(p, horizons=(1,))["fillable"]["A"].iloc[0]
 
 
 def test_add_excess_demeans_within_given_rows():
@@ -99,3 +108,34 @@ def test_sector_relative_uses_sector_median():
     rel = f["sector_rel_1d"].iloc[-1]
     assert rel["A"] == pytest.approx(0.10) and rel["C"] == pytest.approx(-0.10)
     assert rel["H"] == pytest.approx(0.0)
+
+
+def test_bonus_adjustment_removes_artificial_drop():
+    # 100% bonus announced after day 2's close: day 3 trades at half price.
+    closes = {"A": [100.0, 102.0, 104.0, 52.5, 53.0], "B": [50.0] * 5}
+    p_raw = _panel(closes)
+    d = list(p_raw.close.index)
+    actions = pd.DataFrame([{"date": d[2], "symbol": "A", "factor": 0.5}])
+    rows = []
+    for sym, cs in closes.items():
+        for i, c in enumerate(cs):
+            rows.append({"date": d[i], "symbol": sym, "close": c, "high": c * 1.01, "low": c * 0.99,
+                         "volume": 100.0, "turnover": 100.0 * c, "trades": 10.0})
+    index = pd.DataFrame({"date": d, "close": [1000.0 + i for i in range(5)]})
+    p = F.build_panel(pd.DataFrame(rows), index, {"A": "BANKING", "B": "BANKING"}, actions)
+    r = p.close["A"] / p.close["A"].shift(1) - 1
+    assert r.iloc[3] == pytest.approx(52.5 / 52.0 - 1)  # not -49.5%
+    assert p.close["A"].iloc[2] == pytest.approx(52.0) and p.close["A"].iloc[4] == pytest.approx(53.0)
+    assert p.volume["A"].iloc[0] == pytest.approx(200.0)  # share counts scale inversely
+    assert p.turnover["A"].iloc[0] == pytest.approx(10_000.0)  # rupee turnover unchanged
+    pd.testing.assert_series_equal(p.close["B"], p_raw.close["B"])
+
+
+def test_actions_outside_window_or_unknown_symbol_are_ignored():
+    closes = {"A": [100.0, 101.0, 102.0]}
+    traded = _panel(closes).traded
+    acts = pd.DataFrame([
+        {"date": "2020-01-01", "symbol": "A", "factor": 0.5},
+        {"date": traded.index[1], "symbol": "ZZZ", "factor": 0.5},
+    ])
+    assert (F.adjustment_factors(acts, traded) == 1.0).all().all()

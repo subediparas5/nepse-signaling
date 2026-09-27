@@ -1,6 +1,8 @@
 import contextlib
+import html
 import io
 import logging
+import re
 import time
 import types
 from typing import Any
@@ -418,3 +420,73 @@ def get_index_history(index_id: int = NEPSE_INDEX_ID) -> list[dict]:
         page += 1
     rows.sort(key=lambda r: r["date"] or "")
     return rows
+
+
+# ---------------------------------------------------------------------------
+# Corporate actions (bonus / rights / cash dividend price adjustments)
+# ---------------------------------------------------------------------------
+
+_ADJ_NUM = r"(?:Rs\.?\s*)?(?P<{}>[\d,]+(?:\.\d+)?)"
+_ADJ_PATTERN = re.compile(
+    r"\bis\s*" + _ADJ_NUM.format("adjusted") + r"\s*for\s*(?P<reason>.+?)\s*on\s*(?:the\s*)?previous\s*"
+    r"closing\s*price\s*of\s*" + _ADJ_NUM.format("prev"),
+    re.IGNORECASE,
+)
+_SYM_PAREN = re.compile(r"\(\s*([A-Z][A-Z0-9]+)\s*\)")
+_SYM_TITLE_TAIL = re.compile(r"[-–]\s*([A-Z][A-Z0-9]+)\s*$")
+_SYM_BARE = re.compile(r"\bof\s+([A-Z][A-Z0-9]+)\s+is\b")
+
+
+def _adjustment_symbol(title: str, body_text: str) -> str | None:
+    """Symbol from the title '(SYM)' or '- SYM', else from the body."""
+    title = title.strip()
+    for found in (_SYM_PAREN.findall(title), _SYM_TITLE_TAIL.findall(title),
+                  _SYM_PAREN.findall(body_text), _SYM_BARE.findall(body_text)):
+        if found:
+            return found[-1]
+    return None
+
+
+def _html_text(body: str | None) -> str:
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body or ""))).strip()
+
+
+def parse_price_adjustment(title: str, body: str) -> dict | None:
+    """Parse a NOTS 'Price Adjusted' notice. Returns None if it is not one or cannot be read."""
+    if "price adjust" not in (title or "").lower():
+        return None
+    text = _html_text(body)
+    m = _ADJ_PATTERN.search(text)
+    symbol = _adjustment_symbol(title, text)
+    if not m or not symbol:
+        return None
+    adjusted = float(m["adjusted"].replace(",", ""))
+    prev = float(m["prev"].replace(",", ""))
+    if adjusted <= 0 or prev <= 0 or adjusted > prev * 1.5:
+        return None
+    return {
+        "symbol": symbol,
+        "prev_close": prev,
+        "adjusted_price": adjusted,
+        "factor": adjusted / prev,
+        "reason": m["reason"].strip(),
+    }
+
+
+def get_price_adjustments() -> list[dict]:
+    """
+    Price-adjustment notices from the NOTS news feed. `date` is the day the notice was posted
+    (after that day's close); the adjustment applies to prices on or before that session.
+    """
+    out: list[dict] = []
+    unparsed = 0
+    for a in _client().get_news_alerts(use_cache=False) or []:
+        title = a.get("messageTitle") or ""
+        parsed = parse_price_adjustment(title, a.get("messageBody"))
+        if parsed is None:
+            unparsed += "price adjust" in title.lower()
+            continue
+        out.append({"date": (a.get("addedDate") or "")[:10], "alert_id": a.get("id"), **parsed})
+    if unparsed:
+        logger.warning("NOTS price-adjustment notices not parsed: %s", unparsed)
+    return out

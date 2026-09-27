@@ -6,6 +6,9 @@ Layout (under DATA_DIR, default `<repo>/data`):
   index/nepse.csv      one row per date — NEPSE index
   signals/YYYY-MM.csv  one row per (date, symbol) — rule verdicts from the daily run
   securities.csv       one row per symbol — id, sector, first/last seen
+  corporate_actions.csv one row per (date, symbol) — bonus/rights/dividend price adjustments
+
+Prices are stored raw (as traded). features.build_panel applies corporate_actions on load.
 
 Writes are upserts: a row keyed like an existing one is merged field by field, and an
 empty incoming value never erases a stored one. Re-running with the same data leaves
@@ -42,6 +45,7 @@ SIGNAL_FIELDS = [
     "technical_buy", "technical_sell", "fundamental_buy", "fundamental_sell", "close", "reasons",
 ]
 SECURITY_FIELDS = ["symbol", "security_id", "sector", "first_seen", "last_seen"]
+ACTION_FIELDS = ["date", "symbol", "prev_close", "adjusted_price", "factor", "reason", "alert_id"]
 
 
 def fmt(value: Any) -> str:
@@ -149,6 +153,14 @@ def upsert_securities(rows: Iterable[dict[str, Any]], seen_on: str, data_dir: Pa
         last = max(prev["last_seen"], seen_on) if prev and prev.get("last_seen") else seen_on
         incoming.append({**r, "symbol": sym, "first_seen": first, "last_seen": last})
     return _upsert(path, SECURITY_FIELDS, ("symbol",), incoming)
+
+
+def upsert_corporate_actions(rows: Iterable[dict[str, Any]], data_dir: Path = DATA_DIR) -> int:
+    return _upsert(data_dir / "corporate_actions.csv", ACTION_FIELDS, ("date", "symbol"), rows)
+
+
+def load_corporate_actions(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:
+    return _read(data_dir / "corporate_actions.csv")
 
 
 def load_prices(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:

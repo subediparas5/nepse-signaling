@@ -28,6 +28,7 @@ _SRC_DIR = Path(__file__).resolve().parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
+import classifier as C
 import features as F
 import history_store
 import regime as R
@@ -50,6 +51,10 @@ IC_FEATURES = [
 ]
 # market_rel_20d is ret_20d minus a per-date constant, so its cross-sectional rank IC is identical.
 MIN_NAMES_PER_DATE = 30
+
+# Classifier adoption margins over the step-4 score (20-day horizon).
+ADOPT_IC_MARGIN = 0.02
+ADOPT_EXCESS_MARGIN = 0.0025
 
 
 def replay_rules(df: pd.DataFrame) -> pd.DataFrame:
@@ -202,6 +207,8 @@ def build_report(df: pd.DataFrame, horizons: tuple[int, ...] = (5, 20)) -> str:
         + _new_listing_note(df.attrs.get("new_listings")),
         "- *Median excess* and *hit rate* (share with excess > 0) matter because returns are skewed: "
         "a mean driven by a few big winners will not show up in a typical trade.",
+        f"- Prices are back-adjusted for {df.attrs.get('n_actions', 0)} NOTS bonus/rights/cash-dividend notices "
+        "(data/corporate_actions.csv), so those events do not show up as losses.",
         "- Survivorship: only currently listed symbols are in the data.",
         "",
         "## Individual rule votes",
@@ -362,13 +369,116 @@ def build_scoring_report(df: pd.DataFrame, weights: pd.DataFrame, reg: pd.DataFr
     return "\n".join(lines)
 
 
+def add_classifier_predictions(scored: pd.DataFrame, reg: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    calendar = pd.Index(sorted(scored.index.get_level_values("date").unique()), name="date")
+    X = C.design_matrix(scored, reg)
+    preds, retrains = C.walk_forward_predict(X, C.target(scored), calendar)
+    out = scored.join(preds.add_prefix("p_"))
+    dates = out.index.get_level_values("date")
+    # Blend: average of the day's percentile of the step-4 score and of the logit probability.
+    out["blend"] = (out["score"].groupby(dates).rank(pct=True) + out["p_logit"].groupby(dates).rank(pct=True)) / 2
+    return out, retrains
+
+
+def _top_decile(df: pd.DataFrame, col: str) -> pd.Series:
+    pct = df[col].groupby(df.index.get_level_values("date")).rank(pct=True)
+    return pct >= 0.90
+
+
+def build_classifier_report(df: pd.DataFrame, retrains: list[str], h_list=(5, 20)) -> str:
+    lines = ["## Learned classifier (walk-forward)", ""]
+    common = df[["score", "p_logit", "p_gbm"]].notna().all(axis=1)
+    cdf = df[common]
+    if cdf.empty:
+        return "\n".join(lines + ["Not enough realised outcomes yet to train the classifier.", ""])
+    dates = sorted(cdf.index.get_level_values("date").unique())
+    split = dates[len(dates) // 2]
+    y = C.target(cdf)
+    base = y.mean()
+    lines += [
+        f"Target: P(20-day return beats the same-day universe average). Retrained every {C.RETRAIN_EVERY} "
+        f"trading days on outcomes realised before the retrain date; first retrain {retrains[0]}, "
+        f"{len(retrains)} retrains. Compared on the {len(dates)} dates where every candidate has an "
+        f"out-of-sample value (halves split at {split}). Base rate of the target: {base * 100:.1f}%.",
+        "",
+        "- `score` — step-4 walk-forward score (the current live ranking).",
+        "- `p_logit`, `p_gbm` — classifier probabilities. "
+        "`blend` — mean of the day's percentile of `score` and `p_logit`.",
+        "",
+        "### Ranking quality",
+        "",
+        "| Candidate | " + " | ".join(f"IC {h}d | t {h}d | Q5−Q1 {h}d" for h in h_list) + " |",
+        "|---|" + "---:|---:|---:|" * len(h_list),
+    ]
+    cands = [("score", "Step-4 score"), ("p_logit", "Logistic"), ("p_gbm", "Gradient boosting"), ("blend", "Blend")]
+    for col, label in cands:
+        res = [feature_ic(cdf, col, h) for h in h_list]
+        lines.append(f"| {label} | " + " | ".join(
+            f"{_num(r['ic'], 3)} | {_num(r['ic_t'])} | {_pct(r['q5_q1'])}" for r in res) + " |")
+    lines.append("")
+
+    everything = pd.Series(True, index=cdf.index)
+    top20 = {}
+    for h in h_list:
+        rows = [("All observations (baseline)", group_stats(cdf, everything, h, split))]
+        for col, label in cands:
+            st = group_stats(cdf, _top_decile(cdf, col), h, split)
+            rows.append((f"Top 10% by {label}", st))
+            if h == h_list[-1]:
+                top20[col] = st
+        lines += _stats_table("Top decile", rows, h)
+
+    # Adoption rule, fixed in advance: a classifier replaces the score only if it beats it on
+    # both 20d IC and 20d top-decile excess return by a margin, in both halves.
+    h = h_list[-1]
+    ic_score = feature_ic(cdf, "score", h)["ic"]
+    verdicts = []
+    for col, label in cands[1:3]:
+        ic_c = feature_ic(cdf, col, h)["ic"]
+        a, b = top20[col], top20["score"]
+        wins = (
+            ic_c >= ic_score + ADOPT_IC_MARGIN
+            and a["excess"] >= b["excess"] + ADOPT_EXCESS_MARGIN
+            and a["excess_h1"] > b["excess_h1"]
+            and a["excess_h2"] > b["excess_h2"]
+        )
+        verdicts.append(f"{label}: {'**beats**' if wins else 'does not beat'} the step-4 score")
+    lines += [
+        f"**Adoption check** (needs +{ADOPT_IC_MARGIN:.2f} IC and +{ADOPT_EXCESS_MARGIN * 100:.2f}pp top-decile "
+        f"{h}d excess, and a better top decile in both halves): " + "; ".join(verdicts) + ". "
+        "The live digest keeps the step-4 score unless this changes.",
+        "",
+    ]
+
+    lines += [
+        "### Calibration (20-day target)",
+        "",
+        f"Brier score (lower is better): constant base rate {C.brier(pd.Series(base, index=y.index), y):.4f}, "
+        f"logistic {C.brier(cdf['p_logit'], y):.4f}, gradient boosting {C.brier(cdf['p_gbm'], y):.4f}.",
+        "",
+        "| Decile | Logistic predicted | Logistic realised | GBM predicted | GBM realised |",
+        "|---:|---:|---:|---:|---:|",
+    ]
+    cl, cg = C.calibration_table(cdf["p_logit"], y), C.calibration_table(cdf["p_gbm"], y)
+    for b in cl.index:
+        lines.append(
+            f"| {b + 1} | {cl.loc[b, 'predicted'] * 100:.1f}% | {cl.loc[b, 'realised'] * 100:.1f}% "
+            f"| {cg.loc[b, 'predicted'] * 100:.1f}% | {cg.loc[b, 'realised'] * 100:.1f}% |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def run(data_dir: Path = history_store.DATA_DIR) -> str:
     p = F.load_panel(data_dir)
     df = replay_rules(F.build_dataset(p))
     df.attrs["index_first"] = f"{p.index_close.dropna().iloc[0]:.0f}"
     df.attrs["index_last"] = f"{p.index_close.dropna().iloc[-1]:.0f}"
+    df.attrs["n_actions"] = len(history_store.load_corporate_actions(data_dir))
     scored, weights, reg = score_dataset(df, p)
-    return build_report(df) + "\n" + build_scoring_report(scored, weights, reg)
+    with_clf, retrains = add_classifier_predictions(scored, reg)
+    return "\n".join([build_report(df), build_scoring_report(scored, weights, reg),
+                      build_classifier_report(with_clf, retrains)])
 
 
 def main() -> None:

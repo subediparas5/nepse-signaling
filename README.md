@@ -40,6 +40,10 @@ separately. Classes from the day's score percentile:
 | HIGH_RISK | risk_score ≥ 90 |
 | INSUFFICIENT_DATA | new listing (first 120 sessions) or < 3 components |
 
+A walk-forward learned classifier (`src/classifier.py`) is benchmarked against this score in the
+backtest with a pre-set adoption rule; it has not beaten it, so the live digest does not use it. The
+digest's confidence line is instead each class's realised walk-forward track record.
+
 The market regime (`src/regime.py`: NEPSE vs SMA20/50 plus breadth) is shown as context; the backtest
 found no reliable benefit from gating on it. Scores are **relative** — a STRONG_SETUP can still fall in a
 falling market.
@@ -83,6 +87,11 @@ Every run appends to plain CSVs committed to the repo — the research record fo
 | `data/index/nepse.csv` | one per date: NEPSE index OHLC, turnover, trades | backfill |
 | `data/signals/YYYY-MM.csv` | one per (date, symbol): verdict, scores, reasons, close | daily run |
 | `data/securities.csv` | one per symbol: NOTS id, sector, first/last seen | both |
+| `data/corporate_actions.csv` | one per (date, symbol): bonus/rights/cash-dividend adjustment factor | NOTS news notices |
+
+Prices are stored **raw**; `features.build_panel` back-adjusts them with `corporate_actions.csv`
+(parsed from NOTS "Price Adjusted" notices: factor = adjusted ÷ previous close) so bonus and rights
+issues do not look like crashes.
 
 `date` is the NEPSE business date the data describes (the 09:00 NPT run records the previous session).
 Writes are upserts and never blank out a stored value, so re-runs are safe and unchanged data produces no diff.
@@ -135,7 +144,8 @@ src/
   history_store.py      # CSV history store (upserts, deterministic output)
   backfill_history.py   # Pull NOTS price/index history into data/
   features.py           # Point-in-time features + forward-return labels
-  backtest.py           # Rule replay, vote/feature statistics, report
+  backtest.py           # Rule replay, vote/feature statistics, model comparisons, report
+  classifier.py         # Walk-forward logistic / gradient-boosting benchmark (not used live)
 reports/backtest.md     # Latest backtest output
 data/                   # Committed history (see above)
 .github/workflows/

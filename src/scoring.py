@@ -180,6 +180,24 @@ def score_frame(df: pd.DataFrame, calendar: pd.Index, excess_col: str | None = f
     return out, weights
 
 
+def track_record(scored: pd.DataFrame, weights: pd.DataFrame, h: int = LABEL_HORIZON) -> dict[str, dict]:
+    """
+    How each class actually did over h days, on dates scored with learned (walk-forward)
+    weights and whose outcome is known: n, share beating the universe, mean excess return.
+    This is the calibrated "confidence" shown in the digest.
+    """
+    prior = pd.Series(PRIOR_WEIGHTS) / sum(PRIOR_WEIGHTS.values())
+    learned = weights.index[(weights - prior[weights.columns]).abs().max(axis=1) > 1e-12]
+    ex = scored[f"fwd_excess_{h}"]
+    mask = scored.index.get_level_values("date").isin(learned) & ex.notna()
+    sub = scored[mask]
+    out = {}
+    for cls, g in sub.groupby("classification"):
+        e = g[f"fwd_excess_{h}"]
+        out[cls] = {"n": int(len(e)), "hit": float((e > 0).mean()), "excess": float(e.mean()), "horizon": h}
+    return out
+
+
 def score_latest(data_dir: Path = history_store.DATA_DIR) -> tuple[pd.DataFrame, dict]:
     """
     Score the most recent stored date for the live digest.
@@ -198,6 +216,7 @@ def score_latest(data_dir: Path = history_store.DATA_DIR) -> tuple[pd.DataFrame,
         "date": last,
         **{k: (None if pd.isna(v) else v) for k, v in reg.loc[last].items()},
         "weights": weights.loc[last].to_dict(),
+        "track_record": track_record(scored, weights),
         "weights_learned": len(calendar) > 0 and not np.allclose(
             weights.loc[last].values, (pd.Series(PRIOR_WEIGHTS) / sum(PRIOR_WEIGHTS.values())).values
         ),

@@ -49,7 +49,10 @@ def test_digest_omits_llm_section_when_empty():
 
 
 def test_digest_renders_setups_regime_and_llm():
-    ctx = {"regime": "BEARISH", "index_ret_20d": -0.031, "breadth_sma50": 0.42, "high_vol": True}
+    ctx = {
+        "regime": "BEARISH", "index_ret_20d": -0.031, "breadth_sma50": 0.42, "high_vol": True,
+        "track_record": {"STRONG_SETUP": {"n": 3364, "hit": 0.752, "excess": 0.023, "horizon": 20}},
+    }
     body = ms.format_telegram_digest(
         "NABIL | Rs 500 | steady trend\nNICA | Rs 400 | ok",
         [_setup("NABIL", "STRONG_SETUP", 91.4), _setup("NICA", "SETUP", 80.2, ret=-0.012)],
@@ -61,6 +64,12 @@ def test_digest_renders_setups_regime_and_llm():
     assert "NABIL     500.0  91  40  +5.0  S+" in body
     assert "NICA      500.0  80  40  -1.2  S" in body
     assert "3 high risk" in body
+    assert "beat the market over 20d in 75% of 3,364 cases (avg +2.3% vs market)" in body
+
+
+def test_digest_hides_track_record_when_sample_small():
+    ctx = {"regime": "NEUTRAL", "track_record": {"STRONG_SETUP": {"n": 40, "hit": 0.9, "excess": 0.05, "horizon": 20}}}
+    assert "Past strong setups" not in ms.format_telegram_digest("", [], ctx, {})
 
 
 def test_telegram_chunks_keep_pre_blocks_balanced():

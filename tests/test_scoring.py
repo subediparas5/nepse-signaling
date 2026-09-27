@@ -109,3 +109,19 @@ def test_regime_labels():
     assert R.compute_regime(up, stocks_down)["regime"].iloc[-1] == "NEUTRAL"
     assert R.compute_regime(up, stocks_up)["regime"].iloc[10] == "NEUTRAL"  # SMA50 warm-up
     assert R.compute_regime(up, stocks_up)["breadth_sma50"].iloc[-1] == pytest.approx(1.0)
+
+
+def test_track_record_uses_only_learned_weight_dates_with_outcomes():
+    dates = ["d1", "d2", "d3"]
+    idx = pd.MultiIndex.from_product([dates, ["A", "B"]], names=["date", "symbol"])
+    scored = pd.DataFrame(
+        {"classification": ["STRONG_SETUP", "AVOID"] * 3, "fwd_excess_20": [0.05, -0.02, 0.03, 0.01, np.nan, np.nan]},
+        index=idx,
+    )
+    prior = pd.Series(S.PRIOR_WEIGHTS) / sum(S.PRIOR_WEIGHTS.values())
+    learned = prior.copy()
+    learned["trend"] += 0.1
+    weights = pd.DataFrame([prior, learned, learned], index=dates)[list(S.COMPONENTS)]
+    rec = S.track_record(scored, weights)
+    assert rec["STRONG_SETUP"] == {"n": 1, "hit": 1.0, "excess": pytest.approx(0.03), "horizon": 20}
+    assert rec["AVOID"]["n"] == 1 and rec["AVOID"]["hit"] == 1.0

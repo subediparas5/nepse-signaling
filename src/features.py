@@ -25,8 +25,10 @@ HORIZONS = (1, 5, 10, 20)
 RANGE_WINDOW = 240
 RANGE_MIN_OBS = 120
 
-# NEPSE daily band is ±10%; a day whose low is already this far up was locked limit-up.
+# NEPSE's daily band is ±10% (±15% for some names from 2026-04 in this data). A day that traded
+# only in a sliver of range at least this far up was locked limit-up and could not be bought.
 LIMIT_UP_LOCK = 0.09
+LOCKED_RANGE = 0.005
 
 # Fresh listings behave differently (a few run up many-fold); keep them out of the main universe.
 NEW_LISTING_SESSIONS = 120
@@ -54,8 +56,35 @@ class Panel:
     index_close: pd.Series
 
 
-def build_panel(prices: pd.DataFrame, index: pd.DataFrame, sectors: dict[str, str]) -> Panel:
-    """`prices`/`index` are long frames with a `date` column (see history_store fields)."""
+def adjustment_factors(actions: pd.DataFrame | None, traded: pd.DataFrame) -> pd.DataFrame:
+    """
+    Multiplicative back-adjustment per (date, symbol). An action posted on date D (after that
+    session) with factor f = adjusted / previous close scales every price on or before the last
+    session <= D that the symbol traded; later prices are untouched.
+    """
+    out = pd.DataFrame(1.0, index=traded.index, columns=traded.columns)
+    if actions is None or actions.empty:
+        return out
+    step = out.copy()
+    dates = traded.index
+    for a in actions.itertuples(index=False):
+        if a.symbol not in traded.columns or not (dates[0] <= a.date):
+            continue
+        sessions = dates[(dates <= a.date) & traded[a.symbol].to_numpy()]
+        if len(sessions) == 0:
+            continue
+        step.loc[sessions[-1], a.symbol] *= float(a.factor)
+    # Price at t is scaled by every factor whose reference session is on or after t.
+    return step.iloc[::-1].cumprod().iloc[::-1]
+
+
+def build_panel(
+    prices: pd.DataFrame, index: pd.DataFrame, sectors: dict[str, str], actions: pd.DataFrame | None = None
+) -> Panel:
+    """
+    `prices`/`index` are long frames with a `date` column (see history_store fields). Raw prices are
+    back-adjusted for `actions` (bonus/rights/dividend) so returns are not distorted by them.
+    """
     prices = prices.copy()
     for c in _NUMERIC:
         if c in prices:
@@ -72,8 +101,15 @@ def build_panel(prices: pd.DataFrame, index: pd.DataFrame, sectors: dict[str, st
             return pd.DataFrame(np.nan, index=calendar, columns=symbols)
         return prices.pivot(index="date", columns="symbol", values=col).reindex(index=calendar, columns=symbols)
 
-    close_raw = wide("close")
-    traded = close_raw.notna()
+    traded = wide("close").notna()
+    if actions is not None and not actions.empty:
+        actions = actions.assign(factor=pd.to_numeric(actions["factor"], errors="coerce")).dropna(subset=["factor"])
+    adj = adjustment_factors(actions, traded)
+
+    def wide_adj(col: str) -> pd.DataFrame:
+        return wide(col) * adj
+
+    close_raw = wide_adj("close")
     close = close_raw.ffill()
     listed = close.notna()  # False before a symbol's first trade
 
@@ -89,11 +125,11 @@ def build_panel(prices: pd.DataFrame, index: pd.DataFrame, sectors: dict[str, st
 
     return Panel(
         close=close,
-        high=fill_price(wide("high")),
-        low=fill_price(wide("low")),
-        open=wide("open"),
-        vwap=wide("vwap"),
-        volume=fill_zero(wide("volume")),
+        high=fill_price(wide_adj("high")),
+        low=fill_price(wide_adj("low")),
+        open=wide_adj("open"),
+        vwap=wide_adj("vwap"),
+        volume=fill_zero(wide("volume") / adj),
         turnover=fill_zero(wide("turnover")),
         trades=fill_zero(wide("trades")),
         traded=traded,
@@ -106,7 +142,8 @@ def load_panel(data_dir: Path = history_store.DATA_DIR) -> Panel:
     prices = pd.DataFrame(history_store.load_prices(data_dir))
     index = pd.DataFrame(history_store.load_index(data_dir))
     secs = {r["symbol"]: r["sector"] for r in history_store._read(data_dir / "securities.csv")}
-    return build_panel(prices, index, secs)
+    actions = pd.DataFrame(history_store.load_corporate_actions(data_dir))
+    return build_panel(prices, index, secs, actions if not actions.empty else None)
 
 
 def _wilder(x: pd.DataFrame, n: int) -> pd.DataFrame:
@@ -182,7 +219,8 @@ def forward_labels(p: Panel, horizons: tuple[int, ...] = HORIZONS) -> dict[str, 
     """
     c = p.close
     entry = c.shift(-1)
-    locked = p.low.shift(-1) >= c * (1 + LIMIT_UP_LOCK)
+    nxt_lo, nxt_hi = p.low.shift(-1), p.high.shift(-1)
+    locked = (nxt_lo >= c * (1 + LIMIT_UP_LOCK)) & ((nxt_hi - nxt_lo) <= nxt_lo * LOCKED_RANGE)
     fillable = p.traded & p.traded.shift(-1, fill_value=False) & ~locked
     entry = entry.where(fillable)
 
