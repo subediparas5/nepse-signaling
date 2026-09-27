@@ -1,0 +1,252 @@
+date,symbol,sector,verdict,buy_score,sell_score,confidence,technical_buy,technical_sell,fundamental_buy,fundamental_sell,close,reasons
+2026-09-24,ACLBSL,MICROFINANCE,HOLD,2,2,0,2,2,0,0,877,Near 52w low (18% of range — value zone) | Closed below VWAP (-1.1%) | Low turnover Rs 0.25M (illiquid) | Wide range (2.2%) bullish bar
+2026-09-24,ADBL,BANKING,HOLD,1,0,100,1,0,0,0,313,"Good activity: Rs 5.8M, 119 txns"
+2026-09-24,AHL,HYDROPOWER,BUY,5,1,67,5,1,0,0,402.7,"Near 52w low (17% of range — value zone) | Bullish day (+2.7%, closed above open) | Gap down -3.0% (bearish sentiment) | Closed above VWAP (+3.1%) | Wide range (14.3%) bullish bar | Outperforming sector by +2.5pp"
+2026-09-24,AHPC,HYDROPOWER,HOLD,1,0,100,1,0,0,0,266.9,"Good activity: Rs 16.1M, 228 txns"
+2026-09-24,AKJCL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,358,"Gap down -1.1% (bearish sentiment) | Good activity: Rs 80.9M, 545 txns | Wide range (2.2%) bullish bar"
+2026-09-24,AKPL,HYDROPOWER,HOLD,2,0,100,2,0,0,0,253,"Good activity: Rs 10.0M, 158 txns | Wide range (1.7%) bullish bar"
+2026-09-24,ALBSL,MICROFINANCE,LEAN_SELL,1,3,50,1,3,0,0,1174.4,Gap down -2.4% (bearish sentiment) | Only 48 transactions (illiquid) | Wide range (3.1%) bullish bar | Underperforming sector by -2.3pp
+2026-09-24,ALICL,LIFEINSU,LEAN_BUY,3,0,100,3,0,0,0,432.8,"Closed above VWAP (+1.7%) | Good activity: Rs 10.3M, 114 txns | Wide range (2.7%) bullish bar"
+2026-09-24,ANLB,MICROFINANCE,BUY,4,1,60,4,1,0,0,4987,At 52w low (8%) with volume — accumulation signal | Closed above VWAP (+1.6%) | Only 34 transactions (illiquid) | Wide range (2.2%) bullish bar
+2026-09-24,APHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,671,Gap down -1.7% (bearish sentiment) | Closed above VWAP (+0.6%) | Wide range (5.3%) bullish bar
+2026-09-24,API,HYDROPOWER,HOLD,2,0,100,2,0,0,0,334.8,"Good activity: Rs 74.2M, 592 txns | Wide range (1.7%) bullish bar"
+2026-09-24,AVYAN,MICROFINANCE,HOLD,0,2,100,0,2,0,0,1060,Only 20 transactions (illiquid) | Wide range (2.9%) bearish bar
+2026-09-24,BANDIPUR,HOTELS,HOLD,2,1,33,2,1,0,0,640,"Gap down -4.9% (bearish sentiment) | Good activity: Rs 12.3M, 281 txns | Wide range (5.6%) bullish bar"
+2026-09-24,BARUN,HYDROPOWER,HOLD,1,1,0,1,1,0,0,326,Gap down -4.0% (bearish sentiment) | Wide range (4.9%) bullish bar
+2026-09-24,BBC,TRADING,HOLD,2,1,33,2,1,0,0,4090.5,Near 52w low (15% of range — value zone) | Gap up +1.2% (bullish sentiment) | Low turnover Rs 0.37M (illiquid)
+2026-09-24,BEDC,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,308.9,At 52w low (8% of range — deep value) | Closed above VWAP (+0.6%) | Wide range (1.9%) bearish bar
+2026-09-24,BFC,FINANCE,HOLD,2,0,100,2,0,0,0,447,Near 52w low (20% of range — value zone) | Wide range (2.1%) bullish bar
+2026-09-24,BGWT,HYDROPOWER,HOLD,2,1,33,2,1,0,0,492,Near 52w low (11% of range — value zone) | Only 35 transactions (illiquid) | Wide range (1.8%) bullish bar
+2026-09-24,BHCL,HYDROPOWER,BUY,5,0,100,5,0,0,0,574.8,"Bullish day (+2.8%, closed above open) | Closed above VWAP (+1.0%) | Good activity: Rs 64.8M, 823 txns | Wide range (5.2%) bullish bar | Outperforming sector by +2.6pp"
+2026-09-24,BHDC,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,433.4,Near 52w low (15% of range — value zone) | Gap down -5.0% (bearish sentiment) | Closed above VWAP (+0.5%) | Wide range (5.9%) bullish bar
+2026-09-24,BHL,HYDROPOWER,HOLD,2,0,100,2,0,0,0,212.2,"Good activity: Rs 19.8M, 288 txns | Wide range (2.2%) bullish bar"
+2026-09-24,BHPL,HYDROPOWER,LEAN_BUY,4,2,33,4,2,0,0,447.5,At 52w low (8% of range — deep value) | Gap down -1.6% (bearish sentiment) | Closed above VWAP (+1.1%) | Only 46 transactions (illiquid) | Wide range (2.2%) bullish bar
+2026-09-24,BJHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,643,Gap down -5.0% (bearish sentiment) | Closed above VWAP (+0.7%) | Wide range (6.6%) bullish bar
+2026-09-24,BNHC,HYDROPOWER,BUY,4,0,100,4,0,0,0,278.5,At 52w low (8% of range — deep value) | Closed above VWAP (+0.5%) | Wide range (2.2%) bullish bar
+2026-09-24,BNL,MANUFACTURE,HOLD,1,1,0,1,1,0,0,14244.7,Near 52w low (21% of range — value zone) | Only 0 transactions (illiquid)
+2026-09-24,BNT,MANUFACTURE,HOLD,1,2,33,1,2,0,0,12001,Closed below VWAP (-0.9%) | Only 9 transactions (illiquid) | Wide range (3.0%) bullish bar
+2026-09-24,BPCL,HYDROPOWER,HOLD,2,0,100,2,0,0,0,676,"Good activity: Rs 21.6M, 146 txns | Wide range (2.9%) bullish bar"
+2026-09-24,BUNGAL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,514,"Gap up +5.0% (bullish sentiment) | Good activity: Rs 6.6M, 160 txns | Wide range (5.2%) bearish bar"
+2026-09-24,CBBL,MICROFINANCE,HOLD,1,0,100,1,0,0,0,956.8,"Good activity: Rs 9.4M, 110 txns"
+2026-09-24,CFCL,FINANCE,LEAN_BUY,3,0,100,3,0,0,0,567.9,"Closed above VWAP (+1.0%) | Good activity: Rs 53.4M, 169 txns | Wide range (1.7%) bullish bar"
+2026-09-24,CGH,HOTELS,HOLD,2,1,33,2,1,0,0,773,Near 52w low (11% of range — value zone) | Gap up +2.2% (bullish sentiment) | Wide range (3.5%) bearish bar
+2026-09-24,CHCL,HYDROPOWER,BUY,4,1,60,4,1,0,0,352,"At 52w low (4%) with volume — accumulation signal | Gap down -5.0% (bearish sentiment) | Good activity: Rs 29.5M, 314 txns | Wide range (6.3%) bullish bar"
+2026-09-24,CHDC,INVESTMENT,HOLD,1,1,0,1,1,0,0,2402,"Good activity: Rs 37.6M, 184 txns | Wide range (1.6%) bearish bar"
+2026-09-24,CHL,HYDROPOWER,HOLD,2,0,100,2,0,0,0,267,Closed above VWAP (+1.6%) | Wide range (2.6%) bullish bar
+2026-09-24,CIT,INVESTMENT,HOLD,0,0,0,0,0,0,0,1747,
+2026-09-24,CITY,HOTELS,BUY,5,0,100,5,0,0,0,353.5,"At 52w low (8%) with volume — accumulation signal | Closed above VWAP (+1.0%) | Good activity: Rs 23.5M, 290 txns | Wide range (2.6%) bullish bar"
+2026-09-24,CKHL,HYDROPOWER,LEAN_BUY,3,2,20,3,2,0,0,582.4,Near 52w low (21% of range — value zone) | Gap up +2.4% (bullish sentiment) | Closed above VWAP (+1.9%) | Only 25 transactions (illiquid) | Wide range (5.6%) bearish bar
+2026-09-24,CLI,LIFEINSU,HOLD,2,0,100,2,0,0,0,440,Closed above VWAP (+1.1%) | Wide range (1.7%) bullish bar
+2026-09-24,CREST,LIFEINSU,LEAN_BUY,3,0,100,3,0,0,0,1099,Near 52w low (17% of range — value zone) | Closed above VWAP (+1.8%) | Wide range (2.6%) bullish bar
+2026-09-24,CYCL,MICROFINANCE,BUY,5,2,43,5,2,0,0,1630,"Upper 52w range (75%) | Bullish day (+6.5%, closed above open) | Gap down -2.4% (bearish sentiment) | Closed above VWAP (+7.0%) | Good activity: Rs 41.2M, 258 txns | Wide range (10.5%) bullish bar | Outperforming sector by +5.8pp"
+2026-09-24,CZBIL,BANKING,HOLD,2,0,100,2,0,0,0,213.4,"Good activity: Rs 39.6M, 367 txns | Wide range (3.7%) bullish bar"
+2026-09-24,DDBL,MICROFINANCE,HOLD,1,1,0,1,1,0,0,861,Gap down -5.0% (bearish sentiment) | Wide range (6.0%) bullish bar
+2026-09-24,DHEL,HYDROPOWER,HOLD,1,1,0,1,1,0,0,554,Gap up +2.7% (bullish sentiment) | Wide range (3.4%) bearish bar
+2026-09-24,DHPL,HYDROPOWER,LEAN_BUY,3,2,20,3,2,0,0,275,Near 52w low (23% of range — value zone) | Gap down -1.1% (bearish sentiment) | Closed above VWAP (+0.6%) | Only 32 transactions (illiquid) | Wide range (7.3%) bullish bar
+2026-09-24,DLBS,MICROFINANCE,LEAN_SELL,2,3,20,2,3,0,0,1205.1,"Bearish day (-10.2%, closed below open) | Gap up +4.9% (bullish sentiment) | Closed above VWAP (+3.3%) | Wide range (19.9%) bearish bar | Underperforming sector by -10.9pp"
+2026-09-24,DOLTI,HYDROPOWER,LEAN_SELL,2,3,20,2,3,0,0,299,"At 52w low (7% of range — deep value) | Bearish day (-1.6%, closed below open) | Wide range (3.9%) bearish bar | Underperforming sector by -1.9pp"
+2026-09-24,DORDI,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,263,"Gap down -5.0% (bearish sentiment) | Closed above VWAP (+0.7%) | Good activity: Rs 7.7M, 117 txns | Wide range (7.7%) bullish bar"
+2026-09-24,EBL,BANKING,HOLD,1,0,100,1,0,0,0,697.4,"Good activity: Rs 21.7M, 150 txns"
+2026-09-24,ECL,MANUFACTURE,HOLD,1,2,33,1,2,0,0,1296.1,"Good activity: Rs 12.8M, 193 txns | Wide range (2.6%) bearish bar | Underperforming sector by -1.6pp"
+2026-09-24,EHPL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,326.8,Near 52w low (12% of range — value zone) | Gap up +5.0% (bullish sentiment) | Wide range (9.3%) bearish bar
+2026-09-24,ENL,INVESTMENT,LEAN_BUY,3,2,20,3,2,0,0,550.6,"At 52w low (4%) with volume — accumulation signal | Closed below VWAP (-1.8%) | Good activity: Rs 9.0M, 126 txns | Wide range (3.0%) bearish bar"
+2026-09-24,FMDBL,MICROFINANCE,HOLD,2,1,33,2,1,0,0,759.5,Near 52w low (24% of range — value zone) | Gap down -5.0% (bearish sentiment) | Wide range (6.3%) bullish bar
+2026-09-24,FOWAD,MICROFINANCE,HOLD,2,1,33,2,1,0,0,900,Near 52w low (12% of range — value zone) | Only 15 transactions (illiquid) | Wide range (3.7%) bullish bar
+2026-09-24,GBIME,BANKING,LEAN_BUY,3,1,50,3,1,0,0,243.8,"Gap up +1.9% (bullish sentiment) | Closed above VWAP (+0.5%) | Good activity: Rs 54.2M, 660 txns | Wide range (2.9%) bearish bar"
+2026-09-24,GBLBS,MICROFINANCE,HOLD,2,2,0,2,2,0,0,692,Gap down -3.0% (bearish sentiment) | Closed above VWAP (+1.8%) | Only 48 transactions (illiquid) | Wide range (3.7%) bullish bar
+2026-09-24,GCIL,MANUFACTURE,BUY,5,1,67,5,1,0,0,401.3,"Bullish day (+7.1%, closed above open) | Gap down -1.3% (bearish sentiment) | Closed above VWAP (+1.0%) | Good activity: Rs 73.4M, 974 txns | Wide range (10.4%) bullish bar | Outperforming sector by +5.6pp"
+2026-09-24,GFCL,FINANCE,LEAN_BUY,3,2,20,3,2,0,0,577,Near 52w low (14% of range — value zone) | Gap up +1.2% (bullish sentiment) | Closed above VWAP (+0.9%) | Only 37 transactions (illiquid) | Wide range (2.1%) bearish bar
+2026-09-24,GHL,HYDROPOWER,LEAN_SELL,2,3,20,2,3,0,0,253.7,"Gap up +5.0% (bullish sentiment) | Closed below VWAP (-1.3%) | Good activity: Rs 74.4M, 567 txns | Wide range (6.5%) bearish bar | Underperforming sector by -1.5pp"
+2026-09-24,GILB,MICROFINANCE,HOLD,1,1,0,1,1,0,0,1139.5,Closed above VWAP (+0.9%) | Only 15 transactions (illiquid)
+2026-09-24,GLBSL,MICROFINANCE,HOLD,1,1,0,1,1,0,0,1700,Near 52w low (16% of range — value zone) | Low turnover Rs 0.36M (illiquid)
+2026-09-24,GLH,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,278.8,"Gap down -1.1% (bearish sentiment) | Closed above VWAP (+0.6%) | Good activity: Rs 21.2M, 220 txns | Wide range (2.1%) bullish bar"
+2026-09-24,GMFBS,MICROFINANCE,LEAN_BUY,4,2,33,4,2,0,0,1124,"Near 52w low (13% of range — value zone) | Bullish day (+2.2%, closed above open) | Gap down -3.0% (bearish sentiment) | Closed above VWAP (+0.7%) | Low turnover Rs 0.33M (illiquid) | Wide range (5.2%) bullish bar"
+2026-09-24,GMFIL,FINANCE,HOLD,1,2,33,1,2,0,0,421,Near 52w low (19% of range — value zone) | Only 20 transactions (illiquid) | Wide range (2.2%) bearish bar
+2026-09-24,GMLI,LIFEINSU,LEAN_BUY,4,3,14,4,3,0,0,990,At 52w low (9% of range — deep value) | Gap down -3.0% (bearish sentiment) | Closed above VWAP (+0.7%) | Only 30 transactions (illiquid) | Wide range (3.0%) bullish bar | Underperforming sector by -1.7pp
+2026-09-24,GUFL,FINANCE,HOLD,2,0,100,2,0,0,0,496.4,Near 52w low (20% of range — value zone) | Wide range (2.1%) bullish bar
+2026-09-24,GVL,HYDROPOWER,HOLD,2,0,100,2,0,0,0,489.3,Near 52w low (20% of range — value zone) | Wide range (1.8%) bullish bar
+2026-09-24,HATHY,INVESTMENT,HOLD,3,3,0,3,3,0,0,452.9,"At 52w low (4%) with volume — accumulation signal | Bearish day (-3.4%, closed below open) | Good activity: Rs 119.3M, 1357 txns | Wide range (5.7%) bearish bar | Underperforming sector by -3.4pp"
+2026-09-24,HBL,BANKING,LEAN_BUY,3,1,50,3,1,0,0,195.5,"Near 52w low (23% of range — value zone) | Gap down -1.0% (bearish sentiment) | Good activity: Rs 14.3M, 514 txns | Wide range (2.5%) bullish bar"
+2026-09-24,HDHPC,HYDROPOWER,HOLD,2,0,100,2,0,0,0,220.3,"Good activity: Rs 52.8M, 430 txns | Wide range (2.3%) bullish bar"
+2026-09-24,HDL,MANUFACTURE,BUY,4,0,100,4,0,0,0,1312,"Bullish day (+2.6%, closed above open) | Closed above VWAP (+0.6%) | Good activity: Rs 351.7M, 1735 txns | Wide range (3.9%) bullish bar"
+2026-09-24,HFIN,HOTELS,LEAN_BUY,3,0,100,3,0,0,0,617.5,"Closed above VWAP (+0.6%) | Good activity: Rs 12.8M, 459 txns | Wide range (1.8%) bullish bar"
+2026-09-24,HHL,HYDROPOWER,LEAN_BUY,3,0,100,3,0,0,0,342,"Closed above VWAP (+0.7%) | Good activity: Rs 12.2M, 119 txns | Wide range (2.1%) bullish bar"
+2026-09-24,HIDCL,INVESTMENT,HOLD,2,1,33,2,1,0,0,256,"Gap up +5.0% (bullish sentiment) | Good activity: Rs 8.2M, 171 txns | Wide range (6.0%) bearish bar"
+2026-09-24,HIMSTAR,HYDROPOWER,BUY,4,1,60,4,1,0,0,644,At 52w low (9% of range — deep value) | Closed above VWAP (+0.7%) | Only 34 transactions (illiquid) | Wide range (3.4%) bullish bar
+2026-09-24,HLBSL,MICROFINANCE,HOLD,2,1,33,2,1,0,0,869,Near 52w low (22% of range — value zone) | Only 14 transactions (illiquid) | Wide range (1.5%) bullish bar
+2026-09-24,HLI,LIFEINSU,BUY,4,0,100,4,0,0,0,309.2,"Near 52w low (19% of range — value zone) | Closed above VWAP (+0.6%) | Good activity: Rs 9.1M, 194 txns | Wide range (2.0%) bullish bar"
+2026-09-24,HPPL,HYDROPOWER,BUY,7,0,100,7,0,0,0,380,"Near 52w low (15% of range — value zone) | Bullish day (+2.1%, closed above open) | Gap up +1.3% (bullish sentiment) | Closed above VWAP (+0.7%) | Good activity: Rs 30.0M, 233 txns | Wide range (2.1%) bullish bar | Outperforming sector by +1.9pp"
+2026-09-24,HRL,OTHERS,BUY,4,1,60,4,1,0,0,510,"At 52w low (5%) with volume — accumulation signal | Gap down -3.0% (bearish sentiment) | Good activity: Rs 19.5M, 509 txns | Wide range (5.1%) bullish bar"
+2026-09-24,HURJA,HYDROPOWER,BUY,5,0,100,5,0,0,0,257,"Bullish day (+2.0%, closed above open) | Closed above VWAP (+0.8%) | Good activity: Rs 20.6M, 251 txns | Wide range (2.9%) bullish bar | Outperforming sector by +1.7pp"
+2026-09-24,ICFC,FINANCE,HOLD,1,1,0,1,1,0,0,595,Near 52w low (19% of range — value zone) | Only 41 transactions (illiquid)
+2026-09-24,IHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,327.2,Near 52w low (13% of range — value zone) | Gap up +4.9% (bullish sentiment) | Wide range (6.4%) bearish bar
+2026-09-24,ILBS,MICROFINANCE,HOLD,2,2,0,2,2,0,0,950,Gap down -2.9% (bearish sentiment) | Closed above VWAP (+1.5%) | Wide range (8.3%) bullish bar | Underperforming sector by -2.6pp
+2026-09-24,ILI,LIFEINSU,HOLD,2,0,100,2,0,0,0,428,Closed above VWAP (+0.8%) | Wide range (2.2%) bullish bar
+2026-09-24,JBLB,MICROFINANCE,HOLD,1,0,100,1,0,0,0,1278.8,Near 52w low (20% of range — value zone)
+2026-09-24,JFL,FINANCE,BUY,5,1,67,5,1,0,0,285,"Near 52w low (14% of range — value zone) | Bullish day (+2.1%, closed above open) | Gap down -3.3% (bearish sentiment) | Closed above VWAP (+0.6%) | Wide range (8.9%) bullish bar | Outperforming sector by +1.9pp"
+2026-09-24,JHAPA,OTHERS,HOLD,1,1,0,1,1,0,0,1038,Only 32 transactions (illiquid) | Wide range (1.6%) bullish bar
+2026-09-24,JOSHI,HYDROPOWER,HOLD,2,1,33,2,1,0,0,264,Near 52w low (13% of range — value zone) | Closed above VWAP (+1.6%) | Wide range (2.7%) bearish bar
+2026-09-24,JSLBB,MICROFINANCE,HOLD,2,2,0,2,2,0,0,969,Near 52w low (16% of range — value zone) | Gap up +1.0% (bullish sentiment) | Low turnover Rs 0.15M (illiquid) | Wide range (2.6%) bearish bar
+2026-09-24,KAHL,HYDROPOWER,HOLD,1,1,0,1,1,0,0,485,"Gap down -1.0% (bearish sentiment) | Good activity: Rs 6.7M, 504 txns"
+2026-09-24,KBL,BANKING,HOLD,2,0,100,2,0,0,0,226,"Good activity: Rs 83.3M, 621 txns | Wide range (2.1%) bullish bar"
+2026-09-24,KBSH,HYDROPOWER,LEAN_SELL,2,3,20,2,3,0,0,807,At 52w low (4% of range — deep value) | Only 40 transactions (illiquid) | Wide range (3.5%) bearish bar | Underperforming sector by -1.7pp
+2026-09-24,KDL,HOTELS,BUY,7,0,100,7,0,0,0,629.8,"At 52w low (3%) with volume — accumulation signal | Bullish day (+2.5%, closed above open) | Closed above VWAP (+1.2%) | Good activity: Rs 37.8M, 400 txns | Wide range (2.5%) bullish bar | Outperforming sector by +2.3pp"
+2026-09-24,KHPL,HYDROPOWER,HOLD,1,0,100,1,0,0,0,716.7,Wide range (2.8%) bullish bar
+2026-09-24,KKHC,HYDROPOWER,HOLD,2,1,33,2,1,0,0,275.1,"Closed below VWAP (-1.0%) | Good activity: Rs 41.8M, 383 txns | Wide range (2.8%) bullish bar"
+2026-09-24,KMCDB,MICROFINANCE,BUY,4,1,60,4,1,0,0,828,"Near 52w low (20% of range — value zone) | Bullish day (+2.2%, closed above open) | Gap down -5.0% (bearish sentiment) | Wide range (8.5%) bullish bar | Outperforming sector by +1.5pp"
+2026-09-24,KPCL,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,467,Near 52w low (12% of range — value zone) | Closed above VWAP (+0.5%) | Only 22 transactions (illiquid) | Wide range (1.9%) bullish bar
+2026-09-24,LEC,HYDROPOWER,HOLD,2,2,0,2,2,0,0,254.8,"Upper 52w range (78%) | Gap up +5.0% (bullish sentiment) | Good activity: Rs 82.8M, 566 txns | Wide range (6.1%) bearish bar"
+2026-09-24,LICN,LIFEINSU,HOLD,2,1,33,2,1,0,0,800.9,Gap down -1.3% (bearish sentiment) | Closed above VWAP (+1.1%) | Wide range (2.4%) bullish bar
+2026-09-24,LLBS,MICROFINANCE,HOLD,2,2,0,2,2,0,0,860,Gap down -2.2% (bearish sentiment) | Closed above VWAP (+2.7%) | Low turnover Rs 0.37M (illiquid) | Wide range (3.3%) bullish bar
+2026-09-24,LSL,BANKING,LEAN_BUY,3,2,20,3,2,0,0,250,"Near 52w high (92% — overextended) | Gap up +1.7% (bullish sentiment) | Closed above VWAP (+0.6%) | Good activity: Rs 137.8M, 673 txns"
+2026-09-24,MABEL,HYDROPOWER,HOLD,2,0,100,2,0,0,0,579,Closed above VWAP (+1.0%) | Wide range (4.0%) bullish bar
+2026-09-24,MAKAR,HYDROPOWER,BUY,4,1,60,4,1,0,0,410.9,"At 52w low (9%) with volume — accumulation signal | Gap down -1.5% (bearish sentiment) | Good activity: Rs 34.4M, 258 txns | Wide range (2.3%) bullish bar"
+2026-09-24,MANDU,HYDROPOWER,SELL,0,4,100,0,4,0,0,740.2,Closed below VWAP (-0.8%) | Only 39 transactions (illiquid) | Wide range (2.4%) bearish bar | Underperforming sector by -1.7pp
+2026-09-24,MATRI,MICROFINANCE,LEAN_SELL,2,4,33,2,4,0,0,727.1,"At 52w low (6% of range — deep value) | Bearish day (-2.9%, closed below open) | Low turnover Rs 0.36M (illiquid) | Wide range (3.0%) bearish bar | Underperforming sector by -3.6pp"
+2026-09-24,MBJC,HYDROPOWER,LEAN_BUY,3,0,100,3,0,0,0,295.9,"Closed above VWAP (+0.7%) | Good activity: Rs 10.7M, 252 txns | Wide range (3.1%) bullish bar"
+2026-09-24,MBL,BANKING,HOLD,1,0,100,1,0,0,0,258.5,"Good activity: Rs 45.0M, 353 txns"
+2026-09-24,MCHL,HYDROPOWER,BUY,4,1,60,4,1,0,0,269.8,"Near 52w low (12% of range — value zone) | Bullish day (+2.6%, closed above open) | Closed below VWAP (-1.6%) | Wide range (8.3%) bullish bar | Outperforming sector by +2.3pp"
+2026-09-24,MEHL,HYDROPOWER,BUY,6,1,71,6,1,0,0,255.9,"Near 52w low (12% of range — value zone) | Bullish day (+2.4%, closed above open) | Gap down -1.2% (bearish sentiment) | Closed above VWAP (+1.5%) | Good activity: Rs 15.8M, 281 txns | Wide range (4.2%) bullish bar | Outperforming sector by +2.1pp"
+2026-09-24,MEL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,214,Near 52w low (14% of range — value zone) | Closed above VWAP (+0.6%) | Wide range (2.1%) bearish bar
+2026-09-24,MEN,HYDROPOWER,HOLD,2,1,33,2,1,0,0,653,"Upper 52w range (80%) | Closed above VWAP (+0.9%) | Good activity: Rs 62.9M, 291 txns"
+2026-09-24,MEPDL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,654,"Gap down -4.0% (bearish sentiment) | Good activity: Rs 11.7M, 466 txns | Wide range (5.7%) bullish bar"
+2026-09-24,MERO,MICROFINANCE,LEAN_BUY,3,1,50,3,1,0,0,607,At 52w low (8% of range — deep value) | Only 20 transactions (illiquid) | Wide range (1.6%) bullish bar
+2026-09-24,MFIL,FINANCE,HOLD,2,2,0,2,2,0,0,764.8,"Gap down -3.1% (bearish sentiment) | Closed below VWAP (-1.6%) | Good activity: Rs 54.2M, 142 txns | Wide range (6.0%) bullish bar"
+2026-09-24,MHCL,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,296,Near 52w low (19% of range — value zone) | Closed above VWAP (+0.9%) | Only 32 transactions (illiquid) | Wide range (2.7%) bullish bar
+2026-09-24,MHL,HYDROPOWER,HOLD,2,2,0,2,2,0,0,457,Near 52w low (15% of range — value zone) | Gap up +2.4% (bullish sentiment) | Only 45 transactions (illiquid) | Wide range (2.6%) bearish bar
+2026-09-24,MHNL,HYDROPOWER,SELL,0,5,100,0,5,0,0,252,"Bearish day (-1.9%, closed below open) | Gap down -1.4% (bearish sentiment) | Closed below VWAP (-0.9%) | Wide range (5.0%) bearish bar | Underperforming sector by -2.2pp"
+2026-09-24,MKCL,OTHERS,BUY,4,1,60,4,1,0,0,867,At 52w low (7% of range — deep value) | Gap down -1.1% (bearish sentiment) | Closed above VWAP (+2.0%) | Wide range (2.9%) bullish bar
+2026-09-24,MKHC,HYDROPOWER,BUY,5,0,100,5,0,0,0,263.8,"Near 52w low (17% of range — value zone) | Bullish day (+2.2%, closed above open) | Closed above VWAP (+2.0%) | Wide range (3.4%) bullish bar | Outperforming sector by +2.0pp"
+2026-09-24,MKHL,HYDROPOWER,LEAN_BUY,4,2,33,4,2,0,0,505,Near 52w low (10% of range — value zone) | Gap up +2.8% (bullish sentiment) | Closed above VWAP (+1.4%) | Only 27 transactions (illiquid) | Wide range (4.6%) bearish bar | Outperforming sector by +1.8pp
+2026-09-24,MKJC,HYDROPOWER,HOLD,3,3,0,3,3,0,0,329.3,"Near 52w low (20% of range — value zone) | Gap down -5.0% (bearish sentiment) | Closed below VWAP (-0.8%) | Good activity: Rs 12.5M, 195 txns | Wide range (4.7%) bullish bar | Underperforming sector by -3.1pp"
+2026-09-24,MLBBL,MICROFINANCE,LEAN_BUY,3,2,20,3,2,0,0,978.9,Near 52w low (11% of range — value zone) | Gap down -5.0% (bearish sentiment) | Closed above VWAP (+1.0%) | Only 21 transactions (illiquid) | Wide range (6.0%) bullish bar
+2026-09-24,MLBS,MICROFINANCE,BUY,5,2,43,5,2,0,0,1019,"At 52w low (7% of range — deep value) | Bullish day (+1.9%, closed above open) | Gap down -1.5% (bearish sentiment) | Closed above VWAP (+0.6%) | Low turnover Rs 0.13M (illiquid) | Wide range (3.4%) bullish bar"
+2026-09-24,MLBSL,MICROFINANCE,BUY,4,1,60,4,1,0,0,1126.4,At 52w low (8% of range — deep value) | Closed above VWAP (+1.2%) | Only 22 transactions (illiquid) | Wide range (1.7%) bullish bar
+2026-09-24,MMKJL,HYDROPOWER,HOLD,1,2,33,1,2,0,0,361,Near 52w low (13% of range — value zone) | Gap down -1.1% (bearish sentiment) | Low turnover Rs 0.41M (illiquid)
+2026-09-24,MPFL,FINANCE,HOLD,2,2,0,2,2,0,0,588,Gap down -1.4% (bearish sentiment) | Closed above VWAP (+0.6%) | Only 48 transactions (illiquid) | Wide range (1.8%) bullish bar
+2026-09-24,MSHL,HYDROPOWER,LEAN_SELL,2,4,33,2,4,0,0,550,"Near 52w low (15% of range — value zone) | Bearish day (-11.6%, closed below open) | Closed below VWAP (-7.5%) | Good activity: Rs 7.8M, 148 txns | Wide range (12.1%) bearish bar | Underperforming sector by -11.8pp"
+2026-09-24,MSLB,MICROFINANCE,HOLD,2,1,33,2,1,0,0,1210,Near 52w low (22% of range — value zone) | Only 37 transactions (illiquid) | Wide range (2.8%) bullish bar
+2026-09-24,NABIL,BANKING,HOLD,1,2,33,1,2,0,0,569,"Near 52w high (88% — overextended) | Good activity: Rs 40.2M, 495 txns"
+2026-09-24,NADEP,MICROFINANCE,LEAN_BUY,3,1,50,3,1,0,0,695,Near 52w low (20% of range — value zone) | Closed above VWAP (+1.8%) | Only 16 transactions (illiquid) | Wide range (2.2%) bullish bar
+2026-09-24,NBL,BANKING,HOLD,2,2,0,2,2,0,0,292,"Near 52w high (84% — overextended) | Good activity: Rs 92.2M, 443 txns | Wide range (2.3%) bullish bar"
+2026-09-24,NESDO,MICROFINANCE,BUY,4,1,60,4,1,0,0,1357.9,"Near 52w low (21% of range — value zone) | Bullish day (+2.0%, closed above open) | Closed above VWAP (+2.2%) | Low turnover Rs 0.28M (illiquid) | Wide range (2.8%) bullish bar"
+2026-09-24,NFS,FINANCE,BUY,4,1,60,4,1,0,0,495,"Near 52w low (12% of range — value zone) | Bullish day (+1.9%, closed above open) | Only 38 transactions (illiquid) | Wide range (3.4%) bullish bar | Outperforming sector by +1.6pp"
+2026-09-24,NGPL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,403,"Gap down -5.0% (bearish sentiment) | Good activity: Rs 29.9M, 278 txns | Wide range (5.7%) bullish bar"
+2026-09-24,NHDL,HYDROPOWER,HOLD,1,2,33,1,2,0,0,633.2,Near 52w low (14% of range — value zone) | Only 21 transactions (illiquid) | Wide range (1.6%) bearish bar
+2026-09-24,NHPC,HYDROPOWER,HOLD,2,0,100,2,0,0,0,265.5,"Good activity: Rs 54.7M, 389 txns | Wide range (1.9%) bullish bar"
+2026-09-24,NICA,BANKING,HOLD,2,0,100,2,0,0,0,316.3,"Near 52w low (12% of range — value zone) | Good activity: Rs 13.0M, 167 txns"
+2026-09-24,NICLBSL,MICROFINANCE,LEAN_BUY,3,1,50,3,1,0,0,516.9,Near 52w low (14% of range — value zone) | Gap up +1.2% (bullish sentiment) | Closed above VWAP (+1.1%) | Wide range (2.5%) bearish bar
+2026-09-24,NIFRA,INVESTMENT,HOLD,2,0,100,2,0,0,0,253,"Good activity: Rs 9.3M, 285 txns | Wide range (1.5%) bullish bar"
+2026-09-24,NIMB,BANKING,LEAN_BUY,3,0,100,3,0,0,0,194.6,"Closed above VWAP (+0.9%) | Good activity: Rs 21.2M, 306 txns | Wide range (2.7%) bullish bar"
+2026-09-24,NLIC,LIFEINSU,LEAN_BUY,3,1,50,3,1,0,0,745,"Gap down -5.0% (bearish sentiment) | Closed above VWAP (+0.7%) | Good activity: Rs 6.3M, 123 txns | Wide range (5.2%) bullish bar"
+2026-09-24,NLICL,LIFEINSU,HOLD,2,1,33,2,1,0,0,581.4,"Bullish day (+1.6%, closed above open) | Only 44 transactions (illiquid) | Wide range (3.4%) bullish bar"
+2026-09-24,NLO,MANUFACTURE,BUY,5,1,67,5,1,0,0,271.3,"Bullish day (+12.5%, closed above open) | Gap up +3.0% (bullish sentiment) | Closed above VWAP (+3.2%) | Low turnover Rs 0.01M (illiquid) | Wide range (9.5%) bullish bar | Outperforming sector by +11.0pp"
+2026-09-24,NMB,BANKING,LEAN_BUY,3,1,50,3,1,0,0,257.1,"Gap up +5.0% (bullish sentiment) | Closed above VWAP (+0.9%) | Good activity: Rs 20.1M, 221 txns | Wide range (5.9%) bearish bar"
+2026-09-24,NMBMF,MICROFINANCE,BUY,4,1,60,4,1,0,0,612.8,"Near 52w low (24% of range — value zone) | Bullish day (+1.6%, closed above open) | Closed above VWAP (+1.8%) | Low turnover Rs 0.44M (illiquid) | Wide range (2.6%) bullish bar"
+2026-09-24,NMFBS,MICROFINANCE,HOLD,2,0,100,2,0,0,0,1200,"Bullish day (+1.6%, closed above open) | Wide range (3.1%) bullish bar"
+2026-09-24,NMLBBL,MICROFINANCE,HOLD,2,2,0,2,2,0,0,509,Near 52w low (18% of range — value zone) | Gap down -5.0% (bearish sentiment) | Only 39 transactions (illiquid) | Wide range (6.2%) bullish bar
+2026-09-24,NRIC,OTHERS,BUY,4,1,60,4,1,0,0,817,"At 52w low (5%) with volume — accumulation signal | Gap down -2.4% (bearish sentiment) | Good activity: Rs 7.5M, 124 txns | Wide range (5.7%) bullish bar"
+2026-09-24,NRM,OTHERS,LEAN_BUY,3,0,100,3,0,0,0,288,At 52w low (9% of range — deep value) | Wide range (2.0%) bullish bar
+2026-09-24,NRN,INVESTMENT,LEAN_BUY,3,1,50,3,1,0,0,1415,"Near 52w low (15% of range — value zone) | Gap down -5.0% (bearish sentiment) | Good activity: Rs 73.8M, 280 txns | Wide range (7.2%) bullish bar"
+2026-09-24,NTC,OTHERS,HOLD,1,0,100,1,0,0,0,906,"Good activity: Rs 7.1M, 140 txns"
+2026-09-24,NUBL,MICROFINANCE,LEAN_BUY,3,2,20,3,2,0,0,604,Near 52w low (20% of range — value zone) | Gap up +1.2% (bullish sentiment) | Closed above VWAP (+0.8%) | Only 20 transactions (illiquid) | Wide range (2.0%) bearish bar
+2026-09-24,NWCL,OTHERS,LEAN_BUY,3,2,20,3,2,0,0,602,At 52w low (7% of range — deep value) | Gap down -2.9% (bearish sentiment) | Closed above VWAP (+0.6%) | Low turnover Rs 0.47M (illiquid)
+2026-09-24,NYADI,HYDROPOWER,SELL,1,5,67,1,5,0,0,351.4,"Near 52w low (11% of range — value zone) | Bearish day (-1.8%, closed below open) | Closed below VWAP (-0.6%) | Only 32 transactions (illiquid) | Wide range (2.2%) bearish bar | Underperforming sector by -2.1pp"
+2026-09-24,OHL,HOTELS,HOLD,2,2,0,2,2,0,0,638,Near 52w low (25% of range — value zone) | Gap up +1.2% (bullish sentiment) | Low turnover Rs 0.38M (illiquid) | Wide range (1.9%) bearish bar
+2026-09-24,OMPL,MANUFACTURE,LEAN_BUY,3,2,20,3,2,0,0,870,"At 52w low (3%) with volume — accumulation signal | Good activity: Rs 10.3M, 129 txns | Wide range (4.8%) bearish bar | Underperforming sector by -2.0pp"
+2026-09-24,PCBL,BANKING,BUY,4,0,100,4,0,0,0,257,"Bullish day (+1.6%, closed above open) | Closed above VWAP (+0.7%) | Good activity: Rs 27.3M, 277 txns | Wide range (3.3%) bullish bar"
+2026-09-24,PCIL,MANUFACTURE,BUY,5,0,100,5,0,0,0,633,"Bullish day (+3.6%, closed above open) | Closed above VWAP (+0.9%) | Good activity: Rs 70.5M, 1336 txns | Wide range (5.4%) bullish bar | Outperforming sector by +2.2pp"
+2026-09-24,PFL,FINANCE,LEAN_BUY,4,2,33,4,2,0,0,351,"At 52w low (-1%) with volume — accumulation signal | Gap up +1.3% (bullish sentiment) | Closed below VWAP (-0.9%) | Good activity: Rs 5.4M, 133 txns | Wide range (3.9%) bearish bar"
+2026-09-24,PHCL,HYDROPOWER,BUY,4,0,100,4,0,0,0,319.6,"Bullish day (+2.4%, closed above open) | Good activity: Rs 68.9M, 550 txns | Wide range (3.8%) bullish bar | Outperforming sector by +2.2pp"
+2026-09-24,PMHPL,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,309,Near 52w low (16% of range — value zone) | Closed above VWAP (+2.1%) | Only 26 transactions (illiquid) | Wide range (2.7%) bullish bar
+2026-09-24,PMLI,LIFEINSU,LEAN_BUY,3,1,50,3,1,0,0,423,Near 52w low (20% of range — value zone) | Gap down -1.7% (bearish sentiment) | Closed above VWAP (+0.8%) | Wide range (2.4%) bullish bar
+2026-09-24,PPCL,HYDROPOWER,HOLD,1,2,33,1,2,0,0,335,Closed above VWAP (+0.5%) | Only 40 transactions (illiquid) | Wide range (2.7%) bearish bar
+2026-09-24,PPL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,324.9,Gap down -1.2% (bearish sentiment) | Closed above VWAP (+0.9%) | Wide range (4.2%) bullish bar
+2026-09-24,PROFL,FINANCE,BUY,5,1,67,5,1,0,0,391,"Near 52w low (19% of range — value zone) | Bullish day (+2.0%, closed above open) | Closed above VWAP (+1.2%) | Only 22 transactions (illiquid) | Wide range (2.1%) bullish bar | Outperforming sector by +1.8pp"
+2026-09-24,PRVU,BANKING,HOLD,1,0,100,1,0,0,0,187.3,"Good activity: Rs 12.4M, 230 txns"
+2026-09-24,PURE,OTHERS,BUY,5,0,100,5,0,0,0,817,"Bullish day (+2.8%, closed above open) | Closed above VWAP (+0.9%) | Good activity: Rs 6.1M, 102 txns | Wide range (2.5%) bullish bar | Outperforming sector by +2.8pp"
+2026-09-24,RADHI,HYDROPOWER,HOLD,2,0,100,2,0,0,0,721.7,"Good activity: Rs 77.7M, 283 txns | Wide range (2.4%) bullish bar"
+2026-09-24,RAWA,HYDROPOWER,BUY,4,1,60,4,1,0,0,416,"At 52w low (8%) with volume — accumulation signal | Gap down -1.7% (bearish sentiment) | Good activity: Rs 5.9M, 107 txns | Wide range (3.6%) bullish bar"
+2026-09-24,RFPL,HYDROPOWER,LEAN_BUY,3,0,100,3,0,0,0,336,Near 52w low (19% of range — value zone) | Closed above VWAP (+0.5%) | Wide range (1.8%) bullish bar
+2026-09-24,RHGCL,HYDROPOWER,LEAN_SELL,1,3,50,1,3,0,0,262.8,"Bearish day (-1.9%, closed below open) | Good activity: Rs 7.8M, 119 txns | Wide range (3.7%) bearish bar | Underperforming sector by -2.1pp"
+2026-09-24,RHPL,HYDROPOWER,BUY,4,0,100,4,0,0,0,172,"At 52w low (9%) with volume — accumulation signal | Good activity: Rs 13.3M, 275 txns | Wide range (5.6%) bullish bar"
+2026-09-24,RIDI,HYDROPOWER,HOLD,1,1,0,1,1,0,0,343,"Good activity: Rs 75.1M, 447 txns | Wide range (1.7%) bearish bar"
+2026-09-24,RLEL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,752.1,"Gap down -1.3% (bearish sentiment) | Good activity: Rs 6.0M, 162 txns | Wide range (3.1%) bullish bar"
+2026-09-24,RLFL,FINANCE,HOLD,2,2,0,2,2,0,0,424,Near 52w low (22% of range — value zone) | Gap down -5.0% (bearish sentiment) | Only 48 transactions (illiquid) | Wide range (5.8%) bullish bar
+2026-09-24,RNLI,LIFEINSU,HOLD,1,0,100,1,0,0,0,438.1,"Good activity: Rs 8.5M, 214 txns"
+2026-09-24,RSDC,MICROFINANCE,HOLD,0,1,100,0,1,0,0,628,Only 16 transactions (illiquid)
+2026-09-24,RSML,MANUFACTURE,HOLD,2,0,100,2,0,0,0,2754,"Good activity: Rs 221.5M, 538 txns | Wide range (1.8%) bullish bar"
+2026-09-24,RURU,HYDROPOWER,BUY,4,1,60,4,1,0,0,604,"Near 52w low (16% of range — value zone) | Bullish day (+2.0%, closed above open) | Only 21 transactions (illiquid) | Wide range (2.9%) bullish bar | Outperforming sector by +1.8pp"
+2026-09-24,SAGAR,MANUFACTURE,LEAN_BUY,3,1,50,3,1,0,0,1608,"Gap down -1.6% (bearish sentiment) | Closed above VWAP (+0.9%) | Good activity: Rs 10.1M, 133 txns | Wide range (3.1%) bullish bar"
+2026-09-24,SAHAS,HYDROPOWER,LEAN_SELL,2,3,20,2,3,0,0,694.2,"Near 52w high (84% — overextended) | Gap down -5.0% (bearish sentiment) | Good activity: Rs 43.9M, 333 txns | Wide range (5.1%) bullish bar"
+2026-09-24,SAIL,MANUFACTURE,BUY,4,1,60,4,1,0,0,993.5,"Bullish day (+2.1%, closed above open) | Gap down -4.9% (bearish sentiment) | Closed above VWAP (+0.7%) | Good activity: Rs 17.1M, 243 txns | Wide range (8.5%) bullish bar"
+2026-09-24,SANIMA,BANKING,LEAN_BUY,3,1,50,3,1,0,0,368,"Upper 52w range (76%) | Closed above VWAP (+0.7%) | Good activity: Rs 15.9M, 142 txns | Wide range (1.6%) bullish bar"
+2026-09-24,SANVI,HYDROPOWER,BUY,4,1,60,4,1,0,0,559,"At 52w low (3%) with volume — accumulation signal | Gap down -2.1% (bearish sentiment) | Good activity: Rs 9.0M, 143 txns | Wide range (2.3%) bullish bar"
+2026-09-24,SAPIL,MANUFACTURE,LEAN_BUY,3,2,20,3,2,0,0,1348.9,"Near 52w high (80% — overextended) | Closed above VWAP (+0.9%) | Good activity: Rs 27.1M, 487 txns | Wide range (3.5%) bullish bar"
+2026-09-24,SARBTM,MANUFACTURE,BUY,4,0,100,4,0,0,0,825.7,"Bullish day (+1.7%, closed above open) | Closed above VWAP (+0.7%) | Good activity: Rs 29.4M, 241 txns | Wide range (2.3%) bullish bar"
+2026-09-24,SBI,BANKING,HOLD,0,1,100,0,1,0,0,404.2,Only 43 transactions (illiquid)
+2026-09-24,SBL,BANKING,LEAN_SELL,1,3,50,1,3,0,0,456.8,"At 52w high (98% — extreme overextension) | Good activity: Rs 80.3M, 519 txns"
+2026-09-24,SCB,BANKING,HOLD,0,0,0,0,0,0,0,657.2,
+2026-09-24,SGHC,HYDROPOWER,HOLD,2,0,100,2,0,0,0,298,At 52w low (9% of range — deep value)
+2026-09-24,SGHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,486.5,"Gap down -5.0% (bearish sentiment) | Good activity: Rs 12.4M, 777 txns | Wide range (5.8%) bullish bar"
+2026-09-24,SHEL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,302.3,"Gap down -4.6% (bearish sentiment) | Good activity: Rs 17.0M, 180 txns | Wide range (5.3%) bullish bar"
+2026-09-24,SHIVM,MANUFACTURE,LEAN_BUY,4,2,33,4,2,0,0,702,"Near 52w high (85% — overextended) | Bullish day (+2.2%, closed above open) | Closed above VWAP (+0.6%) | Good activity: Rs 358.1M, 1641 txns | Wide range (2.8%) bullish bar"
+2026-09-24,SHL,HOTELS,HOLD,2,0,100,2,0,0,0,518,"Good activity: Rs 18.8M, 120 txns | Wide range (1.7%) bullish bar"
+2026-09-24,SHLB,MICROFINANCE,HOLD,2,1,33,2,1,0,0,1312,Near 52w low (12% of range — value zone) | Low turnover Rs 0.15M (illiquid) | Wide range (3.0%) bullish bar
+2026-09-24,SHPC,HYDROPOWER,LEAN_BUY,3,0,100,3,0,0,0,534.5,"Closed above VWAP (+1.1%) | Good activity: Rs 33.5M, 171 txns | Wide range (1.6%) bullish bar"
+2026-09-24,SIFC,FINANCE,HOLD,1,2,33,1,2,0,0,480.3,Near 52w low (13% of range — value zone) | Gap down -1.1% (bearish sentiment) | Only 30 transactions (illiquid)
+2026-09-24,SIKLES,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,574,Near 52w low (14% of range — value zone) | Closed above VWAP (+0.5%) | Only 38 transactions (illiquid) | Wide range (2.1%) bullish bar
+2026-09-24,SIPD,HYDROPOWER,HOLD,2,0,100,2,0,0,0,569.9,Closed above VWAP (+1.2%) | Wide range (3.4%) bullish bar
+2026-09-24,SJCL,HYDROPOWER,LEAN_BUY,3,1,50,3,1,0,0,247.9,Near 52w low (22% of range — value zone) | Gap down -2.2% (bearish sentiment) | Closed above VWAP (+0.6%) | Wide range (3.6%) bullish bar
+2026-09-24,SJLIC,LIFEINSU,HOLD,1,0,100,1,0,0,0,415,Wide range (1.7%) bullish bar
+2026-09-24,SKBBL,MICROFINANCE,HOLD,2,0,100,2,0,0,0,767.9,Near 52w low (19% of range — value zone) | Gap up +1.0% (bullish sentiment)
+2026-09-24,SKHEL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,845,Gap down -2.7% (bearish sentiment) | Closed above VWAP (+1.1%) | Wide range (3.0%) bullish bar
+2026-09-24,SKHL,HYDROPOWER,HOLD,1,1,0,1,1,0,0,744,Gap down -1.1% (bearish sentiment) | Wide range (2.6%) bullish bar
+2026-09-24,SLBBL,MICROFINANCE,LEAN_BUY,3,1,50,3,1,0,0,822,"Bullish day (+1.8%, closed above open) | Closed above VWAP (+0.6%) | Only 47 transactions (illiquid) | Wide range (1.7%) bullish bar"
+2026-09-24,SLBSL,MICROFINANCE,HOLD,2,2,0,2,2,0,0,917,Near 52w low (12% of range — value zone) | Gap down -2.1% (bearish sentiment) | Only 46 transactions (illiquid) | Wide range (3.9%) bullish bar
+2026-09-24,SMATA,MICROFINANCE,HOLD,2,1,33,2,1,0,0,700,Near 52w low (10% of range — value zone) | Closed above VWAP (+1.0%) | Only 35 transactions (illiquid)
+2026-09-24,SMB,MICROFINANCE,HOLD,2,2,0,2,2,0,0,1864,Gap down -2.1% (bearish sentiment) | Closed above VWAP (+1.0%) | Only 13 transactions (illiquid) | Wide range (2.7%) bullish bar
+2026-09-24,SMFBS,MICROFINANCE,LEAN_SELL,2,4,33,2,4,0,0,1395,"Near 52w low (21% of range — value zone) | Bearish day (-1.6%, closed below open) | Gap up +4.4% (bullish sentiment) | Low turnover Rs 0.25M (illiquid) | Wide range (8.5%) bearish bar | Underperforming sector by -2.2pp"
+2026-09-24,SMH,HYDROPOWER,LEAN_BUY,3,0,100,3,0,0,0,518,At 52w low (7%) with volume — accumulation signal | Closed above VWAP (+0.8%)
+2026-09-24,SMHL,HYDROPOWER,BUY,4,0,100,4,0,0,0,470,"At 52w low (5%) with volume — accumulation signal | Good activity: Rs 11.9M, 134 txns | Wide range (1.6%) bullish bar"
+2026-09-24,SMJC,HYDROPOWER,HOLD,2,1,33,2,1,0,0,412,Near 52w low (10% of range — value zone) | Gap up +1.5% (bullish sentiment) | Wide range (2.5%) bearish bar
+2026-09-24,SMPDA,MICROFINANCE,LEAN_BUY,3,2,20,3,2,0,0,750,Near 52w low (12% of range — value zone) | Gap down -1.1% (bearish sentiment) | Closed above VWAP (+1.2%) | Only 16 transactions (illiquid) | Wide range (3.1%) bullish bar
+2026-09-24,SNLI,LIFEINSU,LEAN_BUY,3,0,100,3,0,0,0,421,"Closed above VWAP (+1.1%) | Good activity: Rs 7.0M, 234 txns | Wide range (2.4%) bullish bar"
+2026-09-24,SNORL,HYDROPOWER,BUY,6,1,71,6,1,0,0,899,"Upper 52w range (79%) | Bullish day (+4.6%, closed above open) | Gap up +3.4% (bullish sentiment) | Closed above VWAP (+1.8%) | Good activity: Rs 36.5M, 502 txns | Wide range (7.9%) bullish bar | Outperforming sector by +4.4pp"
+2026-09-24,SOHL,HYDROPOWER,HOLD,1,0,100,1,0,0,0,645,"Good activity: Rs 53.8M, 784 txns"
+2026-09-24,SONA,MANUFACTURE,BUY,5,1,67,5,1,0,0,434.9,"Bullish day (+7.6%, closed above open) | Gap down -5.0% (bearish sentiment) | Closed above VWAP (+3.0%) | Good activity: Rs 183.7M, 1804 txns | Wide range (12.6%) bullish bar | Outperforming sector by +6.2pp"
+2026-09-24,SOPL,MANUFACTURE,HOLD,2,1,33,2,1,0,0,735,"Gap down -1.1% (bearish sentiment) | Good activity: Rs 17.0M, 500 txns | Wide range (2.4%) bullish bar"
+2026-09-24,SPC,HYDROPOWER,SELL,1,4,60,1,4,0,0,397.1,"Near 52w low (16% of range — value zone) | Bearish day (-2.0%, closed below open) | Only 37 transactions (illiquid) | Wide range (2.0%) bearish bar | Underperforming sector by -2.2pp"
+2026-09-24,SPDL,HYDROPOWER,LEAN_BUY,3,0,100,3,0,0,0,358.9,Near 52w low (22% of range — value zone) | Closed above VWAP (+1.1%) | Wide range (2.0%) bullish bar
+2026-09-24,SPHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,512,Near 52w low (15% of range — value zone) | Gap down -1.3% (bearish sentiment) | Wide range (2.5%) bullish bar
+2026-09-24,SPL,HYDROPOWER,HOLD,3,3,0,3,3,0,0,595,At 52w low (2% of range — deep value) | Gap up +1.0% (bullish sentiment) | Only 23 transactions (illiquid) | Wide range (3.0%) bearish bar | Underperforming sector by -1.6pp
+2026-09-24,SRLI,LIFEINSU,BUY,4,0,100,4,0,0,0,373.8,"Bullish day (+1.6%, closed above open) | Closed above VWAP (+1.6%) | Good activity: Rs 9.7M, 207 txns | Wide range (2.9%) bullish bar"
+2026-09-24,SSHL,HYDROPOWER,LEAN_SELL,1,3,50,1,3,0,0,207.1,"Gap down -1.3% (bearish sentiment) | Good activity: Rs 31.5M, 361 txns | Wide range (2.2%) bearish bar | Underperforming sector by -1.6pp"
+2026-09-24,STC,TRADING,HOLD,2,2,0,2,2,0,0,5563,Gap down -1.6% (bearish sentiment) | Closed above VWAP (+1.9%) | Only 27 transactions (illiquid) | Wide range (2.7%) bullish bar
+2026-09-24,SWASTIK,MICROFINANCE,HOLD,1,2,33,1,2,0,0,1815.1,Gap down -1.1% (bearish sentiment) | Only 14 transactions (illiquid) | Wide range (2.0%) bullish bar
+2026-09-24,SWBBL,MICROFINANCE,HOLD,1,1,0,1,1,0,0,703.3,Gap up +1.3% (bullish sentiment) | Only 31 transactions (illiquid)
+2026-09-24,SWMF,MICROFINANCE,HOLD,1,1,0,1,1,0,0,617,Only 29 transactions (illiquid) | Wide range (2.3%) bullish bar
+2026-09-24,SYPNL,MANUFACTURE,HOLD,2,0,100,2,0,0,0,1319.8,"Good activity: Rs 45.0M, 425 txns | Wide range (1.9%) bullish bar"
+2026-09-24,TAMOR,HYDROPOWER,LEAN_BUY,3,2,20,3,2,0,0,533.8,"Near 52w high (89% — overextended) | Closed above VWAP (+1.8%) | Good activity: Rs 243.5M, 1155 txns | Wide range (4.5%) bullish bar"
+2026-09-24,TPC,HYDROPOWER,HOLD,0,1,100,0,1,0,0,365,Only 35 transactions (illiquid)
+2026-09-24,TPKHL,HYDROPOWER,HOLD,2,2,0,2,2,0,0,500,"Gap down -5.0% (bearish sentiment) | Good activity: Rs 9.8M, 367 txns | Wide range (6.2%) bullish bar | Underperforming sector by -1.6pp"
+2026-09-24,TRH,HOTELS,LEAN_SELL,2,3,20,2,3,0,0,813.9,Upper 52w range (71%) | Gap down -1.4% (bearish sentiment) | Closed above VWAP (+1.2%) | Only 36 transactions (illiquid) | Wide range (2.2%) bullish bar
+2026-09-24,TSHL,HYDROPOWER,BUY,6,0,100,6,0,0,0,359.9,"At 52w low (9% of range — deep value) | Bullish day (+2.0%, closed above open) | Closed above VWAP (+2.4%) | Wide range (9.9%) bullish bar | Outperforming sector by +1.7pp"
+2026-09-24,TTL,OTHERS,HOLD,2,0,100,2,0,0,0,692.1,At 52w low (5% of range — deep value)
+2026-09-24,TVCL,HYDROPOWER,BUY,6,0,100,6,0,0,0,305,"At 52w low (9% of range — deep value) | Bullish day (+3.0%, closed above open) | Closed above VWAP (+2.7%) | Wide range (8.6%) bullish bar | Outperforming sector by +2.8pp"
+2026-09-24,UHEWA,HYDROPOWER,HOLD,1,1,0,1,1,0,0,587,"Good activity: Rs 11.6M, 128 txns | Wide range (1.7%) bearish bar"
+2026-09-24,ULBSL,MICROFINANCE,LEAN_BUY,3,2,20,3,2,0,0,2552,Near 52w low (12% of range — value zone) | Gap down -2.8% (bearish sentiment) | Closed above VWAP (+1.7%) | Only 32 transactions (illiquid) | Wide range (3.9%) bullish bar
+2026-09-24,ULHC,HYDROPOWER,BUY,5,0,100,5,0,0,0,339,"Near 52w low (23% of range — value zone) | Bullish day (+2.7%, closed above open) | Closed above VWAP (+0.9%) | Wide range (3.6%) bullish bar | Outperforming sector by +2.5pp"
+2026-09-24,UMHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,559,Gap down -1.4% (bearish sentiment) | Closed above VWAP (+0.9%) | Wide range (1.8%) bullish bar
+2026-09-24,UMRH,HYDROPOWER,BUY,5,0,100,5,0,0,0,518,"Near 52w low (14% of range — value zone) | Bullish day (+2.6%, closed above open) | Closed above VWAP (+1.5%) | Wide range (3.0%) bullish bar | Outperforming sector by +2.3pp"
+2026-09-24,UNHPL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,359,At 52w low (8% of range — deep value) | Only 42 transactions (illiquid)
+2026-09-24,UNL,MANUFACTURE,HOLD,0,1,100,0,1,0,0,47999,Only 0 transactions (illiquid)
+2026-09-24,UNLB,MICROFINANCE,LEAN_BUY,4,2,33,4,2,0,0,1255.9,At 52w low (6% of range — deep value) | Gap down -2.3% (bearish sentiment) | Closed above VWAP (+2.1%) | Low turnover Rs 0.34M (illiquid) | Wide range (2.9%) bullish bar
+2026-09-24,UPCL,HYDROPOWER,HOLD,1,0,100,1,0,0,0,336,Near 52w low (16% of range — value zone)
+2026-09-24,UPPER,HYDROPOWER,HOLD,2,0,100,2,0,0,0,193.3,"Good activity: Rs 19.3M, 360 txns | Wide range (2.1%) bullish bar"
+2026-09-24,USHEC,HYDROPOWER,HOLD,1,2,33,1,2,0,0,502,Gap down -1.6% (bearish sentiment) | Wide range (1.5%) bullish bar | Underperforming sector by -1.6pp
+2026-09-24,USHL,HYDROPOWER,LEAN_BUY,3,2,20,3,2,0,0,515,At 52w low (10% of range — deep value) | Closed above VWAP (+0.9%) | Only 34 transactions (illiquid) | Wide range (1.9%) bearish bar
+2026-09-24,USLB,MICROFINANCE,BUY,5,1,67,5,1,0,0,1144,"Near 52w low (14% of range — value zone) | Bullish day (+4.7%, closed above open) | Gap down -5.0% (bearish sentiment) | Closed above VWAP (+1.6%) | Wide range (9.8%) bullish bar | Outperforming sector by +4.0pp"
+2026-09-24,VLBS,MICROFINANCE,LEAN_SELL,2,3,20,2,3,0,0,624.2,Near 52w low (11% of range — value zone) | Gap down -2.2% (bearish sentiment) | Only 46 transactions (illiquid) | Wide range (2.1%) bullish bar | Underperforming sector by -1.9pp
+2026-09-24,VLUCL,HYDROPOWER,BUY,4,1,60,4,1,0,0,389.9,At 52w low (9% of range — deep value) | Closed above VWAP (+0.9%) | Low turnover Rs 0.24M (illiquid) | Wide range (2.1%) bullish bar
+2026-09-24,YMHL,HYDROPOWER,HOLD,2,1,33,2,1,0,0,557,"Gap down -2.1% (bearish sentiment) | Good activity: Rs 10.4M, 328 txns | Wide range (2.7%) bullish bar"
