@@ -148,8 +148,9 @@ uv run src/build_dashboard.py     # writes reports/dashboard.html (self-containe
 One offline HTML page built from `data/` with the same code as the backtest: today's sortable ranking,
 per-stock adjusted price / daily class / score history, growth of Rs 100 for the model vs the average
 stock and the NEPSE index (out-of-sample sessions, net of an estimated 0.4% per trade
-side), class track record, feature correlations and component weights over time. It is not committed;
-the scheduled workflow uploads it as the `nepse-dashboard` build artifact.
+side), class track record, feature correlations and component weights over time. It is not committed:
+each scheduled run publishes it to GitHub Pages at **https://subediparas5.github.io/nepse-signaling/**
+(public, like the repo) and also attaches it to the run as the `nepse-dashboard` build artifact.
 
 The strategy comparison uses a staggered 20-session hold (each day's picks get 1/20 of capital), the
 horizon the model is evaluated on. Rebuilding the list daily is shown too: at ~33% daily turnover,
