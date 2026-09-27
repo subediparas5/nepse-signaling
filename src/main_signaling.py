@@ -16,14 +16,13 @@ if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
 from nepse_official import get_official_listed_stocks, get_official_share_price_lookup
-from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal
+from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal, stock_eps
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Optional: without it the rule engine and Telegram digest still run, minus the LLM section.
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
-if not OPEN_AI_API_KEY:
-    raise ValueError("OPEN_AI_API_KEY environment variable is not set.")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
@@ -77,8 +76,9 @@ If none pass, return exactly: "No strong picks today."\
 
 SYSTEM_PROMPT_LEAN = """\
 You are an expert Nepal stock market analyst. These stocks are **LEAN_BUY** from a rule screen: \
-buy edge over sell but **below** the strict BUY bar (with NOTS-only data that is typically buy≥4 \
-and +3 margin vs sell; higher thresholds apply when fundamentals are present). Data: official prices/volume/52w.
+buy edge over sell but **below** the strict BUY bar (with NOTS-only data: buy≥3 and at least +1 vs sell, \
+where strict BUY needs buy≥4 and +3; higher thresholds apply when fundamentals are present). \
+Data: official prices/volume/52w.
 
 Pick the best risk/reward names anyway; reject obvious illiquidity. At most 5 lines.
 
@@ -125,13 +125,9 @@ def _near_52w_low(stock: dict) -> bool:
         except (ValueError, TypeError):
             pass
     pct_from_low = (ltp - lo) / (hi - lo)
-    eps = stock.get("eps_ttm") or stock.get("eps")
-    if eps is not None:
-        try:
-            if float(eps) <= 0:
-                return False
-        except (ValueError, TypeError):
-            return False
+    eps = stock_eps(stock)
+    if eps is not None and eps <= 0:
+        return False
     return pct_from_low <= 0.10
 
 
@@ -253,6 +249,9 @@ def get_llm_picks(
     if not candidates:
         logger.warning("get_llm_picks(%s): empty candidate list — skipping API", log_label)
         return "No strong picks today."
+    if not OPEN_AI_API_KEY:
+        logger.warning("get_llm_picks(%s): OPEN_AI_API_KEY not set — skipping DeepSeek", log_label)
+        return ""
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
     payload = compact_for_llm(candidates)
     user_content = json.dumps(payload, default=str)
@@ -375,18 +374,18 @@ def format_telegram_digest(
     ts = html.escape(_npt_now(), quote=False)
     parts = [f"<b>NEPSE</b> · <code>{ts}</code>", ""]
 
-    parts.append("<b>LLM</b>")
     raw = llm_output or ""
     lines = raw.splitlines()
     first_nonempty = next((x.strip() for x in lines if x.strip()), "")
-    if not first_nonempty:
-        parts.append("<i>(No LLM text.)</i>")
-    elif first_nonempty.lower().startswith("no strong"):
-        parts.append("<i>No picks.</i>")
-    else:
-        parts.append(_mono_block(_llm_mono_rows(raw)))
+    if first_nonempty:
+        parts.append("<b>LLM</b>")
+        if first_nonempty.lower().startswith("no strong"):
+            parts.append("<i>No picks.</i>")
+        else:
+            parts.append(_mono_block(_llm_mono_rows(raw)))
+        parts.append("")
 
-    parts.extend(["", "<b>Strict BUY</b> ({})".format(len(buys))])
+    parts.append("<b>Strict BUY</b> ({})".format(len(buys)))
     if buys:
         rows = [
             f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
