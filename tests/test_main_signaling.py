@@ -44,3 +44,23 @@ def test_telegram_chunks_keep_pre_blocks_balanced():
     joined = "".join(chunks)
     assert all(f"ROW{i:04d}" in joined for i in range(200))
     assert re.search(r"tail$", chunks[-1])
+
+
+def test_persist_daily_snapshot_writes_prices_signals_and_securities(tmp_path):
+    import history_store as hs
+    from nepse_signal_rules import classify_nepse_signal
+
+    stock = {
+        "symbol": "NABIL", "sector": "BANKING", "ltp": 569.0, "open": 566.0, "high": 570.0, "low": 565.0,
+        "vwap": 568.2, "prev_close": 565.0, "volume": 70749.0, "turnover": 40205031.3, "transactions": 495.0,
+        "week_52_high": 620.0, "week_52_low": 480.0,
+    }
+    stock.update(classify_nepse_signal(stock, "BANKING"))
+    listed = [{"symbol": "NABIL", "security_id": 131, "sector": "BANKING"}]
+    ms.persist_daily_snapshot("2026-09-24", [stock], listed, data_dir=tmp_path)
+
+    [price] = hs.load_prices(tmp_path)
+    assert (price["close"], price["open"], price["trades"], price["week_52_low"]) == ("569", "566", "495", "480")
+    [sig] = hs._read(tmp_path / "signals" / "2026-09.csv")
+    assert sig["verdict"] == stock["signal_verdict"] and sig["close"] == "569"
+    assert hs._read(tmp_path / "securities.csv")[0]["security_id"] == "131"

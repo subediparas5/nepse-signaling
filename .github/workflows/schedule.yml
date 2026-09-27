@@ -6,6 +6,13 @@ on:
       timezone: Asia/Kathmandu
   workflow_dispatch:
 
+permissions:
+  contents: write  # commit data/ back to the repo
+
+concurrency:
+  group: nepse-daily
+  cancel-in-progress: false
+
 jobs:
   signal:
     runs-on: ubuntu-latest
@@ -13,11 +20,15 @@ jobs:
     environment: Prod
 
     steps:
+      # The slim image has no git; without it checkout downloads a tarball and we cannot push.
+      - name: Install git
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --no-dev
 
       - name: Run signal pipeline
         run: uv run src/main_signaling.py
@@ -25,3 +36,23 @@ jobs:
           OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      # NOTS keeps ~1 year; re-pulling the recent window fills any day a previous run missed.
+      - name: Backfill recent history
+        if: ${{ !cancelled() }}
+        run: uv run src/backfill_history.py --days 30
+
+      - name: Commit history
+        if: ${{ !cancelled() }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No history changes"
+          else
+            git commit -m "data: NEPSE history $(date -u +%F)"
+            git pull --rebase --quiet
+            git push
+          fi

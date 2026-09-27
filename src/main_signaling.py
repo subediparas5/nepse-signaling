@@ -15,7 +15,8 @@ _SRC_DIR = Path(__file__).resolve().parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
-from nepse_official import get_official_listed_stocks, get_official_share_price_lookup
+import history_store
+from nepse_official import get_business_date, get_official_listed_stocks, get_official_share_price_lookup
 from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal, stock_eps
 
 logging.basicConfig(level=logging.INFO)
@@ -131,8 +132,8 @@ def _near_52w_low(stock: dict) -> bool:
     return pct_from_low <= 0.10
 
 
-def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int, list[dict]]:
-    """Returns (top_buys, top_sells, near_52w_lows, total_screened, lean_buys_for_llm).
+def classify_all_stocks() -> tuple[list[dict], list[dict]]:
+    """Returns (all_classified_stocks, listed_stocks).
 
     Data: Nepal Stock Exchange NOTS only (www.nepalstock.com.np via nepse-data-api).
     """
@@ -174,14 +175,18 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int, li
     sector_medians = _compute_sector_medians(pre_stocks)
 
     all_stocks: list[dict] = []
-    ipo_count = 0
     for data in pre_stocks:
         data["_sector_median_diff"] = sector_medians.get(data["sector"])
         data.update(classify_nepse_signal(data, data["sector"]))
-        if data.get("signal_verdict") == "IPO":
-            ipo_count += 1
         all_stocks.append(data)
+    return all_stocks, listed_stocks
 
+
+def get_classified_stocks(
+    all_stocks: list[dict],
+) -> tuple[list[dict], list[dict], list[dict], int, list[dict]]:
+    """Returns (top_buys, top_sells, near_52w_lows, total_screened, lean_buys_for_llm)."""
+    ipo_count = sum(1 for s in all_stocks if s.get("signal_verdict") == "IPO")
     established = [s for s in all_stocks if s.get("signal_verdict") != "IPO"]
 
     vcounts = Counter(s.get("signal_verdict") for s in established)
@@ -574,8 +579,58 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
             logger.info("Telegram sent → %s", chat_id)
 
 
+def persist_daily_snapshot(
+    business_date: str,
+    all_stocks: list[dict],
+    listed_stocks: list[dict],
+    data_dir: Path = history_store.DATA_DIR,
+) -> None:
+    """Append today's market fields and every verdict to data/ (see history_store)."""
+    price_rows = [
+        {
+            **s,
+            "date": business_date,
+            "close": s.get("close") if s.get("close") is not None else s.get("ltp"),
+            "trades": s.get("transactions"),
+        }
+        for s in all_stocks
+        if s.get("ltp") is not None or s.get("close") is not None
+    ]
+    signal_rows = [
+        {
+            "date": business_date,
+            "symbol": s["symbol"],
+            "sector": s.get("sector"),
+            "verdict": s.get("signal_verdict"),
+            "buy_score": s.get("signal_buy_score"),
+            "sell_score": s.get("signal_sell_score"),
+            "confidence": s.get("signal_confidence"),
+            "technical_buy": s.get("signal_technical_buy"),
+            "technical_sell": s.get("signal_technical_sell"),
+            "fundamental_buy": s.get("signal_fundamental_buy"),
+            "fundamental_sell": s.get("signal_fundamental_sell"),
+            "close": s.get("close") if s.get("close") is not None else s.get("ltp"),
+            "reasons": s.get("signal_reasons"),
+        }
+        for s in all_stocks
+    ]
+    history_store.upsert_securities(listed_stocks, seen_on=business_date, data_dir=data_dir)
+    logger.info(
+        "History %s: %s price rows changed, %s signal rows changed",
+        business_date,
+        history_store.upsert_prices(price_rows, data_dir),
+        history_store.upsert_signals(signal_rows, data_dir),
+    )
+
+
 if __name__ == "__main__":
-    buys, sells, near_lows, _n_screened, lean_buys = get_classified_stocks()
+    all_stocks, listed_stocks = classify_all_stocks()
+    try:
+        persist_daily_snapshot(get_business_date(), all_stocks, listed_stocks)
+    except Exception:
+        # History is for research; never let it block the daily digest.
+        logger.exception("Failed to persist daily snapshot")
+    buys, sells, near_lows, _n_screened, lean_buys = get_classified_stocks(all_stocks)
 
     llm_output = ""
     if buys:

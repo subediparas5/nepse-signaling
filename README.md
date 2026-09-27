@@ -41,6 +41,29 @@ uv run src/main_signaling.py
 
 The first run may take **1–3 minutes** while security detail is fetched for each symbol.
 
+### History (`data/`)
+
+Every run appends to plain CSVs committed to the repo — the research record for backtesting:
+
+| Path | Rows | Source |
+|------|------|--------|
+| `data/prices/YYYY-MM.csv` | one per (date, symbol): OHLC, VWAP, volume, turnover, trades, 52w | backfill + daily snapshot |
+| `data/index/nepse.csv` | one per date: NEPSE index OHLC, turnover, trades | backfill |
+| `data/signals/YYYY-MM.csv` | one per (date, symbol): verdict, scores, reasons, close | daily run |
+| `data/securities.csv` | one per symbol: NOTS id, sector, first/last seen | both |
+
+`date` is the NEPSE business date the data describes (the 09:00 NPT run records the previous session).
+Writes are upserts and never blank out a stored value, so re-runs are safe and unchanged data produces no diff.
+
+**NOTS only serves ~1 trading year of history**, and its history endpoint has no open, VWAP or 52w
+fields — those exist only from daily snapshots onward. Anything older than a year survives only in git.
+Only currently listed equities are backfilled; symbols are never removed from `securities.csv` once seen.
+
+```bash
+uv run src/backfill_history.py              # full available window (~3 min, one request per symbol)
+uv run src/backfill_history.py --days 30    # recent window, fills missed days
+```
+
 ### Tests
 
 ```bash
@@ -49,7 +72,8 @@ uv run pytest
 
 ### GitHub Actions
 
-Workflow: `.github/workflows/schedule.yml` (cron in **Asia/Kathmandu**).
+Workflow: `.github/workflows/schedule.yml` (cron in **Asia/Kathmandu**). After the digest it
+backfills the last 30 days and commits any `data/` changes back to the branch (`contents: write`).
 
 **Secrets:** `OPEN_AI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.
 
@@ -60,6 +84,9 @@ src/
   main_signaling.py     # Orchestration, LLM, Telegram
   nepse_official.py     # NOTS listing + per-symbol market merge
   nepse_signal_rules.py # Scoring and verdicts
+  history_store.py      # CSV history store (upserts, deterministic output)
+  backfill_history.py   # Pull NOTS price/index history into data/
+data/                   # Committed history (see above)
 .github/workflows/
   schedule.yml
 tests/                  # pytest, no network
