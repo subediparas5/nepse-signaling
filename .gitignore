@@ -9,3 +9,8 @@ wheels/
 # Virtual environments
 .venv
 .vscode
+# History store temp files
+data/**/*.tmp
+
+# Generated dashboard (rebuilt each run, uploaded by the workflow)
+reports/dashboard.html

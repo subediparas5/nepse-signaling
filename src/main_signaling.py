@@ -2,12 +2,13 @@ import html
 import json
 import logging
 import os
+import re
 import sys
-import textwrap
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+import pandas as pd
 import requests
 from openai import OpenAI
 
@@ -15,80 +16,61 @@ _SRC_DIR = Path(__file__).resolve().parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
-from nepse_official import get_official_listed_stocks, get_official_share_price_lookup
+import history_store
+import scoring
+from nepse_official import (
+    get_business_date,
+    get_index_history,
+    get_price_adjustments,
+    get_official_listed_stocks,
+    get_official_share_price_lookup,
+)
 from nepse_signal_rules import TRADABLE_SECTORS, classify_nepse_signal
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Optional: without it the rule engine and Telegram digest still run, minus the LLM section.
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
-if not OPEN_AI_API_KEY:
-    raise ValueError("OPEN_AI_API_KEY environment variable is not set.")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 
 LLM_FIELDS = [
-    "symbol", "sector", "market_cap_category", "ltp",
-    "signal_verdict", "signal_buy_score", "signal_sell_score",
-    "signal_confidence", "signal_reasons",
-    "pe", "pb", "roe", "npl", "eps_ttm",
-    "promoter_percentage", "dividend_yield",
-    "week_52_high", "week_52_low",
-    "open", "high", "low", "vwap", "prev_close",
-    "volume", "turnover", "diff_pct", "ma120", "ma180",
+    "symbol", "sector", "ltp", "classification", "score", "opportunity_score", "risk_score",
+    "trend", "momentum", "low_risk", "calm", "liquidity",
+    "ret_20d", "ret_60d", "dist_sma50", "dist_sma120", "drawdown_120", "range_pos",
+    "rsi14", "vol_20d", "atr14_pct", "turnover_med_20",
+    "flagged_since", "sessions", "since_ret", "recent_scores",
 ]
 
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-reasoner")
+
 SYSTEM_PROMPT = """\
-You are an expert Nepal stock market analyst. You receive BUY candidates from NEPSE \
-that passed a rule-based screen using official exchange price data (no P/E or EPS in the feed).
+You are a Nepal stock market analyst writing short notes for a retail trader. You receive the \
+top-ranked NEPSE stocks from a quantitative model. You do NOT pick, drop or re-rank them — you \
+explain what the numbers show and what could go wrong.
 
-For each stock you get: buy/sell scores, reasons, 52-week range, OHLC, VWAP, volume, turnover, \
-and sector. Moving averages may be absent.
+The model ranks stocks against each other each day using official exchange prices (adjusted for \
+bonus/rights). In its backtest, steady uptrends (price above 50/120-day averages, shallow \
+drawdowns), low volatility and no one-day shock outperformed; volatile names and names near \
+52-week lows lagged. Scores are 0-100 percentiles within today's market; trend, momentum, \
+low_risk, calm and liquidity are 0-1 ranks. Returns and distances are fractions (0.05 = 5%). \
+turnover_med_20 is the 20-day median daily turnover in Rs. flagged_since / sessions / since_ret \
+describe how long the stock has been a setup and its return since then; recent_scores are the \
+last few daily scores. There is no P/E, EPS or news data: do not invent fundamentals, news or \
+price targets.
 
-Your job:
-1. Review each candidate and either CONFIRM or REJECT.
-2. REJECT if: near 52-week high, very low turnover (illiquid), or price far above VWAP (chase risk).
-3. PREFER stocks with: good liquidity, constructive price vs 52-week range, sensible sector context.
-4. For confirmed picks, write a short reason a retail trader can act on.
-5. Return at most 5 confirmed picks — quality over quantity.
-
-Output format — return ONLY this, nothing else:
-
-SYMBOL | Rs PRICE | reason (15 words max)
-
-One stock per line. No numbering, no markdown, no headers. \
-If no stock passes your review, return exactly: "No strong picks today."\
+Return ONLY a JSON object, no prose and no code fences, in exactly this shape:
+{"notes": [{"symbol": "ABC", "summary": "<= 20 words on what the numbers show",
+            "risks": ["<= 12 words each, at most 3"]}]}
+Include every symbol you were given, once each, in the same order.\
 """
 
-SYSTEM_PROMPT_NEAR_LOW = """\
-You are an expert Nepal stock market analyst. These names trade **near the 52-week low** on official \
-NEPSE NOTS data (no P/E or EPS in the feed). Review for dip-buy quality vs traps; reject illiquid \
-chase setups. Prefer sensible turnover vs price. At most 5 lines.
-
-Output format — return ONLY this, nothing else:
-
-SYMBOL | Rs PRICE | reason (15 words max)
-
-One stock per line. No numbering, no markdown, no headers. \
-If none pass, return exactly: "No strong picks today."\
-"""
-
-SYSTEM_PROMPT_LEAN = """\
-You are an expert Nepal stock market analyst. These stocks are **LEAN_BUY** from a rule screen: \
-buy edge over sell but **below** the strict BUY bar (with NOTS-only data that is typically buy≥4 \
-and +3 margin vs sell; higher thresholds apply when fundamentals are present). Data: official prices/volume/52w.
-
-Pick the best risk/reward names anyway; reject obvious illiquidity. At most 5 lines.
-
-Output format — return ONLY this, nothing else:
-
-SYMBOL | Rs PRICE | reason (15 words max)
-
-One stock per line. No numbering, no markdown, no headers. \
-If none pass, return exactly: "No strong picks today."\
-"""
+LLM_SUMMARY_MAX = 160
+LLM_RISK_MAX = 90
+LLM_RISKS = 3
 
 
 def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
@@ -107,36 +89,8 @@ def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
     return {sec: median(vals) for sec, vals in sector_vals.items() if vals}
 
 
-def _near_52w_low(stock: dict) -> bool:
-    """Within bottom 10% of 52-week range; skips IPO when MA120 is present and zero."""
-    try:
-        ltp = float(stock.get("ltp", 0))
-        hi = float(stock.get("week_52_high", 0))
-        lo = float(stock.get("week_52_low", 0))
-    except (ValueError, TypeError):
-        return False
-    if hi <= lo or ltp <= 0:
-        return False
-    ma120 = stock.get("ma120")
-    if ma120 is not None:
-        try:
-            if float(ma120) == 0:
-                return False
-        except (ValueError, TypeError):
-            pass
-    pct_from_low = (ltp - lo) / (hi - lo)
-    eps = stock.get("eps_ttm") or stock.get("eps")
-    if eps is not None:
-        try:
-            if float(eps) <= 0:
-                return False
-        except (ValueError, TypeError):
-            return False
-    return pct_from_low <= 0.10
-
-
-def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int, list[dict]]:
-    """Returns (top_buys, top_sells, near_52w_lows, total_screened, lean_buys_for_llm).
+def classify_all_stocks() -> tuple[list[dict], list[dict]]:
+    """Returns (all_classified_stocks, listed_stocks).
 
     Data: Nepal Stock Exchange NOTS only (www.nepalstock.com.np via nepse-data-api).
     """
@@ -178,94 +132,127 @@ def get_classified_stocks() -> tuple[list[dict], list[dict], list[dict], int, li
     sector_medians = _compute_sector_medians(pre_stocks)
 
     all_stocks: list[dict] = []
-    ipo_count = 0
     for data in pre_stocks:
         data["_sector_median_diff"] = sector_medians.get(data["sector"])
         data.update(classify_nepse_signal(data, data["sector"]))
-        if data.get("signal_verdict") == "IPO":
-            ipo_count += 1
         all_stocks.append(data)
+    return all_stocks, listed_stocks
 
-    established = [s for s in all_stocks if s.get("signal_verdict") != "IPO"]
 
-    vcounts = Counter(s.get("signal_verdict") for s in established)
-    logger.info(
-        "Rule verdict mix (established, NOTS-only): %s — "
-        "NOTS-only: BUY buy≥4 & +3 vs sell; with fundamentals: buy≥6 & +3",
-        dict(vcounts.most_common()),
+SCORE_FIELDS = [
+    "classification", "score", "opportunity_score", "risk_score",
+    "trend", "momentum", "low_risk", "calm", "liquidity",
+    "ret_20d", "ret_60d", "dist_sma50", "dist_sma120", "drawdown_120", "range_pos",
+    "rsi14", "vol_20d", "atr14_pct", "turnover_med_20",
+    "flagged_since", "sessions", "since_ret", "recent_scores",
+]
+TOP_SETUPS = 8
+
+
+def attach_scores(all_stocks: list[dict], scored: pd.DataFrame) -> None:
+    """Copy model fields onto each stock dict; unscored symbols become INSUFFICIENT_DATA."""
+    for s in all_stocks:
+        sym = s.get("symbol")
+        if sym in scored.index:
+            row = scored.loc[sym]
+            for k in SCORE_FIELDS:
+                v = row.get(k)
+                s[k] = None if v is None or (isinstance(v, float) and pd.isna(v)) else v
+        else:
+            s["classification"] = "INSUFFICIENT_DATA"
+
+
+def select_setups(all_stocks: list[dict], n: int = TOP_SETUPS) -> list[dict]:
+    """Highest-scoring STRONG_SETUP names, topped up with SETUP if there are fewer than n."""
+    ranked = sorted(
+        (s for s in all_stocks if s.get("classification") in ("STRONG_SETUP", "SETUP") and s.get("score") is not None),
+        key=lambda s: (s["classification"] != "STRONG_SETUP", -float(s["score"])),
     )
-
-    lean_buys = [s for s in established if s.get("signal_verdict") == "LEAN_BUY"]
-    lean_buys.sort(
-        key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0),
-        reverse=True,
-    )
-    lean_buys = lean_buys[:12]
-
-    buys = [s for s in established if s.get("signal_verdict") == "BUY"]
-    buys.sort(
-        key=lambda s: s.get("signal_buy_score", 0) - s.get("signal_sell_score", 0),
-        reverse=True,
-    )
-    buys = buys[:10]
-
-    sells = [s for s in established if s.get("signal_verdict") == "SELL"]
-    sells.sort(
-        key=lambda s: s.get("signal_sell_score", 0) - s.get("signal_buy_score", 0),
-        reverse=True,
-    )
-    sells = sells[:5]
-
-    near_lows = [s for s in established if _near_52w_low(s)]
-    near_lows.sort(
-        key=lambda s: (
-            (float(s.get("ltp", 0)) - float(s.get("week_52_low", 0)))
-            / (float(s.get("week_52_high", 1)) - float(s.get("week_52_low", 0)))
-            if float(s.get("week_52_high", 0)) > float(s.get("week_52_low", 0))
-            else 1
-        ),
-    )
-
-    logger.info(
-        "Classified %s stocks (%s IPO excluded) -> %s BUY, %s SELL, %s near 52w low",
-        len(all_stocks),
-        ipo_count,
-        len(buys),
-        len(sells),
-        len(near_lows),
-    )
-    return buys, sells, near_lows, len(established), lean_buys
+    return ranked[:n]
 
 
 def compact_for_llm(candidates: list[dict]) -> list[dict]:
+    def clean(v):
+        return round(float(v), 4) if isinstance(v, float) else v
+
     return [
-        {k: s.get(k) for k in LLM_FIELDS if s.get(k) is not None}
+        {k: clean(s.get(k)) for k in LLM_FIELDS if s.get(k) is not None}
         for s in candidates
     ]
 
 
-def get_llm_picks(
-    candidates: list[dict],
-    *,
-    system_prompt: str | None = None,
-    log_label: str = "BUY",
-) -> str:
+def get_llm_notes(candidates: list[dict], *, log_label: str = "SETUPS") -> str:
+    """Raw DeepSeek reply for `candidates` ('' when skipped). Parse with `parse_llm_notes`."""
     if not candidates:
-        logger.warning("get_llm_picks(%s): empty candidate list — skipping API", log_label)
-        return "No strong picks today."
+        logger.warning("get_llm_notes(%s): empty candidate list — skipping API", log_label)
+        return ""
+    if not OPEN_AI_API_KEY:
+        logger.warning("get_llm_notes(%s): OPEN_AI_API_KEY not set — skipping DeepSeek", log_label)
+        return ""
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
     payload = compact_for_llm(candidates)
-    user_content = json.dumps(payload, default=str)
-    logger.info("Calling DeepSeek (%s) with %s candidates", log_label, len(payload))
+    logger.info("Calling DeepSeek %s (%s) with %s candidates", DEEPSEEK_MODEL, log_label, len(payload))
+    try:
+        response = client.chat.completions.create(
+            model=DEEPSEEK_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": json.dumps(payload, default=str)},
+            ],
+        )
+    except Exception:
+        # Notes are optional; the digest goes out without them.
+        logger.exception("DeepSeek call failed")
+        return ""
+    return response.choices[0].message.content or ""
 
-    response = client.chat.completions.create(
-        model="deepseek-reasoner",
-        messages=[
-            {"role": "system", "content": system_prompt or SYSTEM_PROMPT},
-            {"role": "user", "content": user_content},
-        ],
-    )
-    return response.choices[0].message.content
+
+def _clip(text: object, limit: int) -> str:
+    t = " ".join(str(text).split())
+    return t if len(t) <= limit else t[: limit - 1].rstrip() + "…"
+
+
+def parse_llm_notes(raw: str, allowed_symbols: list[str]) -> dict[str, dict]:
+    """
+    Validate DeepSeek's JSON: keep only notes for symbols we sent, clip lengths, drop anything
+    malformed. Returns {symbol: {"summary": str, "risks": [str]}} in `allowed_symbols` order.
+    """
+    if not raw or not raw.strip():
+        return {}
+    text = raw.strip()
+    fenced = re.search(r"```(?:json)?\s*(\{.*\})\s*```", text, re.DOTALL)
+    if fenced:
+        text = fenced.group(1)
+    start, end = text.find("{"), text.rfind("}")
+    if start == -1 or end <= start:
+        logger.warning("DeepSeek reply has no JSON object")
+        return {}
+    try:
+        data = json.loads(text[start : end + 1])
+    except json.JSONDecodeError:
+        logger.warning("DeepSeek reply is not valid JSON")
+        return {}
+    notes = data.get("notes") if isinstance(data, dict) else None
+    if not isinstance(notes, list):
+        return {}
+    allowed = set(allowed_symbols)
+    out: dict[str, dict] = {}
+    for n in notes:
+        if not isinstance(n, dict):
+            continue
+        sym = str(n.get("symbol", "")).strip().upper()
+        summary = n.get("summary")
+        if sym not in allowed or sym in out or not isinstance(summary, str) or not summary.strip():
+            continue
+        risks = n.get("risks") if isinstance(n.get("risks"), list) else []
+        out[sym] = {
+            "summary": _clip(summary, LLM_SUMMARY_MAX),
+            "risks": [_clip(r, LLM_RISK_MAX) for r in risks if isinstance(r, str) and r.strip()][:LLM_RISKS],
+        }
+    dropped = len(notes) - len(out)
+    if dropped:
+        logger.warning("Dropped %s invalid/unknown DeepSeek notes", dropped)
+    return {sym: out[sym] for sym in allowed_symbols if sym in out}
 
 
 def _npt_now() -> str:
@@ -282,147 +269,105 @@ def _fmt_num(val, decimals=1) -> str:
         return str(val)
 
 
-def _pct_from_52w_low(s: dict) -> float:
-    try:
-        ltp_f = float(s.get("ltp", 0))
-        lo_f = float(s.get("week_52_low", 0))
-        hi_f = float(s.get("week_52_high", 1))
-        if hi_f <= lo_f:
-            return 0.0
-        return (ltp_f - lo_f) / (hi_f - lo_f) * 100.0
-    except (ValueError, TypeError):
-        return 0.0
-
-
-def _llm_mono_rows(raw: str) -> list[str]:
-    """
-    Monospace rows for <pre>: pipe-separated lines become a padded column layout;
-    otherwise long lines are wrapped to fit phones.
-    """
-    lines = raw.splitlines()
-    nonempty = [ln for ln in lines if ln.strip()]
-    if not nonempty:
-        return []
-
-    pipe_lines = [ln for ln in nonempty if "|" in ln]
-    use_table = bool(pipe_lines) and (
-        len(pipe_lines) >= 2
-        or (len(pipe_lines) == 1 and pipe_lines[0].count("|") >= 2)
-        or len(pipe_lines) * 2 >= len(nonempty)
-    )
-
-    if not use_table:
-        width = 44
-        out: list[str] = []
-        for ln in lines:
-            if not ln:
-                out.append("")
-                continue
-            if len(ln) <= width:
-                out.append(ln)
-            else:
-                wrapped = textwrap.wrap(
-                    ln,
-                    width=width,
-                    replace_whitespace=False,
-                    break_long_words=True,
-                )
-                out.extend(wrapped or [ln[:width]])
-        return out
-
-    max_cell = 24
-    max_cols = 8
-    cell_matrix: list[list[str]] = []
-    for ln in lines:
-        if "|" not in ln or not ln.strip():
-            continue
-        cells = [c.strip()[:max_cell] for c in ln.split("|")]
-        cell_matrix.append(cells)
-    ncols = min(max(len(r) for r in cell_matrix), max_cols) if cell_matrix else 1
-    widths = [2] * ncols
-    for r in cell_matrix:
-        for i in range(ncols):
-            cell = r[i] if i < len(r) else ""
-            widths[i] = min(max(widths[i], len(cell)), max_cell)
-
-    out: list[str] = []
-    for ln in lines:
-        if not ln.strip():
-            out.append("")
-            continue
-        if "|" in ln:
-            cells = [c.strip()[:max_cell] for c in ln.split("|")]
-            while len(cells) < ncols:
-                cells.append("")
-            cells = cells[:ncols]
-            out.append(" | ".join(c.ljust(widths[i]) for i, c in enumerate(cells)))
-        else:
-            out.append(ln.rstrip())
-    return out
-
-
 def _mono_block(lines: list[str]) -> str:
     body = "\n".join(html.escape(line, quote=False) for line in lines)
     return f"<pre>{body}</pre>"
 
 
+def _pct_cell(val, decimals=1) -> str:
+    try:
+        return f"{float(val) * 100:+.{decimals}f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def format_market_line(context: dict | None) -> str:
+    if not context:
+        return "<i>Market regime unavailable.</i>"
+    parts = [f"<b>{html.escape(str(context.get('regime') or 'NEUTRAL'))}</b>"]
+    if context.get("index_ret_20d") is not None:
+        parts.append(f"NEPSE 20d {_pct_cell(context['index_ret_20d'])}%")
+    if context.get("breadth_sma50") is not None:
+        parts.append(f"{float(context['breadth_sma50']) * 100:.0f}% above SMA50")
+    if context.get("high_vol"):
+        parts.append("high volatility")
+    return "Market: " + " · ".join(parts)
+
+
+def _record_line(label: str, rec: dict | None) -> str | None:
+    if not rec or rec.get("n", 0) < 100:
+        return None
+    return (
+        f"{label}: {rec['hit'] * 100:.0f}% beat the market over {rec['horizon']}d "
+        f"(avg {rec['excess'] * 100:+.1f}%, n={rec['n']:,})"
+    )
+
+
 def format_telegram_digest(
-    llm_output: str,
-    buys: list[dict],
-    near_lows: list[dict],
+    notes: dict[str, dict],
+    setups: list[dict],
+    context: dict | None,
+    class_counts: dict[str, int],
 ) -> str:
-    """Telegram HTML: LLM in <pre> (pipe-table or wrapped) + strict BUY + near-52w-low tables."""
+    """Telegram HTML: regime, setups table with signal age, track record, DeepSeek notes, dropped names."""
+    context = context or {}
     ts = html.escape(_npt_now(), quote=False)
-    parts = [f"<b>NEPSE</b> · <code>{ts}</code>", ""]
+    parts = [f"<b>NEPSE</b> · <code>{ts}</code>", format_market_line(context or None), ""]
 
-    parts.append("<b>LLM</b>")
-    raw = llm_output or ""
-    lines = raw.splitlines()
-    first_nonempty = next((x.strip() for x in lines if x.strip()), "")
-    if not first_nonempty:
-        parts.append("<i>(No LLM text.)</i>")
-    elif first_nonempty.lower().startswith("no strong"):
-        parts.append("<i>No picks.</i>")
-    else:
-        parts.append(_mono_block(_llm_mono_rows(raw)))
-
-    parts.extend(["", "<b>Strict BUY</b> ({})".format(len(buys))])
-    if buys:
-        rows = [
-            f"{'SYM':<7} {'Rs':>7} {'B/S':>5} {'cf':>3}  sector",
-            "-" * 44,
-        ]
-        for s in buys:
-            sym = str(s.get("symbol", "?"))[:7]
+    n_strong = class_counts.get("STRONG_SETUP", 0)
+    n_setup = class_counts.get("SETUP", 0)
+    parts.append(f"<b>Top setups</b> ({n_strong} strong, {n_setup} setup)")
+    if setups:
+        rows = [f"{'SYM':<7} {'Rs':>7} {'scr':>3} {'rsk':>3} {'20d%':>5} {'ses':>3} {'since':>6}", "-" * 41]
+        for s in setups:
+            sym = str(s.get("symbol", "?"))[:7] + ("*" if s.get("classification") == "STRONG_SETUP" else "")
             ltp = _fmt_num(s.get("ltp"), 1)
-            b = int(s.get("signal_buy_score", 0) or 0)
-            sl = int(s.get("signal_sell_score", 0) or 0)
-            cf = int(s.get("signal_confidence", 0) or 0)
-            sec = str(s.get("sector", ""))[:12]
-            bs = f"{b}/{sl}"
-            rows.append(f"{sym:<7} {ltp:>7} {bs:>5} {cf:>3}  {sec}")
+            scr = int(round(float(s.get("score") or 0)))
+            rsk = int(round(float(s.get("risk_score") or 0)))
+            ses = s.get("sessions")
+            ses_txt = str(int(ses)) if ses is not None else "—"
+            rows.append(
+                f"{sym:<8}{ltp:>7} {scr:>3} {rsk:>3} {_pct_cell(s.get('ret_20d')):>5} {ses_txt:>3} "
+                f"{_pct_cell(s.get('since_ret')):>6}"
+            )
         parts.append(_mono_block(rows))
     else:
         parts.append("<i>None.</i>")
 
-    parts.extend(["", "<b>Near 52-week low</b> ({})".format(len(near_lows))])
-    if near_lows:
-        rows = [
-            f"{'SYM':<7} {'Rs':>7} {'rng%':>4}  {'52w lo':>7} {'hi':>7}",
-            "-" * 40,
-        ]
-        for s in near_lows:
-            sym = str(s.get("symbol", "?"))[:7]
-            ltp = _fmt_num(s.get("ltp"), 1)
-            p = int(round(_pct_from_52w_low(s)))
-            lo = _fmt_num(s.get("week_52_low"), 0)
-            hi = _fmt_num(s.get("week_52_high"), 0)
-            rows.append(f"{sym:<7} {ltp:>7} {p:>4}  {lo:>7} {hi:>7}")
-        parts.append(_mono_block(rows))
-    else:
-        parts.append("<i>None.</i>")
+    records = [
+        _record_line(f"Strong setups, last {context.get('recent_sessions', 90)} sessions",
+                     (context.get("track_record_recent") or {}).get("STRONG_SETUP")),
+        _record_line("all history", (context.get("track_record") or {}).get("STRONG_SETUP")),
+    ]
+    records = [r for r in records if r]
+    if records:
+        parts.append("<i>" + html.escape(" · ".join(records), quote=False) + "</i>")
 
-    parts.extend(["", "<i>Not financial advice.</i>"])
+    if notes:
+        parts.extend(["", "<b>Notes</b> (DeepSeek, explains the ranking — does not change it)"])
+        for sym, n in notes.items():
+            line = f"<b>{html.escape(sym)}</b> {html.escape(n['summary'], quote=False)}"
+            if n["risks"]:
+                line += " <i>Risk: " + html.escape("; ".join(n["risks"]), quote=False) + "</i>"
+            parts.append(line)
+
+    dropped = context.get("dropped") or []
+    if dropped:
+        shown = ", ".join(f"{d['symbol']}→{d['now'].lower().replace('_', ' ')}" for d in dropped[:10])
+        more = f" +{len(dropped) - 10} more" if len(dropped) > 10 else ""
+        parts.extend(["", f"<b>No longer a setup</b>: {html.escape(shown, quote=False)}{more}"])
+
+    flagged = ", ".join(
+        f"{class_counts[c]} {c.lower().replace('_', ' ')}" for c in ("HIGH_RISK", "AVOID") if class_counts.get(c)
+    )
+    if flagged:
+        parts.append(f"<i>Flagged: {flagged}.</i>")
+    parts.extend([
+        "",
+        "<i>* strong setup. scr = rank vs today's market (0-100), rsk = volatility rank, ses = sessions "
+        "flagged, since = return since first flagged. Relative ranking, not a price forecast. "
+        "Not financial advice.</i>",
+    ])
     return "\n".join(parts)
 
 
@@ -575,41 +520,100 @@ def send_telegram(message: str, chat_id: str | None, parse_mode: str = "HTML") -
             logger.info("Telegram sent → %s", chat_id)
 
 
-if __name__ == "__main__":
-    buys, sells, near_lows, _n_screened, lean_buys = get_classified_stocks()
+def persist_market_snapshot(
+    business_date: str,
+    all_stocks: list[dict],
+    listed_stocks: list[dict],
+    data_dir: Path = history_store.DATA_DIR,
+) -> None:
+    """Append today's market fields and the NEPSE index to data/ (see history_store)."""
+    price_rows = [
+        {
+            **s,
+            "date": business_date,
+            "close": s.get("close") if s.get("close") is not None else s.get("ltp"),
+            "trades": s.get("transactions"),
+        }
+        for s in all_stocks
+        if s.get("ltp") is not None or s.get("close") is not None
+    ]
+    history_store.upsert_securities(listed_stocks, seen_on=business_date, data_dir=data_dir)
+    logger.info("History %s: %s price rows changed", business_date, history_store.upsert_prices(price_rows, data_dir))
 
-    llm_output = ""
-    if buys:
-        llm_output = get_llm_picks(buys, log_label="BUY")
-        logger.info("LLM output:\n%s", llm_output)
-    elif near_lows:
-        llm_output = get_llm_picks(
-            near_lows[:12],
-            system_prompt=SYSTEM_PROMPT_NEAR_LOW,
-            log_label="52W_LOW",
-        )
-        logger.info("LLM (near 52w low) output:\n%s", llm_output)
-    elif lean_buys:
-        llm_output = get_llm_picks(
-            lean_buys,
-            system_prompt=SYSTEM_PROMPT_LEAN,
-            log_label="LEAN_BUY",
-        )
-        logger.info("LLM (LEAN_BUY) output:\n%s", llm_output)
-    else:
-        logger.info(
-            "DeepSeek not called: 0 strict BUY, 0 near-52w-low, 0 LEAN_BUY after screening."
-        )
+
+def persist_signals(
+    business_date: str,
+    all_stocks: list[dict],
+    context: dict | None,
+    data_dir: Path = history_store.DATA_DIR,
+) -> None:
+    """Record every stock's model classification and the legacy vote verdict for later evaluation."""
+    regime = (context or {}).get("regime")
+    rows = [
+        {
+            "date": business_date,
+            "symbol": s["symbol"],
+            "sector": s.get("sector"),
+            "classification": s.get("classification"),
+            "score": s.get("score"),
+            "opportunity_score": s.get("opportunity_score"),
+            "risk_score": s.get("risk_score"),
+            "regime": regime,
+            "verdict": s.get("signal_verdict"),
+            "buy_score": s.get("signal_buy_score"),
+            "sell_score": s.get("signal_sell_score"),
+            "confidence": s.get("signal_confidence"),
+            "technical_buy": s.get("signal_technical_buy"),
+            "technical_sell": s.get("signal_technical_sell"),
+            "fundamental_buy": s.get("signal_fundamental_buy"),
+            "fundamental_sell": s.get("signal_fundamental_sell"),
+            "close": s.get("close") if s.get("close") is not None else s.get("ltp"),
+            "reasons": s.get("signal_reasons"),
+        }
+        for s in all_stocks
+    ]
+    logger.info("History %s: %s signal rows changed", business_date, history_store.upsert_signals(rows, data_dir))
+
+
+if __name__ == "__main__":
+    all_stocks, listed_stocks = classify_all_stocks()
+    business_date = get_business_date()
+    try:
+        persist_market_snapshot(business_date, all_stocks, listed_stocks)
+        history_store.upsert_index(get_index_history())
+        history_store.upsert_corporate_actions(get_price_adjustments())
+    except Exception:
+        # History is for research; never let it block the daily digest.
+        logger.exception("Failed to persist market snapshot")
+
+    context: dict | None = None
+    try:
+        scored, context = scoring.score_latest()
+        if context["date"] != business_date:
+            logger.warning("Scored date %s differs from business date %s", context["date"], business_date)
+        attach_scores(all_stocks, scored)
+    except Exception:
+        logger.exception("Scoring failed — digest will have no setups")
+        for s in all_stocks:
+            s["classification"] = "INSUFFICIENT_DATA"
+
+    class_counts = dict(Counter(s.get("classification") for s in all_stocks))
+    logger.info("Classification mix: %s · legacy verdicts: %s", class_counts,
+                dict(Counter(s.get("signal_verdict") for s in all_stocks)))
+    try:
+        persist_signals(business_date, all_stocks, context)
+    except Exception:
+        logger.exception("Failed to persist signals")
+
+    setups = select_setups(all_stocks)
+    raw_notes = get_llm_notes(setups)
+    notes = parse_llm_notes(raw_notes, [s["symbol"] for s in setups])
+    if raw_notes:
+        logger.info("DeepSeek notes: %s of %s setups", len(notes), len(setups))
 
     if not TELEGRAM_BOT_TOKEN:
         logger.warning("TELEGRAM_BOT_TOKEN not set — skipping Telegram")
+    elif not TELEGRAM_CHAT_ID:
+        logger.warning("TELEGRAM_CHAT_ID is unset")
     else:
-        telegram_body = format_telegram_digest(llm_output or "", buys, near_lows)
-
-        if TELEGRAM_CHAT_ID:
-            send_telegram(telegram_body, chat_id=TELEGRAM_CHAT_ID)
-        else:
-            logger.warning(
-                "TELEGRAM_CHAT_ID is unset"
-            )
-
+        send_telegram(format_telegram_digest(notes, setups, context, class_counts), chat_id=TELEGRAM_CHAT_ID)

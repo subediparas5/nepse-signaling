@@ -7,5 +7,16 @@ requires-python = ">=3.12"
 dependencies = [
     "nepse-data-api>=1.0",
     "openai>=1.63.2",
+    "pandas>=3.0.6",
     "requests>=2.32.3",
+    "scikit-learn>=1.9.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

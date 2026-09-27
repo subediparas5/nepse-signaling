@@ -1,6 +1,8 @@
 import contextlib
+import html
 import io
 import logging
+import re
 import time
 import types
 from typing import Any
@@ -106,6 +108,7 @@ def get_official_listed_stocks() -> list[dict]:
         out.append(
             {
                 "symbol": sym,
+                "security_id": row.get("id"),
                 "sector": sector,
                 "promoter_percentage": None,
                 "public_percentage": None,
@@ -306,4 +309,184 @@ def get_official_share_price_lookup(symbols: set[str] | None = None) -> dict[str
         time.sleep(0.08)
 
     logger.info("NEPSE official market: %s symbols with detail", len(out))
+    return out
+
+
+# ---------------------------------------------------------------------------
+# History (NOTS keeps roughly one year; older days must come from data/ in git)
+# ---------------------------------------------------------------------------
+
+NEPSE_INDEX_ID = 58
+
+
+def _get_json(path: str, attempts: int = 3) -> Any:
+    """
+    GET a NOTS path with the Salter token.
+
+    A stale token shows up as 401 *or* as an empty/non-JSON 200 body (seen after
+    `refresh_auth_token`), so both trigger recovery: full re-auth first, then a new client.
+    """
+    global _nepse
+    last: Exception | None = None
+    for attempt in range(attempts):
+        n = _client()
+        try:
+            resp = n.session.get(f"{n.BASE_URL}{path}", headers=n._get_auth_headers())
+            resp.raise_for_status()
+            return resp.json()
+        except (requests.RequestException, ValueError) as e:
+            last = e
+        if attempt == attempts - 1:
+            break
+        logger.info("NOTS GET %s failed (%s) — recovering session", path, last)
+        if attempt == 0:
+            _authenticate_safe(n, path)
+        else:
+            _nepse = None
+            time.sleep(1.0 * attempt)
+    assert last is not None
+    raise last
+
+
+def get_business_date() -> str:
+    """Last NEPSE trading day (YYYY-MM-DD) the current market data refers to."""
+    status = _client().get_market_status(use_cache=False) or {}
+    as_of = str(status.get("asOf") or "")
+    if len(as_of) < 10:
+        raise RuntimeError(f"NEPSE market status has no asOf date: {status!r}")
+    return as_of[:10]
+
+
+def get_security_history(security_id: int, start: str, end: str) -> list[dict]:
+    """
+    Daily rows for one security, oldest first, shaped like `history_store.PRICE_FIELDS`.
+
+    NOTS returns high/low/close/volume/turnover/trades only — no open, VWAP or 52w range.
+    Days it reports with a zero close (no trades) are dropped; they are not real prices.
+    """
+    rows: list[dict] = []
+    page = 0
+    while True:
+        data = _get_json(
+            f"/api/nots/market/history/security/{security_id}"
+            f"?size=500&page={page}&startDate={start}&endDate={end}"
+        )
+        for r in data.get("content") or []:
+            close = _float(r.get("closePrice"))
+            if close is None or close <= 0:
+                continue
+            rows.append(
+                {
+                    "date": r.get("businessDate"),
+                    "high": _float(r.get("highPrice")),
+                    "low": _float(r.get("lowPrice")),
+                    "close": _float(r.get("closePrice")),
+                    "volume": _float(r.get("totalTradedQuantity")),
+                    "turnover": _float(r.get("totalTradedValue")),
+                    "trades": _float(r.get("totalTrades")),
+                }
+            )
+        if data.get("last", True):
+            break
+        page += 1
+    rows.sort(key=lambda r: r["date"] or "")
+    return rows
+
+
+def get_index_history(index_id: int = NEPSE_INDEX_ID) -> list[dict]:
+    """Daily index rows, oldest first, shaped like `history_store.INDEX_FIELDS`."""
+    rows: list[dict] = []
+    page = 0
+    while True:
+        data = _get_json(f"/api/nots/index/history/{index_id}?size=500&page={page}")
+        for r in data.get("content") or []:
+            rows.append(
+                {
+                    "date": r.get("businessDate"),
+                    "open": _float(r.get("openIndex")),
+                    "high": _float(r.get("highIndex")),
+                    "low": _float(r.get("lowIndex")),
+                    "close": _float(r.get("closingIndex")),
+                    "pct_change": _float(r.get("percentageChange")),
+                    "turnover": _float(r.get("turnoverValue")),
+                    "volume": _float(r.get("turnoverVolume")),
+                    "trades": _float(r.get("totalTransaction")),
+                    "week_52_high": _float(r.get("fiftyTwoWeekHigh")),
+                    "week_52_low": _float(r.get("fiftyTwoWeekLow")),
+                }
+            )
+        if data.get("last", True):
+            break
+        page += 1
+    rows.sort(key=lambda r: r["date"] or "")
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# Corporate actions (bonus / rights / cash dividend price adjustments)
+# ---------------------------------------------------------------------------
+
+_ADJ_NUM = r"(?:Rs\.?\s*)?(?P<{}>[\d,]+(?:\.\d+)?)"
+_ADJ_PATTERN = re.compile(
+    r"\bis\s*" + _ADJ_NUM.format("adjusted") + r"\s*for\s*(?P<reason>.+?)\s*on\s*(?:the\s*)?previous\s*"
+    r"closing\s*price\s*of\s*" + _ADJ_NUM.format("prev"),
+    re.IGNORECASE,
+)
+_SYM_PAREN = re.compile(r"\(\s*([A-Z][A-Z0-9]+)\s*\)")
+_SYM_TITLE_TAIL = re.compile(r"[-–]\s*([A-Z][A-Z0-9]+)\s*$")
+_SYM_BARE = re.compile(r"\bof\s+([A-Z][A-Z0-9]+)\s+is\b")
+
+
+def _adjustment_symbol(title: str, body_text: str) -> str | None:
+    """Symbol from the title '(SYM)' or '- SYM', else from the body."""
+    title = title.strip()
+    for found in (_SYM_PAREN.findall(title), _SYM_TITLE_TAIL.findall(title),
+                  _SYM_PAREN.findall(body_text), _SYM_BARE.findall(body_text)):
+        if found:
+            return found[-1]
+    return None
+
+
+def _html_text(body: str | None) -> str:
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body or ""))).strip()
+
+
+def parse_price_adjustment(title: str, body: str) -> dict | None:
+    """Parse a NOTS 'Price Adjusted' notice. Returns None if it is not one or cannot be read."""
+    if "price adjust" not in (title or "").lower():
+        return None
+    text = _html_text(body)
+    m = _ADJ_PATTERN.search(text)
+    symbol = _adjustment_symbol(title, text)
+    if not m or not symbol:
+        return None
+    adjusted = float(m["adjusted"].replace(",", ""))
+    prev = float(m["prev"].replace(",", ""))
+    if adjusted <= 0 or prev <= 0 or adjusted > prev * 1.5:
+        return None
+    return {
+        "symbol": symbol,
+        "prev_close": prev,
+        "adjusted_price": adjusted,
+        "factor": adjusted / prev,
+        "reason": m["reason"].strip(),
+    }
+
+
+def get_price_adjustments() -> list[dict]:
+    """
+    Price-adjustment notices from the NOTS news feed. `date` is the day the notice was posted
+    (after that day's close); the adjustment applies to prices on or before that session.
+    """
+    out: list[dict] = []
+    unparsed = 0
+    for a in _client().get_news_alerts(use_cache=False) or []:
+        title = a.get("messageTitle") or ""
+        parsed = parse_price_adjustment(title, a.get("messageBody"))
+        if parsed is None:
+            unparsed += "price adjust" in title.lower()
+            continue
+        out.append({"date": (a.get("addedDate") or "")[:10], "alert_id": a.get("id"), **parsed})
+    if unparsed:
+        logger.warning("NOTS price-adjustment notices not parsed: %s", unparsed)
     return out

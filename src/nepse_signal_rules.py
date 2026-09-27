@@ -44,6 +44,23 @@ def _to_float(x: Any) -> float | None:
         return None
 
 
+def stock_eps(stock: dict[str, Any]) -> float | None:
+    """EPS, preferring trailing-twelve-month over the plain `eps` field."""
+    eps = _to_float(stock.get("eps_ttm"))
+    return eps if eps is not None else _to_float(stock.get("eps"))
+
+
+# Any of these present switches classification to the stricter with-fundamentals thresholds.
+FUNDAMENTAL_FIELDS = (
+    "pr_ratio", "pe", "eps_ttm", "eps", "pb", "dpps", "promoter_percentage",
+    "roe_ttm", "return_on_equity", "roe", "npl_to_total_loan", "npl",
+)
+
+
+def _has_fundamentals(stock: dict[str, Any]) -> bool:
+    return any(_to_float(stock.get(k)) is not None for k in FUNDAMENTAL_FIELDS)
+
+
 def _parse_pct(x: Any) -> float | None:
     if x is None:
         return None
@@ -307,7 +324,7 @@ def _fundamental_votes(stock: dict[str, Any], sector: str) -> tuple[int, int, li
             s += 1
             reasons.append(f"P/E {pe:.1f} (above {pe_hi} for {sector})")
 
-    eps = _to_float(stock.get("eps_ttm"))
+    eps = stock_eps(stock)
     if eps is not None and eps < 0:
         s += 2
         reasons.append(f"Negative EPS ({eps:.2f})")
@@ -339,7 +356,7 @@ def _fundamental_votes(stock: dict[str, Any], sector: str) -> tuple[int, int, li
             reasons.append(f"Low promoter {promoter:.0f}%")
 
     db, ds, dr = _dividend_yield_vote(
-        stock.get("ltp"), stock.get("dpps"), stock.get("eps"),
+        stock.get("ltp"), stock.get("dpps"), eps,
     )
     b += db
     s += ds
@@ -427,8 +444,7 @@ def classify_nepse_signal(stock: dict[str, Any], sector: str) -> dict[str, Any]:
     sell_score = fs + ts
     reasons = fr + tr
 
-    has_fundamentals = (fb + fs) > 0
-    if has_fundamentals:
+    if _has_fundamentals(stock):
         buy_thresh, sell_thresh, margin = 6, 6, 3
         lean_thresh = 4
     else:
