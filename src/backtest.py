@@ -30,6 +30,8 @@ if str(_SRC_DIR) not in sys.path:
 
 import features as F
 import history_store
+import regime as R
+import scoring as S
 from nepse_signal_rules import _liquidity_vote, _sector_relative_vote, _week52_vote, classify_nepse_signal
 
 REPORT_PATH = Path(__file__).resolve().parent.parent / "reports" / "backtest.md"
@@ -48,27 +50,6 @@ IC_FEATURES = [
 ]
 # market_rel_20d is ret_20d minus a per-date constant, so its cross-sectional rank IC is identical.
 MIN_NAMES_PER_DATE = 30
-
-
-def build_dataset(p: F.Panel) -> pd.DataFrame:
-    """One row per (date, symbol) on days the symbol traded: features, raw fields, labels."""
-    feats = F.compute_features(p)
-    labels = F.forward_labels(p)
-    raw = {
-        "close": p.close, "high": p.high, "low": p.low, "open": p.open, "vwap": p.vwap,
-        "volume": p.volume, "turnover": p.turnover, "trades": p.trades, "traded": p.traded,
-    }
-    df = F.to_long({**raw, **feats, **labels})
-    df = df[df["traded"].astype(bool)]
-    df.attrs["new_listings"] = df[df["new_listing"].astype(bool)]
-    df = F.add_excess(df[~df["new_listing"].astype(bool)])
-    df["sector"] = df.index.get_level_values("symbol").map(p.sector)
-    df["diff_pct"] = df["ret_1d"] * 100
-    # Live code compares against the sector median of the same day's movers.
-    df["sector_median_diff"] = df.groupby([df.index.get_level_values("date"), "sector"])["diff_pct"].transform(
-        "median"
-    )
-    return df
 
 
 def replay_rules(df: pd.DataFrame) -> pd.DataFrame:
@@ -276,12 +257,118 @@ def build_report(df: pd.DataFrame, horizons: tuple[int, ...] = (5, 20)) -> str:
     return "\n".join(lines)
 
 
+def score_dataset(df: pd.DataFrame, p: F.Panel) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Add scoring-model columns and the market regime. Returns (df, weights_by_date, regime_by_date)."""
+    calendar = pd.Index(sorted(df.index.get_level_values("date").unique()), name="date")
+    scored, weights = S.score_frame(df, calendar)
+    reg = R.compute_regime(p.index_close, df["dist_sma50"].unstack()).reindex(calendar)
+    scored["regime"] = scored.index.get_level_values("date").map(reg["regime"])
+    scored["legacy_net"] = scored["buy_score"] - scored["sell_score"]
+    return scored, weights, reg
+
+
+def _is_prior(weights: pd.DataFrame) -> pd.Series:
+    prior = pd.Series(S.PRIOR_WEIGHTS)
+    prior = prior / prior.abs().sum()
+    return (weights - prior).abs().max(axis=1) < 1e-12
+
+
+def _score_ic(df: pd.DataFrame, col: str, h: int) -> dict:
+    return feature_ic(df, col, h)
+
+
+def build_scoring_report(df: pd.DataFrame, weights: pd.DataFrame, reg: pd.DataFrame, h_list=(5, 20)) -> str:
+    oos_dates = weights.index[~_is_prior(weights)]
+    lines = ["## Scoring model (walk-forward)", ""]
+    if len(oos_dates) == 0:
+        return "\n".join(lines + ["Not enough realised outcomes yet to learn weights.", ""])
+    first = oos_dates[0]
+    oos = df[df.index.get_level_values("date") >= first]
+    o_dates = sorted(oos.index.get_level_values("date").unique())
+    split = o_dates[len(o_dates) // 2]
+    everything = pd.Series(True, index=oos.index)
+
+    lines += [
+        f"Walk-forward weights start on **{first}**, once {S.MIN_IC_DATES} dates of fully realised "
+        f"{S.LABEL_HORIZON}-day outcomes exist. Everything in this section uses only those "
+        f"{len(o_dates)} out-of-sample dates (halves split at {split}).",
+        "",
+        "- `score` = walk-forward weights: each day uses only ICs whose outcome had finished by then.",
+        "- `score_prior` = fixed prior weights chosen after looking at the full year in step 3 — "
+        "**in-sample**, shown for reference only.",
+        "- Legacy = the replayed old vote engine on the same dates.",
+        "",
+        "Weights (signed, sum of |w| = 1):",
+        "",
+        "| Date | " + " | ".join(S.COMPONENTS) + " |",
+        "|---|" + "---:|" * len(S.COMPONENTS),
+    ]
+    marks = [oos_dates[0]] + list(oos_dates[:: max(1, len(oos_dates) // 4)][1:]) + [oos_dates[-1]]
+    prior = pd.Series(S.PRIOR_WEIGHTS) / pd.Series(S.PRIOR_WEIGHTS).abs().sum()
+    lines.append("| prior | " + " | ".join(f"{prior[k]:+.2f}" for k in S.COMPONENTS) + " |")
+    for d in dict.fromkeys(marks):
+        lines.append(f"| {d} | " + " | ".join(f"{weights.loc[d, k]:+.2f}" for k in S.COMPONENTS) + " |")
+    lines.append("")
+
+    lines += [
+        "### Rank IC of each score vs forward excess return (out-of-sample dates)",
+        "",
+        "| Score | " + " | ".join(f"IC {h}d | t {h}d | Q5−Q1 {h}d" for h in h_list) + " |",
+        "|---|" + "---:|---:|---:|" * len(h_list),
+    ]
+    for col, label in [("score", "Walk-forward score"), ("score_prior", "Prior score (in-sample)"),
+                       ("risk_score", "Risk score (higher = riskier)"), ("legacy_net", "Legacy buy − sell")]:
+        res = [feature_ic(oos, col, h) for h in h_list]
+        lines.append(f"| {label} | " + " | ".join(
+            f"{_num(r['ic'], 3)} | {_num(r['ic_t'])} | {_pct(r['q5_q1'])}" for r in res) + " |")
+    lines.append("")
+
+    for h in h_list:
+        rows = [("All observations (baseline)", group_stats(oos, everything, h, split))]
+        for c in S.CLASS_ORDER:
+            m = oos["classification"] == c
+            if m.any():
+                rows.append((f"{c}", group_stats(oos, m, h, split)))
+        for c in ("STRONG_SETUP", "SETUP"):
+            m = oos["classification_prior"] == c
+            if m.any():
+                rows.append((f"{c} (prior weights, in-sample)", group_stats(oos, m, h, split)))
+        for v in ("BUY", "LEAN_BUY"):
+            m = oos["verdict"] == v
+            if m.any():
+                rows.append((f"Legacy {v}", group_stats(oos, m, h, split)))
+        lines += _stats_table("Classifications", rows, h)
+
+    counts = reg.loc[o_dates, "regime"].value_counts()
+    lines += [
+        "### Market regime",
+        "",
+        "Regime days in the out-of-sample window: " + ", ".join(f"{k} {v}" for k, v in counts.items()) + ". "
+        "Would skipping STRONG_SETUP names in BEARISH regimes have avoided losses? Judge on **raw** "
+        "returns (excess is market-neutral). The live pipeline shows the regime as context but does not "
+        "gate on it: the evidence is inconclusive — few BULLISH days, and they were not better than BEARISH ones.",
+        "",
+    ]
+    h = h_list[-1]
+    rows = []
+    for rg in ("BULLISH", "NEUTRAL", "BEARISH"):
+        m = (oos["classification"] == "STRONG_SETUP") & (oos["regime"] == rg)
+        if m.any():
+            rows.append((f"STRONG_SETUP in {rg}", group_stats(oos, m, h, split)))
+    rows.append(("STRONG_SETUP, all regimes", group_stats(oos, oos["classification"] == "STRONG_SETUP", h, split)))
+    gated = (oos["classification"] == "STRONG_SETUP") & (oos["regime"] != "BEARISH")
+    rows.append(("STRONG_SETUP excluding BEARISH (gate)", group_stats(oos, gated, h, split)))
+    lines += _stats_table("Regime gate", rows, h)
+    return "\n".join(lines)
+
+
 def run(data_dir: Path = history_store.DATA_DIR) -> str:
     p = F.load_panel(data_dir)
-    df = replay_rules(build_dataset(p))
+    df = replay_rules(F.build_dataset(p))
     df.attrs["index_first"] = f"{p.index_close.dropna().iloc[0]:.0f}"
     df.attrs["index_last"] = f"{p.index_close.dropna().iloc[-1]:.0f}"
-    return build_report(df)
+    scored, weights, reg = score_dataset(df, p)
+    return build_report(df) + "\n" + build_scoring_report(scored, weights, reg)
 
 
 def main() -> None:

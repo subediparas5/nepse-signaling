@@ -110,3 +110,77 @@ Spearman rank correlation between each feature and the forward excess return, co
 | `rvol_20` | -0.37% | +0.14% | +0.45% | +0.31% | -0.56% |
 | `sector_rel_20d` | -0.80% | +0.12% | +0.41% | +0.49% | -0.20% |
 
+## Scoring model (walk-forward)
+
+Walk-forward weights start on **2026-01-07**, once 40 dates of fully realised 20-day outcomes exist. Everything in this section uses only those 168 out-of-sample dates (halves split at 2026-05-22).
+
+- `score` = walk-forward weights: each day uses only ICs whose outcome had finished by then.
+- `score_prior` = fixed prior weights chosen after looking at the full year in step 3 — **in-sample**, shown for reference only.
+- Legacy = the replayed old vote engine on the same dates.
+
+Weights (signed, sum of |w| = 1):
+
+| Date | trend | momentum | low_risk | calm | liquidity |
+|---|---:|---:|---:|---:|---:|
+| prior | +0.30 | +0.10 | +0.30 | +0.20 | +0.10 |
+| 2026-01-07 | +0.34 | +0.11 | +0.34 | +0.09 | +0.11 |
+| 2026-03-23 | +0.47 | -0.14 | +0.16 | +0.13 | +0.10 |
+| 2026-05-22 | +0.24 | -0.03 | +0.35 | +0.20 | +0.17 |
+| 2026-07-23 | +0.24 | +0.03 | +0.39 | +0.20 | +0.14 |
+| 2026-09-24 | +0.24 | +0.08 | +0.34 | +0.16 | +0.17 |
+
+### Rank IC of each score vs forward excess return (out-of-sample dates)
+
+| Score | IC 5d | t 5d | Q5−Q1 5d | IC 20d | t 20d | Q5−Q1 20d |
+|---|---:|---:|---:|---:|---:|---:|
+| Walk-forward score | 0.137 | 3.68 | +0.91% | 0.304 | 2.75 | +3.94% |
+| Prior score (in-sample) | 0.147 | 3.81 | +0.99% | 0.311 | 2.85 | +3.99% |
+| Risk score (higher = riskier) | -0.153 | -3.20 | -0.77% | -0.280 | -3.36 | -2.91% |
+| Legacy buy − sell | -0.021 | -0.22 | -0.05% | -0.006 | 0.72 | -0.14% |
+
+### Classifications — 5-day horizon
+
+| Group | Obs | Dates | Raw ret | Excess | t (non-overlap) | Median excess | Hit rate | Avg max DD | Excess 1st half | Excess 2nd half |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| All observations (baseline) | 36693 | 162 | -0.25% | +0.00% | — | -0.04% | 49% | -3.6% | +0.00% | +0.00% |
+| STRONG_SETUP | 3720 | 162 | +0.29% | +0.54% | 2.84 | +0.46% | 61% | -2.4% | +0.43% | +0.65% |
+| SETUP | 5260 | 162 | +0.07% | +0.31% | 1.90 | +0.22% | 56% | -2.8% | +0.20% | +0.43% |
+| WATCH | 5172 | 162 | -0.07% | +0.18% | 2.05 | +0.07% | 52% | -3.1% | +0.13% | +0.23% |
+| NEUTRAL | 13256 | 162 | -0.28% | -0.04% | -0.34 | -0.15% | 47% | -3.6% | -0.06% | -0.02% |
+| AVOID | 6321 | 162 | -0.62% | -0.32% | -2.30 | -0.36% | 44% | -4.2% | -0.19% | -0.45% |
+| HIGH_RISK | 2964 | 162 | -0.89% | -0.66% | -1.88 | -0.83% | 39% | -5.5% | -0.48% | -0.85% |
+| STRONG_SETUP (prior weights, in-sample) | 3676 | 162 | +0.30% | +0.56% | 2.73 | +0.50% | 62% | -2.4% | +0.47% | +0.65% |
+| SETUP (prior weights, in-sample) | 5243 | 162 | +0.08% | +0.32% | 2.57 | +0.22% | 55% | -2.8% | +0.22% | +0.43% |
+| Legacy BUY | 77 | 47 | +0.13% | -0.26% | -2.32 | -0.57% | 45% | -4.2% | +0.59% | -0.49% |
+| Legacy LEAN_BUY | 1691 | 104 | -0.20% | -0.27% | -0.71 | -0.17% | 46% | -4.0% | -0.99% | -0.03% |
+
+### Classifications — 20-day horizon
+
+| Group | Obs | Dates | Raw ret | Excess | t (non-overlap) | Median excess | Hit rate | Avg max DD | Excess 1st half | Excess 2nd half |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| All observations (baseline) | 33201 | 147 | -1.88% | -0.00% | — | +0.10% | 51% | -7.2% | -0.00% | -0.00% |
+| STRONG_SETUP | 3364 | 147 | +0.40% | +2.30% | 2.48 | +2.13% | 75% | -4.6% | +1.85% | +2.91% |
+| SETUP | 4768 | 147 | -0.36% | +1.55% | 2.30 | +1.29% | 66% | -5.5% | +1.24% | +1.96% |
+| WATCH | 4692 | 147 | -1.28% | +0.63% | 1.60 | +0.57% | 58% | -6.3% | +0.34% | +1.03% |
+| NEUTRAL | 12045 | 147 | -2.20% | -0.35% | -1.45 | -0.28% | 47% | -7.3% | -0.23% | -0.50% |
+| AVOID | 5650 | 147 | -3.36% | -1.40% | -1.59 | -1.28% | 37% | -8.7% | -1.22% | -1.64% |
+| HIGH_RISK | 2682 | 147 | -3.98% | -2.24% | -2.67 | -2.35% | 34% | -10.8% | -1.57% | -3.13% |
+| STRONG_SETUP (prior weights, in-sample) | 3332 | 147 | +0.46% | +2.35% | 1.59 | +2.22% | 76% | -4.5% | +1.92% | +2.93% |
+| SETUP (prior weights, in-sample) | 4756 | 147 | -0.47% | +1.41% | 3.64 | +1.15% | 65% | -5.3% | +1.11% | +1.81% |
+| Legacy BUY | 49 | 36 | -2.42% | -0.97% | — | -0.83% | 45% | -8.3% | +0.31% | -1.46% |
+| Legacy LEAN_BUY | 1242 | 89 | -2.16% | -0.63% | -1.08 | -0.29% | 46% | -7.7% | -0.58% | -0.64% |
+
+### Market regime
+
+Regime days in the out-of-sample window: BEARISH 75, NEUTRAL 60, BULLISH 33. Would skipping STRONG_SETUP names in BEARISH regimes have avoided losses? Judge on **raw** returns (excess is market-neutral). The live pipeline shows the regime as context but does not gate on it: the evidence is inconclusive — few BULLISH days, and they were not better than BEARISH ones.
+
+### Regime gate — 20-day horizon
+
+| Group | Obs | Dates | Raw ret | Excess | t (non-overlap) | Median excess | Hit rate | Avg max DD | Excess 1st half | Excess 2nd half |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| STRONG_SETUP in BULLISH | 736 | 33 | -0.65% | +2.25% | — | +1.89% | 71% | -7.4% | +2.25% | — |
+| STRONG_SETUP in NEUTRAL | 1278 | 56 | +1.98% | +2.36% | 1.35 | +2.30% | 73% | -3.6% | +1.93% | +3.52% |
+| STRONG_SETUP in BEARISH | 1350 | 58 | -0.53% | +2.27% | 2.91 | +2.10% | 80% | -4.1% | +0.14% | +2.72% |
+| STRONG_SETUP, all regimes | 3364 | 147 | +0.40% | +2.30% | 2.48 | +2.13% | 75% | -4.6% | +1.85% | +2.91% |
+| STRONG_SETUP excluding BEARISH (gate) | 2014 | 89 | +1.02% | +2.32% | 2.40 | +2.14% | 72% | -5.0% | +2.08% | +3.52% |
+

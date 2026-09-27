@@ -16,11 +16,14 @@ from __future__ import annotations
 
 import csv
 import math
+import numbers
 import os
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 DATA_DIR = Path(os.getenv("NEPSE_DATA_DIR") or Path(__file__).resolve().parent.parent / "data")
 
@@ -33,7 +36,9 @@ INDEX_FIELDS = [
     "turnover", "volume", "trades", "week_52_high", "week_52_low",
 ]
 SIGNAL_FIELDS = [
-    "date", "symbol", "sector", "verdict", "buy_score", "sell_score", "confidence",
+    "date", "symbol", "sector", "classification", "score", "opportunity_score", "risk_score", "regime",
+    # Legacy vote engine, kept so its open/VWAP votes can be evaluated once snapshots accumulate.
+    "verdict", "buy_score", "sell_score", "confidence",
     "technical_buy", "technical_sell", "fundamental_buy", "fundamental_sell", "close", "reasons",
 ]
 SECURITY_FIELDS = ["symbol", "security_id", "sector", "first_seen", "last_seen"]
@@ -43,11 +48,12 @@ def fmt(value: Any) -> str:
     """Stable text for CSV: '' for missing, integers without '.0', floats rounded to 4 dp."""
     if value is None:
         return ""
-    if isinstance(value, bool):
+    if isinstance(value, (bool, np.bool_)):
         return str(int(value))
-    if isinstance(value, int):
-        return str(value)
-    if isinstance(value, float):
+    if isinstance(value, numbers.Integral):
+        return str(int(value))
+    if isinstance(value, numbers.Real):  # includes numpy floats, whose repr is "np.float64(...)"
+        value = float(value)
         if math.isnan(value) or math.isinf(value):
             return ""
         r = round(value, 4)

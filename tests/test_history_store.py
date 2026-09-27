@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 import history_store as hs
@@ -5,7 +6,11 @@ import history_store as hs
 
 @pytest.mark.parametrize(
     "value, expected",
-    [(None, ""), (569.0, "569"), (569.25, "569.25"), (1 / 3, "0.3333"), (7, "7"), (float("nan"), ""), (" A ", "A")],
+    [
+        (None, ""), (569.0, "569"), (569.25, "569.25"), (1 / 3, "0.3333"), (7, "7"), (float("nan"), ""),
+        (" A ", "A"), (np.float64(45.51189), "45.5119"), (np.int64(12), "12"), (np.float64("nan"), ""),
+        (np.bool_(True), "1"),
+    ],
 )
 def test_fmt_is_stable(value, expected):
     assert hs.fmt(value) == expected

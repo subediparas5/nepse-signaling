@@ -210,3 +210,28 @@ def add_excess(long: pd.DataFrame, horizons: tuple[int, ...] = HORIZONS) -> pd.D
 def to_long(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Stack wide frames into one long frame indexed by (date, symbol)."""
     return pd.concat({k: v.stack(future_stack=True) for k, v in frames.items()}, axis=1)
+
+
+def build_dataset(p: Panel) -> pd.DataFrame:
+    """
+    The scored universe: one row per (date, symbol) on days the symbol traded, excluding each
+    new listing's first NEW_LISTING_SESSIONS sessions (kept in `df.attrs["new_listings"]`).
+    Features, raw fields and forward labels, with excess returns demeaned within this universe.
+    """
+    feats = compute_features(p)
+    labels = forward_labels(p)
+    raw = {
+        "close": p.close, "high": p.high, "low": p.low, "open": p.open, "vwap": p.vwap,
+        "volume": p.volume, "turnover": p.turnover, "trades": p.trades, "traded": p.traded,
+    }
+    df = to_long({**raw, **feats, **labels})
+    df = df[df["traded"].astype(bool)]
+    df.attrs["new_listings"] = df[df["new_listing"].astype(bool)]
+    df = add_excess(df[~df["new_listing"].astype(bool)])
+    df["sector"] = df.index.get_level_values("symbol").map(p.sector)
+    df["diff_pct"] = df["ret_1d"] * 100
+    # Live code compares against the sector median of the same day's movers.
+    df["sector_median_diff"] = df.groupby([df.index.get_level_values("date"), "sector"])["diff_pct"].transform(
+        "median"
+    )
+    return df

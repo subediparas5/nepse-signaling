@@ -1,24 +1,56 @@
 # NEPSE Signaling
 
-Automated buy/sell signal engine for the Nepal Stock Exchange (NEPSE). Runs on a schedule, scores listed equities using rule-based technical signals from **official NEPSE NOTS data**, optionally reviewed by DeepSeek (skipped when `OPEN_AI_API_KEY` is unset), and sends alerts to Telegram.
+Daily ranking engine for the Nepal Stock Exchange (NEPSE). Runs on a schedule, records **official NEPSE NOTS data** into a committed history, ranks listed equities with a backtested cross-sectional model, optionally has DeepSeek annotate the top names (skipped when `OPEN_AI_API_KEY` is unset), and sends a digest to Telegram.
 
 ## How It Works
 
 ```
-www.nepalstock.com.np (NOTS: listing + prices + 52w)  ──▶  Rule Engine  ──▶  DeepSeek  ──▶  Telegram
+NOTS (listing + prices + 52w + index) ─▶ data/ history ─▶ features ─▶ scoring model ─▶ DeepSeek notes ─▶ Telegram
+                                                                    └▶ legacy vote engine (recorded only)
 ```
 
 Market data is read through the open-source [`nepse-data-api`](https://pypi.org/project/nepse-data-api/) package, which implements NEPSE’s authenticated WASM token flow. Traffic goes to **nepalstock.com.np**, not aggregator websites.
 
-**Not included:** bulk P/E, P/B, EPS, NPL, promoter %, or dividend yield from NOTS in the paths used here. Fundamental votes in the rule engine stay neutral unless you later attach your own fields to each stock dict.
+**Not included:** P/E, P/B, EPS, NPL, promoter % or dividend yield — NOTS does not provide them in the paths used here.
 
-### Technical signals (from NOTS + live merge)
+### Scoring model (`src/scoring.py`)
 
-OHLC, VWAP (average traded price), volume, turnover, transaction count, 52-week high/low, daily change, gaps, sector-relative strength, intraday range. **No** 120d/180d moving averages in this feed — MA-related votes are effectively neutral. **IPO** verdict applies only when `ma120` is present and equal to `0` (e.g. if you enrich data elsewhere).
+Each day, every seasoned stock gets per-date percentile components, oriented so higher is better:
+
+| Component | Built from | Evidence (reports/backtest.md) |
+|-----------|-----------|-------------------------------|
+| trend | price vs SMA50/SMA120, drawdown from 120d high, trailing-range position | stocks near lows lagged |
+| momentum | 20d / 60d return | weak |
+| low_risk | inverse 20d volatility and ATR% | strongest single factor |
+| calm | inverse of today's move vs sector | one-day shocks either way reversed |
+| liquidity | 20d median turnover | modest |
+
+`score` (0-100) is the weighted blend. Weights are **walk-forward**: the mean daily rank correlation of
+each component with 20-day excess return, using only outcomes that had fully played out before the
+scoring date (prior weights until 40 such dates exist). `risk_score` (volatility rank) is reported
+separately. Classes from the day's score percentile:
+
+| Class | Rule |
+|-------|------|
+| STRONG_SETUP | top 10% |
+| SETUP | top 25% |
+| WATCH | top 40% |
+| NEUTRAL | otherwise |
+| AVOID | bottom 20%, or 20d median turnover < Rs 0.5M |
+| HIGH_RISK | risk_score ≥ 90 |
+| INSUFFICIENT_DATA | new listing (first 120 sessions) or < 3 components |
+
+The market regime (`src/regime.py`: NEPSE vs SMA20/50 plus breadth) is shown as context; the backtest
+found no reliable benefit from gating on it. Scores are **relative** — a STRONG_SETUP can still fall in a
+falling market.
+
+The legacy vote engine (`nepse_signal_rules.py`, table under [Legacy scoring](#legacy-scoring)) still runs and
+is recorded in `data/signals/` so its open/VWAP-based votes can be evaluated once enough snapshots exist.
 
 ### Telegram output
 
-- **Group** (`TELEGRAM_CHAT_ID`): one short HTML message — top **5** BUY rows (monospace table), optional **LLM** tickers on one line, and up to **8** near-52w-low rows (`8/total` in the header).
+One HTML message to `TELEGRAM_CHAT_ID`: market regime line, optional DeepSeek notes, the top 8 setups
+(score, risk, 20d return, class), and counts of HIGH_RISK / AVOID names.
 
 ## Setup
 
@@ -97,7 +129,9 @@ backfills the last 30 days and commits any `data/` changes back to the branch (`
 src/
   main_signaling.py     # Orchestration, LLM, Telegram
   nepse_official.py     # NOTS listing + per-symbol market merge
-  nepse_signal_rules.py # Scoring and verdicts
+  nepse_signal_rules.py # Legacy vote engine (recorded, not used for ranking)
+  scoring.py            # Walk-forward scoring model and classes
+  regime.py             # NEPSE market regime
   history_store.py      # CSV history store (upserts, deterministic output)
   backfill_history.py   # Pull NOTS price/index history into data/
   features.py           # Point-in-time features + forward-return labels
@@ -109,7 +143,7 @@ data/                   # Committed history (see above)
 tests/                  # pytest, no network
 ```
 
-## Scoring
+## Legacy scoring
 
 Independent buy/sell scores from weighted votes. Thresholds depend on whether any fundamental field
 (P/E, EPS, P/B, dividend, promoter %, ROE, NPL — see `FUNDAMENTAL_FIELDS`) is present on the stock.
