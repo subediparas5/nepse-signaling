@@ -16,6 +16,7 @@ _SRC_DIR = Path(__file__).resolve().parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
+import events
 import history_store
 import scoring
 from nepse_official import (
@@ -550,6 +551,7 @@ if __name__ == "__main__":
         persist_market_snapshot(business_date, all_stocks, listed_stocks)
         history_store.upsert_index(get_index_history())
         history_store.upsert_corporate_actions(get_price_adjustments())
+        history_store.upsert_events(events.fetch_events())
     except Exception:
         # History is for research; never let it block the daily digest.
         logger.exception("Failed to persist market snapshot")

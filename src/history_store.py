@@ -7,6 +7,7 @@ Layout (under DATA_DIR, default `<repo>/data`):
   signals/YYYY-MM.csv  one row per (date, symbol) — model class and scores from the daily run
   securities.csv       one row per symbol — id, sector, first/last seen
   corporate_actions.csv one row per (date, symbol) — bonus/rights/dividend price adjustments
+  events.csv           one row per (alert, symbol) — typed NOTS exchange notices (events.py)
 
 Prices are stored raw (as traded). features.build_panel applies corporate_actions on load.
 
@@ -43,6 +44,7 @@ SIGNAL_FIELDS = [
 ]
 SECURITY_FIELDS = ["symbol", "security_id", "sector", "first_seen", "last_seen"]
 ACTION_FIELDS = ["date", "symbol", "prev_close", "adjusted_price", "factor", "reason", "alert_id"]
+EVENT_FIELDS = ["date", "symbol", "event", "alert_id", "title"]
 
 
 def fmt(value: Any) -> str:
@@ -158,6 +160,14 @@ def upsert_corporate_actions(rows: Iterable[dict[str, Any]], data_dir: Path = DA
 
 def load_corporate_actions(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:
     return _read(data_dir / "corporate_actions.csv")
+
+
+def upsert_events(rows: Iterable[dict[str, Any]], data_dir: Path = DATA_DIR) -> int:
+    return _upsert(data_dir / "events.csv", EVENT_FIELDS, ("alert_id", "symbol"), rows)
+
+
+def load_events(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:
+    return _read(data_dir / "events.csv")
 
 
 def load_prices(data_dir: Path = DATA_DIR) -> list[dict[str, str]]:

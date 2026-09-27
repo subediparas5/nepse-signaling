@@ -174,3 +174,16 @@ Brier score (lower is better): constant base rate 0.2495, logistic 0.2393, gradi
 | 9 | 62.1% | 64.1% | 54.6% | 63.3% |
 | 10 | 70.5% | 79.4% | 65.3% | 76.8% |
 
+## Notice events
+
+NEPSE exchange notices typed by `src/events.py`, 2025-09-24 → 2026-09-24, matched to universe stocks. Signal = the stock's last session on or before the notice (posted after the close); entry at the next close. *Pre 20d* = excess return over the 20 sessions **before** the event (already happened; not tradeable). *t events* treats each event as independent; *t dates* averages events on the same day first, which is the fairer test when events cluster (e.g. bonus season). Types with fewer than 5 events are listed but not analysed. Prices are adjusted, so ex-dates are not counted as losses.
+
+| Event | n | Dates | Pre 20d | After 1d | After 5d | After 10d | After 20d | t events | t dates | Median 20d | Hit 20d | Avg max DD 20d | Model setup at signal |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `price_adjustment` | 76 | 37 | +1.84% | +0.38% | -0.46% | -1.11% | -2.32% | -3.70 | -1.47 | -2.92% | 31% | -4.7% | 41% |
+| `bonus_listing` | 70 | 38 | -0.32% | -0.18% | +0.13% | +0.00% | +0.39% | 0.61 | 0.66 | +0.43% | 53% | -7.2% | 43% |
+| `right_listing` | 12 | 9 | +1.77% | -1.69% | -1.36% | -2.94% | -1.69% | -1.00 | -1.27 | -1.09% | 42% | -7.9% | 17% |
+| `promoter_conversion` | 8 | 7 | -0.23% | -0.17% | -0.91% | -2.13% | -3.01% | -1.45 | -1.53 | -0.12% | 50% | -9.6% | 25% |
+
+Too few to analyse: merger (2), trading_halt (2), ipo_listing (1), other (1).
+

@@ -1,0 +1,1575 @@
+date,symbol,event,alert_id,title
+2022-01-09,LLBS,bonus_listing,206531,Listing 20% Bonus Shares of Laxmi Laghubitta Bittiya Sanstha Limited ( LLBS)
+2022-01-09,KBL,bonus_listing,206532,Listing 6% Bonus Shares of Kumari Bank Limited (KBL)
+2022-01-10,ACLBSL,bonus_listing,206534,Listing 8.85% Bonus Shares of Aarambha Chautari Laghubitta Bittiya Sanstha Limited – ACLBSL
+2022-01-11,JFL,dividend_book_closure,206536,Dividend Declaration of Janaki Finance Limited (JFL)
+2022-01-14,NBB,trading_halt,206538,धितोपत्रको दोस्रो बजार कारोबार रोक्का राखिएको बारे - NBB
+2022-01-16,BNHC,ipo_listing,206539,Listing IPO Shares of Buddha Bhumi Nepal Hydropower Company Limited – BNHC
+2022-01-17,MEGA,bonus_listing,206541,Listing 10% Bonus Shares of Mega Bank Nepal Limited (MEGA)
+2022-01-17,EDBL,right_listing,206542,Listing 30% Right Shares of Excel Development Bank Limited (EDBL)
+2022-01-18,ACLBSL,other,206543,Listing Shares of Aarambha Chautari Laghubitta Bittiya Sanstha Limited - ACLBSL
+2022-01-18,WNLB,trading_resume,206544,Listing Shares and Transactions Release of Wean Nepal Laghubitta Bittiya Sanstha Limited - WNLB
+2022-01-18,PIC,price_adjustment,206545,Price Adjusted – Premier Insurance Company (Nepal) Limited (PIC)
+2022-01-20,MBL,bonus_listing,206547,Listing 13.30% Bonus Shares of Machhachapuchhre Bank Limited – MBL
+2022-01-20,ALBSL,bonus_listing,206548,Listing 25% Bonus Shares of Asha Laghubitta Bittiya Sanstha Limited – ALBSL
+2022-01-20,SDLBSL,bonus_listing,206549,Listing 25% Bonus Shares of Sadhana Laghubitta Bittiya Sanstha Limited – SDLBSL
+2022-01-20,GLBSL,bonus_listing,206550,Listing 16.9064% Bonus Shares of Gurans Laghubitta Bittiya Sanstha Limited – GLBSL
+2022-01-23,RURU,bonus_listing,206551,Listing 10% Bonus Shares of Ru Ru Jalbidhyut Pariyojana Limited – RURU
+2022-01-25,SLBBL,bonus_listing,206552,Listing 25% Bonus Shares of Swarojgar Laghubitta Bittiya Santha Limited – SLBBL
+2022-02-03,SICL,price_adjustment,206555,Price Adjusted – Shikhar Insurance Company Limited (SICL)
+2022-02-06,JFL,price_adjustment,206556,Price Adjusted – Janaki Finance Limited (JFL)
+2022-02-06,JLI,price_adjustment,206557,Price Adjusted – Jyoti Life Insurance Company Limited (JLI)
+2022-02-06,LICN,price_adjustment,206558,Price Adjusted – Life Insurance Co. Nepal Limited (LICN)
+2022-02-10,IGI,price_adjustment,206562,Price Adjusted – IME General Insurance Limited (IGI)
+2022-02-13,LBBL,bonus_listing,206564,Listing 13% Bonus Shares of Lumbini Bikas Bank Limited – LBBL
+2022-02-13,BOKL,bonus_listing,206565,Listing 10% Bonus Shares of Bank of Kathmandu Limited – BOKL
+2022-02-13,HDL,bonus_listing,206566,Listing 75% Bonus Shares of Himalayan Distillery Limited (HDL)
+2022-02-13,ICFC,bonus_listing,206567,Listing 10% Bonus Shares of ICFC Finance Limited (ICFC)
+2022-02-13,MNBBL,bonus_listing,206568,Listing 17.575% Bonus Shares of Muktinath Bikas Bank Limited (MNBBL)
+2022-02-13,NCCB,bonus_listing,206569,Listing 8% Bonus Shares of Nepal Credit & Commerce Bank LImited (NCCB)
+2022-02-14,JBBL,bonus_listing,206570,Listing 11% Bonus Shares of Jyoti Bikas Bank Limited (JBBL)
+2022-02-14,NLO,bonus_listing,206571,Listing 30% Bonus Shares of Nepal Lube Oil Limited (NLO)
+2022-02-15,CLBSL,bonus_listing,206572,Listing 19% Bonus Shares of Civil Laghubitta Bittiya Sanstha Limited – CLBSL
+2022-02-15,MLBSL,bonus_listing,206573,Listing 47.5% Bonus Shares of Mahila Laghubitta Bittiya Sanstha Limited – MLBSL
+2022-02-15,MERO,bonus_listing,206574,Listing 20% Bonus Shares of Mero Microfinance Laghubitta Bittiya Sanstha Limited – MERO
+2022-02-15,NIB,bonus_listing,206575,Listing 12.611% Bonus Shares of Nepal Investment Bank Limited – NIB
+2022-02-16,SCB,bonus_listing,206576,Listing 10% Bonus Shares of Standard Chartered Bank Limited – SCB
+2022-02-17,CBL,bonus_listing,206577,Listing 5% Bonus Shares of Civil Bank Limited – CBL
+2022-02-17,NIFRA,bonus_listing,206578,Listing 8% Bonus Shares of Nepal Infrastructure Bank Limited – NIFRA
+2022-02-17,SHINE,bonus_listing,206581,Listing 10.93% Bonus Shares of Shine Resunga Development Bank Limited – SHINE
+2022-02-20,SRBL,bonus_listing,206582,Listing 6.65% Bonus Shares of Sunrise Bank Limited – SRBL
+2022-02-20,LBL,bonus_listing,206583,Listing 8% Bonus Shares of Laxmi Bank Limited – LBL
+2022-02-20,NBB,bonus_listing,206584,Listing 12% Bonus Shares of Nepal Bangladesh Bank Limited – NBB
+2022-02-20,GLICL,bonus_listing,206585,Listing 5.5004% Bonus Shares of Gurans Life Insurance Company Limited – GLICL
+2022-02-21,GFCL,bonus_listing,206588,Listing 9.1% Bonus Shares of Goodwill Finance Company Limited – GFCL
+2022-02-21,NBL,bonus_listing,206589,Listing 14% Bonus Shares of Nepal Bank Limited – NBL
+2022-02-22,FMDBL,bonus_listing,206591,Listing 10% Bonus Shares of First Microfinance Laghubitta Bittiya Sanstha Limited – FMDBL
+2022-02-22,BPCL,bonus_listing,206592,Listing 10% Bonus Shares of Butwal Power Company Limited – BPCL
+2022-02-22,GBIME,bonus_listing,206593,Listing 10% Bonus Shares of Global IME Bank Limited – GBIME
+2022-02-22,PRVU,bonus_listing,206594,Listing 12% Bonus Shares of Prabhu Bank Limited – PRVU
+2022-02-23,MDB,bonus_listing,206595,Listing 13.30% Bonus Shares of Miteri Development Bank Limited -MDB
+2022-02-23,GMFIL,bonus_listing,206596,Listing 10% Bonus Shares of Guheshowori Merchant Banking & Finance Limited – GMFIL
+2022-02-24,NHPC,price_adjustment,206597,Price Adjusted - National Hydro Power Company Limited (NHPC)
+2022-02-27,PCBL,bonus_listing,206599,Listing 16% Bonus Shares of Prime Commercial Bank Limited -PCBL
+2022-02-27,SBL,bonus_listing,206600,Listing 14.25% Bonus Shares of Siddhartha Bank Limited -SBL
+2022-02-27,ADBL,bonus_listing,206601,Listing 20% Bonus Shares of Agricultural Development Bank Limited -ADBL
+2022-02-27,HGI,price_adjustment,206602,Price Adjusted - Himalayan General Insurance Company Limited (HGI)
+2022-03-02,CCBL,bonus_listing,206604,Listing 5.75% Bonus Shares of Century Commercial Bank Limited – CCBL
+2022-03-02,PIC,bonus_listing,206605,Listing 14.25% Bonus Shares of Premier Insurance Company Limited – PIC
+2022-03-02,SLICL,bonus_listing,206606,Listing 12.70% Bonus Shares of Surya Life Insurance Company Limited – SLICL
+2022-03-04,ENL,ipo_listing,206607,Listing IPO Shares of Emering Nepal Limited – ENL
+2022-03-04,NLICL,price_adjustment,206609,Price Adjusted – National Life Insurance Company Limited (NLICL)
+2022-03-06,CHCL,bonus_listing,206611,Listing 7.5% Bonus Shares of Chilime Hydropower Company Limited -CHCL
+2022-03-09,GBBL,fund_listing,206612,Listing Shares of Garima Bikas Bank Limited - GBBL
+2022-03-10,RULB,ipo_listing,206615,Listing IPO Shares of Rastra Utthan Laghubitta Bittiya Sanstha Limited – RULB
+2022-03-11,JALPA,ipo_listing,206616,Listing IPO Shares of Jalpa Samudayik Laghubitta Bittiya Sanstha Limited – JALPA
+2022-03-14,NIL,price_adjustment,206617,Price Adjusted – Neco Insurance Company Limited (NIL)
+2022-03-16,GBBL,price_adjustment,206619,Price Adjusted – Garima Bikas Bank Limited (GBBL)
+2022-03-16,NLG,price_adjustment,206620,Price Adjusted – NLG Insurance Company Limited (NLG)
+2022-03-20,EBL,bonus_listing,206623,Listing 6% Bonus Shares of Everest Bank Limited – EBL
+2022-03-20,NMB,bonus_listing,206624,Listing 12.50% Bonus Shares of NMB Bank Limited – NMB
+2022-03-20,GMFBS,bonus_listing,206625,Listing 19% Bonus Shares of Ganapati Laghubitta Bittya Santha Limited – GMFBS
+2022-03-20,NLIC,price_adjustment,206628,Price Adjusted – Nepal Life Insurance Company Limited (NLIC)
+2022-03-21,PFL,bonus_listing,206631,Listing 8.075% Bonus Shares of Pokhara Finance Limited – PFL
+2022-03-21,PLIC,bonus_listing,206632,Listing 15% Bonus Shares of Prime Life Insurance Company Limited – PLIC
+2022-03-21,SBI,bonus_listing,206633,Listing 3.50% Bonus Shares of Nepal SBI Bank Limited– SBI
+2022-03-21,WOMI,bonus_listing,206634,Listing 20% Bonus Shares of Womi Laghubitta Bittiya Sanstha Limited – WOMI
+2022-03-22,SKBBL,bonus_listing,206635,Listing 25% Bonus Shares of Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited -SKBBL
+2022-03-23,NABBC,right_listing,206636,Listing 100% Right Shares of Narayani Development Bank Limited – NABBC
+2022-03-24,NTC,price_adjustment,206639,Price Adjusted – Nepal Doorsanchar Company Limited (NTC)
+2022-03-24,JBLB,price_adjustment,206641,Price Adjusted – Jeevan Bikas Lagbhubitta Bittiya Sanstha Limited (JBLB)
+2022-03-25,MFIL,bonus_listing,206643,Listing 40% Bonus Shares of Manjushree Finance Limited – MFIL
+2022-03-25,NRN,bonus_listing,206645,Listing 5% Bonus Shares of NRN Infrastructure & Development Limited – NRN
+2022-03-25,SLICL,promoter_conversion,206647,Conversion of Promoter Shares of Surya Life Insurance Company Limited - SLICL
+2022-03-27,ALICL,bonus_listing,206648,Listing 25% Bonus Shares of Asian Life Insurance Company Limited – ALICL
+2022-03-27,SABSL,bonus_listing,206649,Listing 31.05% Bonus Shares of Sabaiko Laghubitta Bittiya Sanstha Limited – SABSL
+2022-03-27,CCBL,promoter_conversion,206650,Conversion of Promoter Shares of Century Commercial Bank Limited - CCBL
+2022-03-27,API,price_adjustment,206651,Price Adjusted – Api Power Company Limited (API)
+2022-03-27,NESDO,ipo_listing,206652,Listing IPO Shares of NESDO Sambridha Laghubitta Bittiya Sanstha Limited – NESDO
+2022-03-28,STC,price_adjustment,206654,Price Adjusted- Salt Trading Corporation Limited (STC)
+2022-03-29,NABIL,bonus_listing,206656,Listing 33.60% Bonus Shares of Nabil Bank Limited – NABIL
+2022-03-29,EDBL,bonus_listing,206657,Listing 12% Bonus Shares of Excel Development Bank Limited – EDBL
+2022-03-29,SMFBS,bonus_listing,206658,Listing 32.30% Bonus Shares of Swabhimaan Laghubitta Bittiya Sanstha Limited – SMFBS
+2022-03-29,RMDC,bonus_listing,206659,Listing 20% Bonus Shares of RMDC Laghubitta Bittiya Sanstha Limited– RMDC
+2022-03-30,NMFBS,bonus_listing,206660,Listing 40% Bonus Shares of National Microfinance Laghubitta Bittiya Sanstha Limited – NMFBS
+2022-03-30,PRIN,price_adjustment,206661,Price Adjusted - Prabhu Insurance Limited (PRIN)
+2022-03-30,ACLBSL,price_adjustment,206662,Price Adjusted - Aarambha Chautari Laghubitta Bittiya Sanstha Limited (ACLBSL)
+2022-03-30,SIL,price_adjustment,206663,Price Adjusted -Siddhartha Insurance Limited (SIL)
+2022-03-31,GILB,bonus_listing,206667,Listing 28% Bonus Shares of Global IME Laghubitta Bittiya Sanstha Limited – GILB
+2022-04-03,NHDL,bonus_listing,206668,Listing 7% Bonus Shares of Nepal Hydro Developers Limited – NHDL
+2022-04-03,RLFL,bonus_listing,206669,Listing 15% Bonus Shares of Reliance Finance Limited – RLFL
+2022-04-05,NSLB,price_adjustment,206670,Price Adjusted – Naya Sarathi Laghubitta Bittiya Sanstha Limited (NSLB)
+2022-04-06,PICL,price_adjustment,206672,Price Adjusted - Prudential Insurance Company Limited (PICL)
+2022-04-07,VLBS,bonus_listing,206674,Listing 20.03% Bonus Shares of Vijaya laghubitta Bittiya Sanstha Limited – VLBS
+2022-04-07,IGI,price_adjustment,206675,Price Adjusted – IME General Insurance Limited (IGI)
+2022-04-12,ILBS,bonus_listing,206677,Listing 27.70% Bonus Shares of Infinity laghubitta Bittiya Sanstha Limited – ILBS
+2022-04-12,SLBS,bonus_listing,206678,Listing 20% Bonus Shares of Suryodaya laghubitta Bittiya Sanstha Limited – SLBS
+2022-04-12,CBLD88,debt_listing,206679,Listing Civil Bank Debenture 2088 - CBLD88
+2022-04-12,MLBL,bonus_listing,206680,Listing 20% Bonus Shares of Mahalaxmi Bikas Bank Limited - MLBL
+2022-04-17,GVL,ipo_listing,206683,Listing IPO Shares of Green Ventures Limited – GVL
+2022-04-17,SIFC,bonus_listing,206685,Listing 7.70% Bonus Shares of Shree Investment & Finance Company Limited – SIFC
+2022-04-17,CBBL,bonus_listing,206686,Listing 27% Bonus Shares of Chhimek Laghubitta Bittiya Sanstha Limited– CBBL
+2022-04-17,MKLB,bonus_listing,206687,Listing 17% Bonus Shares of Manakamana Smart Laghubitta Bittiya Sanstha Limited– MKLB
+2022-04-18,KMCDB,bonus_listing,206688,Listing 13% Bonus Shares of Kalika Laghubitta Bittiya Sanstha Limited– KMCDB
+2022-04-21,CHL,right_listing,206689,Listing 30% Right Shares of Chhyangdi Hydropower Limited – CHL
+2022-04-22,USLB,bonus_listing,206690,Listing 30% Bonus Shares of Unnati Sahakarya Laghubitta Bittiya Sanstha Limited– USLB
+2022-04-24,EIC,price_adjustment,206691,Price Adjusted – Everest Insurance Company Limited (EIC)
+2022-04-27,LICN,bonus_listing,206693,Listing 20% Bonus Shares of Life Insurance Corporation (Nepal) Limited -LICN
+2022-04-27,ALICL,promoter_conversion,206694,Conversion of Promoter Shares of Asian Life Insurance Company Limited - ALICL
+2022-04-28,SIC,price_adjustment,206696,Price Adjusted – Sagarmatha Insurance Company Limited (SIC)
+2022-05-02,SMATA,bonus_listing,206698,Listing 20% Bonus Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited – SMATA
+2022-05-02,HGI,bonus_listing,206699,Listing 6.65% Bonus Shares of Himalayan General Insurance Company Limited – HGI
+2022-05-02,NFS,price_adjustment,206700,Price Adjusted – Nepal Finance Limited (NFS)
+2022-05-05,MSLB,bonus_listing,206702,Listing 26% Bonus Shares of Mahuli Laghubitta Bittiya Sanstha Limited – MSLB
+2022-05-05,EBLD86,debt_listing,206704,Listing Everest Bank Limited Debenture 2086 - EBLD86
+2022-05-06,EIC,trading_halt,206706,मर्जर प्रयोजनका लागि धितोपत्रको दोस्रो बजार कारोबार रोक्का राखिएको बारे (EIC & HGI)
+2022-05-06,HGI,trading_halt,206706,मर्जर प्रयोजनका लागि धितोपत्रको दोस्रो बजार कारोबार रोक्का राखिएको बारे (EIC & HGI)
+2022-05-09,LICN,promoter_conversion,206711,Conversion of Promoter Shares of Life Insurance Corporation (Nepal) Limited - LICN
+2022-05-09,MPFL,bonus_listing,206712,Listing 13% Bonus Shares of Multipurpose Finance Limited – MPFL
+2022-05-10,SWMF,merger,206714,सूर्योदय वोमी लघुवित्त वित्तीय संस्था लिमिटेड (SWMF) को धितोपत्र सूचीकरण गरिएको बारे
+2022-05-17,GLICL,trading_halt,206715,"मर्जर प्रयोजनका लागि धितोपत्रको दोस्रो बजार कारोबार रोक्का राखिएको बारे - (PLIC, GLICL & ULI)"
+2022-05-17,PLIC,trading_halt,206715,"मर्जर प्रयोजनका लागि धितोपत्रको दोस्रो बजार कारोबार रोक्का राखिएको बारे - (PLIC, GLICL & ULI)"
+2022-05-17,ULI,trading_halt,206715,"मर्जर प्रयोजनका लागि धितोपत्रको दोस्रो बजार कारोबार रोक्का राखिएको बारे - (PLIC, GLICL & ULI)"
+2022-05-17,WNLB,trading_halt,206717,धितोपत्रको दोस्रो बजार कारोबार रोक्का गरिएको सम्बन्धमा - (WNLB)
+2022-05-17,NLICL,bonus_listing,206718,Listing 19% Bonus Shares of National Life Insurance Company Limited – NLICL
+2022-05-18,JLI,bonus_listing,206719,Listing 10% Bonus Shares of Jyoti Life Insurance Company Limited – JLI
+2022-05-19,WNLB,trading_resume,206720,धितोपत्रको दोस्रो बजार कारोबार फुकुवा गरिएको सम्वन्धमा - WNLB
+2022-05-20,PLIC,promoter_conversion,206721,Conversion of Promoter Shares of Prime Life Insurance Company Limited - PLIC
+2022-05-20,CORBL,right_listing,206722,Listing 150% Right Shares of Corporate Development Bank Limited – CORBL
+2022-05-24,STC,bonus_listing,206723,Listing 10% Bonus Shares of Salt Trading Corporation Limited – STC
+2022-05-24,CFCL,bonus_listing,206725,Listing 7.70% Bonus Shares of Central Finance Limited – CFCL
+2022-05-24,SFCL,right_listing,206726,Listing 50% Right Shares of Sambridhi Finance Company Limited – SFCL
+2022-05-24,BHL,ipo_listing,206727,Listing IPO Shares of Balephi Hydropower Limited – BHL
+2022-05-25,RSDC,bonus_listing,206729,Listing 10% Bonus Shares of RSDC Laghubitta Bittiya Sanstha Limited – RSDC
+2022-05-26,ULBSL,ipo_listing,206732,Listing IPO Shares of Upakar Laghubitta Bittiya Sanstha Limited – ULBSL
+2022-05-30,NIB,other,206733,आधारभूत शेयरधनीहरुको बाहेकको धितोपत्र कारोबार फकुवा सम्बन्धमा - NIB
+2022-05-30,NICL,price_adjustment,206734,Price Adjusted – Nepal Insurance Company Limited (NICL)
+2022-05-31,NIL,bonus_listing,206736,Listing 15% Bonus Shares of Neco Insurance Company Limited – NIL
+2022-05-31,SMB,bonus_listing,206737,Listing 30% Bonus Shares of Support Laghubitta Bittiya Sanstha Limited – SMB
+2022-05-31,WNLB,price_adjustment,206738,Price Adjusted – Wean Nepal Laghubitta Bittiya Sanstha Limited (WNLB)
+2022-06-01,PICL,bonus_listing,206742,Listing 7% Bonus Shares of Prudential Insurance Company Limited – PICL
+2022-06-02,KLBSL,price_adjustment,206743,Price Adjusted - Kisan Laghubitta Bittiya Sanstha Limited (KLBSL)
+2022-06-06,HBL,trading_resume,206745,Transactions Release Except Basic Shareholders of Himalayan Bank Limited -HBL
+2022-06-06,IGI,right_listing,206746,Listing 40% Right Shares of IME General Insurance Limited -IGI
+2022-06-09,NLIC,bonus_listing,206747,Listing 14% Bonus Shares of Nepal Life Insurance Company Limited -NLIC
+2022-06-09,AKBSL,trading_resume,206748,Transactions Release of Adhikhola Laghubitta Bittiya Sanstha Limited - AKBSL
+2022-06-10,SICL,right_listing,206749,Listing 30% Right Shares of Shikhar Insurance Company Limited - SICL
+2022-06-10,CYCL,ipo_listing,206750,Listing IPO Shares of Cyc Nepal Laghubitta Bitttiya Sanstha Limited -CYCL
+2022-06-13,MEGA,trading_halt,206751,Transactions Suspended of Mega Bank Nepal Limited (MEGA) & Nepal Investment Bank Limited (NIB)
+2022-06-13,NIB,trading_halt,206751,Transactions Suspended of Mega Bank Nepal Limited (MEGA) & Nepal Investment Bank Limited (NIB)
+2022-06-13,NLBBL,bonus_listing,206752,Listing 21.4876% Bonus Shares of Nerude Laghubitta Bittiya Sanstha Limited -NLBBL
+2022-06-15,RFPL,ipo_listing,206753,Listing IPO Shares of River Falls Power Limited - RFPL
+2022-06-16,BOKL,trading_halt,206754,Transactions Suspended of Global IME Bank Limited (GBIME) & Bank of Kathmandu Limited (BOKL)
+2022-06-16,GBIME,trading_halt,206754,Transactions Suspended of Global IME Bank Limited (GBIME) & Bank of Kathmandu Limited (BOKL)
+2022-06-16,SIL,bonus_listing,206757,Listing 15% Bonus Shares of Siddhartha Insurance Limited -SIL
+2022-06-20,PROFL,bonus_listing,206758,Listing 6% Bonus Shares of Progressive Finance Limited -PROFL
+2022-06-21,NRIC,bonus_listing,206759,Listing 16.50% Bonus Shares of Nepal Re-Insurance Company Limited -NRIC
+2022-06-21,NHPC,bonus_listing,206760,Listing 18.525% Bonus Shares of National Hydro Power Company Limited - NHPC
+2022-06-21,PRIN,bonus_listing,206761,Listing 11% Bonus Shares of Prabhu Insurance Limited - PRIN
+2022-06-21,NLG,bonus_listing,206762,Listing 10% Bonus Shares of NLG Insurance Company Limited - NLG
+2022-06-21,SLI,price_adjustment,206763,Price Adjusted - Sanima Life Insurance Limited (SLI)
+2022-06-22,JFL,bonus_listing,206765,Listing 15% Bonus Shares Janaki Finance Company Limited – JFL
+2022-06-27,JLI,trading_halt,206767,Transactions Suspended of SLICL & JLI
+2022-06-27,SLICL,trading_halt,206767,Transactions Suspended of SLICL & JLI
+2022-06-28,JSLBB,bonus_listing,206770,Listing 25% Bonus Shares of Janautthan Samudayik Laghubitta Bittiya Sanstha Limited - JSLBB
+2022-06-28,SMFDB,bonus_listing,206771,Listing 25.2854% Bonus Shares of Summit Laghubitta Bittiya Sanstha Limited - SMFDB
+2022-06-28,EIC,bonus_listing,206772,Listing 6% Bonus Shares of Everest Insurance Company Limited - EIC
+2022-06-28,LGIL,price_adjustment,206774,Price Adjusted - Lumbini General Insurance Company Limited (LGIL)
+2022-06-30,CCBD88,debt_listing,206778,Listing Century Debenture 2088- CCBD88
+2022-07-01,JBLB,bonus_listing,206780,Listing 70% Bonus Shares of Jeevan Bikas Laghubitta Bittiya Sanstha Limited- JBLB
+2022-07-03,NGPL,price_adjustment,206782,Price Adjusted – Ngadi Group Power Limited (NGPL)
+2022-07-05,FOWAD,bonus_listing,206784,Listing 35% Bonus Shares Forward Microfinance Laghubitta Bittiya Sanstha Limited – FOWAD
+2022-07-07,AKBSL,trading_halt,206785,कारोबार रोक्का राखिएको बारे - (CYCL) & (AKBSL)
+2022-07-07,CYCL,trading_halt,206785,कारोबार रोक्का राखिएको बारे - (CYCL) & (AKBSL)
+2022-07-11,NUBL,bonus_listing,206786,Listing 29.50% Bonus Shares Nirdhan Utthan Laghubitta Bittiya Sanstha Limited – NUBL
+2022-07-11,EDBL,price_adjustment,206787,Price Adjusted – Excel Development Bank Limited (EDBL)
+2022-07-12,PIC,trading_halt,206790,Transactions Suspended of SIL & PIC
+2022-07-12,SIL,trading_halt,206790,Transactions Suspended of SIL & PIC
+2022-07-13,RLI,trading_halt,206791,Transactions Suspended of SLI & RLI
+2022-07-13,SLI,trading_halt,206791,Transactions Suspended of SLI & RLI
+2022-07-13,DORDI,ipo_listing,206792,Listing IPO Shares of Dordi Khola Jal Bidyut Company Limited – DORDI
+2022-07-13,API,right_listing,206793,Listing 39.3633% Right Shares of Api Power Company Limited -API
+2022-07-14,LGIL,trading_halt,206796,मर्जर प्रयोजनका लागि कारोबार रोक्का राखिएको - SIC & LGIL
+2022-07-14,SIC,trading_halt,206796,मर्जर प्रयोजनका लागि कारोबार रोक्का राखिएको - SIC & LGIL
+2022-07-14,GIC,trading_halt,206797,मर्जर प्रयोजनका लागि कारोबार रोक्का राखिएको - GIC & SGI
+2022-07-14,SGI,trading_halt,206797,मर्जर प्रयोजनका लागि कारोबार रोक्का राखिएको - GIC & SGI
+2022-07-14,CBL,trading_halt,206798,Transactions Suspended of CBL
+2022-07-14,MLBBL,bonus_listing,206799,Listing 25% Bonus Shares of Mithila Laghubitta Bittiya Sanstha Limited - MLBBL
+2022-07-14,ACLBSL,bonus_listing,206800,Listing 19.62% Bonus Shares of Aarambha Chautari Laghubitta Bittiya Sanstha Limited - ACLBSL
+2022-07-15,PLI,trading_halt,206801,धितोपत्रको कारोबार रोक्का राखिएको बारे - PLI
+2022-07-15,SWBBL,bonus_listing,206802,Listing 19% Bonus Shares Swabalamban Laghubitta Bittiya Sanstha Limited – SWBBL
+2022-07-17,AIL,trading_halt,206803,मर्जर प्रयोजनका लागि कारोबार रोक्का गरिएको बारे - PRIN & AIL
+2022-07-17,PRIN,trading_halt,206803,मर्जर प्रयोजनका लागि कारोबार रोक्का गरिएको बारे - PRIN & AIL
+2022-07-17,BARUN,price_adjustment,206805,Price Adjusted – Barun Hydropower Company Limited (BARUN)
+2022-07-17,NSLB,bonus_listing,206807,Listing 19% Bonus Shares Naya Sarathi Laghubitta Bittiya Sanstha Limited – NSLB
+2022-07-20,HIDCL,bonus_listing,206808,Listing 8% Bonus Shares Hydroelectricity Investment and Dev Company Limited – HIDCL
+2022-07-20,IGI,bonus_listing,206809,Listing 7% Bonus Shares IME General Insurance Limited – IGI
+2022-07-24,NICL,bonus_listing,206811,Listing 11% Bonus Shares Nepal Insurance Company Limited – NICL
+2022-07-25,NICFC,fund_listing,206815,Listing NIC Asia Flexi CAP Fund (NICFC)
+2022-07-25,KDBY,fund_listing,206816,Listing Kumari Dhanabriddhi Yojana (KDBY)
+2022-07-27,KPCL,bonus_listing,206817,Listing 15% Bonus Shares Kalika Power Company Limited– KPCL
+2022-07-27,BHDC,ipo_listing,206820,Listing IPO Shares of Bindhyabasini Hydropower Development Company Limited – BHDC
+2022-07-31,GBBL,bonus_listing,206823,Listing 16% Bonus Shares Garima Bikas Bank Limited – GBBL
+2022-07-31,NFS,right_listing,206825,Listing 70% Right Shares of Nepal Finance Limited – NFS
+2022-07-31,HDHPC,other,206826,स्पष्टिकरण पेश गर्ने सम्बन्धमा - HDHPC
+2022-08-01,CCBL,trading_halt,206827,प्राप्ति प्रयोजनका लागि कारोबार रोक्का राखिएको - CCBL
+2022-08-01,HDHPC,trading_resume,206828,कारोबार फुकुवा गरिएको बारे - HDHPC
+2022-08-02,LEMF,dividend_book_closure,206829,Dividend Declaration of LUK & LEMF
+2022-08-02,LUK,dividend_book_closure,206829,Dividend Declaration of LUK & LEMF
+2022-08-02,NABIL,other,206830,धितोपत्रको सूचीकरण गरिएको - नबिल बैंक लिमिटेड (NABIL)
+2022-08-02,NMBMF,bonus_listing,206831,Listing 21.50% Bonus Shares NMB Microfinance Bittiya Sanstha Limited – NMBMF
+2022-08-02,SIC,bonus_listing,206832,Listing 20% Bonus Shares Sagarmatha Insurance Company Limited – SIC
+2022-08-04,NLIC,promoter_conversion,206834,Conversion of Promoter Shares of Nepal Life Insurance Company Limited - NLIC
+2022-08-05,NMB50,dividend_book_closure,206835,Dividend Declaration Notice of NMB50 & NMBHF1
+2022-08-05,NMBHF1,dividend_book_closure,206835,Dividend Declaration Notice of NMB50 & NMBHF1
+2022-08-05,HHL,ipo_listing,206836,Listing IPO Shares of Himalayan Hydropower Limited – HHL
+2022-08-05,NMB50,dividend_book_closure,206837,Book Closure Notice of NMB50 & NMBHF1
+2022-08-05,NMBHF1,dividend_book_closure,206837,Book Closure Notice of NMB50 & NMBHF1
+2022-08-09,NTC,bonus_listing,206839,Listing 20% Bonus Shares of Nepal Doorsanchar Company Limited - NTC
+2022-08-09,CIT,price_adjustment,206840,Price Adjusted - Citizen Investment Trust (CIT)
+2022-08-09,HEI,merger,206842,Listing Shares of Himalayan Everest Insurance Limited - HEI
+2022-08-10,HBL,bonus_listing,206843,Listing 21.38% Bonus Shares of Himalayan Bank Limited - HBL
+2022-08-10,UHEWA,ipo_listing,206844,Listing IPO Shares of Upper Hewakhola Hydropower Company Limited - UHEWA
+2022-08-10,PBD88,debt_listing,206846,Listing 10% Prime Debenture 2088 - PBD88
+2022-08-11,SEF,dividend_book_closure,206847,Dividend Declaration of SEF & SIGS2
+2022-08-11,SIGS2,dividend_book_closure,206847,Dividend Declaration of SEF & SIGS2
+2022-08-11,SEF,dividend_book_closure,206848,Book Closure Notice of SEF & SIGS2
+2022-08-11,SIGS2,dividend_book_closure,206848,Book Closure Notice of SEF & SIGS2
+2022-08-14,RIDI,merger,206850,Listing Shares of Ridi Power Company Limited – RIDI
+2022-08-15,NMB50,price_adjustment,206851,Price Adjusted – NMB 50 (NMB50)
+2022-08-15,NMBHF1,price_adjustment,206852,Price Adjusted – NMB Hybridy fund L-1 (NMBHF1)
+2022-08-16,MHL,ipo_listing,206855,Listing IPO Shares of Mandakini Hydropower Limited – MHL
+2022-08-16,SGHC,ipo_listing,206856,Listing IPO Shares of Swet–Ganga Hydropower & Construction Limited – SGHC
+2022-08-16,USHEC,ipo_listing,206857,Listing IPO Shares of Upper Solu Hydro Electric Company Limited – USHEC
+2022-08-16,SBLD89,debt_listing,206858,Listing 10.75% SBL Debenture 2089 - SBLD89
+2022-08-21,ADBLB87,debt_listing,206859,"Listing Additional 9 Years, 4% Agricultural Bond (ADBLB87)"
+2022-08-22,SIGS2,price_adjustment,206861,Price Adjusted - Siddhartha Investment Growth Scheme-2 (SIGS2)
+2022-08-25,HIDCL,price_adjustment,206862,Listing Right Shares ( Auction of Promoter) of HIDCL
+2022-08-25,NIBLPF,dividend_book_closure,206863,Dividend Declaration of NIBL Pragati Fund - NIBLPF
+2022-08-26,RADHI,price_adjustment,206864,Price Adjusted - Radhi Bidyut Company Limited (RADHI)
+2022-08-29,HEIPO,merger,206866,Regarding opening price range of HEIPO
+2022-08-30,SFMF,dividend_book_closure,206867,Dividend Declaration of Sunrise First Mutual Fund - SFMF
+2022-08-30,SBD89,debt_listing,206868,Listing 10.25% Sanima Debenture 2089 (SBD89)
+2022-08-30,GIBF1,fund_listing,206869,Listing Global IME Balanced Fund – 1 (GIBF1)
+2022-08-30,RHGCL,ipo_listing,206870,Listing IPO Shares of Rapti Hydro And General Construction Limited – RHGCL
+2022-09-02,SBID83,debt_listing,206873,Listing 10.25% Nepal SBI Bank Debenture 2083 - SBID83
+2022-09-02,NRIC,price_adjustment,206874,Price Adjusted- Nepal Re-Insurance Company Limited - NRIC
+2022-09-04,NIBLPF,dividend_book_closure,206876,Book Closure Notice of NIBL Pragati Fund- NIBLPF
+2022-09-05,LGIL,bonus_listing,206877,Listing 9.5% Bonus Shares of Lumbini General Insurance Company Limited – LGIL
+2022-09-06,PBD84,debt_listing,206878,Listing 10.15% Prime Debenture 2084- PBD84
+2022-09-07,SFMF,dividend_book_closure,206880,Book Closure Notice of Sunrise First Mutual Fund - SFMF
+2022-09-13,SAEF,dividend_book_closure,206881,Dividend Declaration of Sanima Equity Fund -SAEF
+2022-09-13,SFMF,price_adjustment,206882,Price Adjusted - Sunrise First Mutual Fund (SFMF)
+2022-09-15,MMFDB,bonus_listing,206884,Listing 20% Bonus Shares of Mirmire Laghubitta Bittiya Sanstha Limited -MMFDB
+2022-09-18,SAEF,dividend_book_closure,206886,Book Closure Notice of Sanima Equity Fund -SAEF
+2022-09-18,ALICL,price_adjustment,206887,Price Adjusted- Asian Life Insurance Company Limited (ALICL)
+2022-09-22,SAEF,price_adjustment,206889,Price Adjusted- Sanima Equity Fund (SAEF)
+2022-09-22,EBLCP,other,206890,Delisting 7% Covertible Preference Shares of Everest Bank Limited -EBLCP
+2022-09-23,AVYAN,ipo_listing,206892,Listing IPO Shares of Aviyan Laghubitta Bittiya Sanstha Limited -AVYAN
+2022-09-23,EBLD85,debt_listing,206893,Listing 10.50% Everest Bank Limited Debenture 2085 - EBLD85
+2022-09-27,KBL,trading_halt,206894,शेयर कारोबार रोक्का राखिएको - KBL & NCCB
+2022-09-27,NCCB,trading_halt,206894,शेयर कारोबार रोक्का राखिएको - KBL & NCCB
+2022-09-29,NLO,price_adjustment,206896,Price Adjusted- Nepal Lube Oil Limited (NLO)
+2022-10-09,ADLB,trading_halt,206897,transactions suspended of Adarsha laghubitta bittiya sasntha limited-ADLB
+2022-10-11,GLICL,price_adjustment,206898,Price Adjusted- Gurans Life Insurance Company Limited (GLICL)
+2022-10-12,NBF2,dividend_book_closure,206900,Dividend Declaration of NEF & NBF2
+2022-10-12,NEF,dividend_book_closure,206900,Dividend Declaration of NEF & NBF2
+2022-10-12,NBF2,trading_halt,206901,Transactions Suspended of NEF & NBF2
+2022-10-12,NEF,trading_halt,206901,Transactions Suspended of NEF & NBF2
+2022-10-12,CIT,bonus_listing,206902,Listing 30% Bonus Shares of Citizen Investment Trust - CIT
+2022-10-12,RURU,price_adjustment,206904,Price Adjusted- RU RU Jalbidhyut Pariyojana Limited (RURU)
+2022-10-13,NMFBS,trading_halt,206905,Tranasctions Suspended of NMFBS & SMFDB
+2022-10-13,SMFDB,trading_halt,206905,Tranasctions Suspended of NMFBS & SMFDB
+2022-10-13,SPHL,ipo_listing,206906,Listing IPO Shares of Sayapatri Hydropower Limited - SPHL
+2022-10-13,PPL,ipo_listing,206907,"Listing IPO Shares of People""s Power Limited - PPL"
+2022-10-16,NICBF,dividend_book_closure,206908,Dividend Announcement Notice of NICBF & NICGF
+2022-10-16,NICGF,dividend_book_closure,206908,Dividend Announcement Notice of NICBF & NICGF
+2022-10-16,NICBF,dividend_book_closure,206909,Book Closure Notice of NICBF & NICGF
+2022-10-16,NICGF,dividend_book_closure,206909,Book Closure Notice of NICBF & NICGF
+2022-10-20,DLBS,ipo_listing,206910,Listing IPO Shares of Dhaulagiri Laghubitta Bittiya Sanstha Limited - DLBS
+2022-10-31,NCCB,price_adjustment,206913,Price Adjusted - Nepal Credit & Commerce Bank Limited (NCCB)
+2022-10-31,NICBF,price_adjustment,206914,Price Adjusted - NIC ASIA Balanced Fund (NICBF)
+2022-10-31,NICGF,price_adjustment,206915,Price Adjusted- NIC ASIA Growth Fund (NICGF)
+2022-11-03,HIDCL,right_listing,206919,Listing Right Shares (Auction of Promoter) of HIDCL
+2022-11-03,AKPL,price_adjustment,206920,Price Adjusted - Arun Kabeli Power Limited (AKPL)
+2022-11-06,GBBL,other,206922,Listing Promoter Shares of Garima Bikas Bank Limited - GBBL
+2022-11-09,NSIF2,fund_listing,206926,Listing NMB Sulav Investment Fund - 2 (NSIF2)
+2022-11-11,NGPL,right_listing,206928,Listing 150% Right Shares of Ngadi Group Power Limited – NGPL
+2022-11-14,SIKLES,ipo_listing,206929,Listing IPO Shares of Sikles Hydropower Limited – SIKLES
+2022-11-14,KLBS,ipo_listing,206930,Listing IPO Shares of Khaptad Laghubitta Bittiya Sanstha Limited – KLBS
+2022-11-14,KBLD89,debt_listing,206931,Listing 11% KBL Debenture 2089 - KBLD89
+2022-11-18,NIB,trading_resume,206936,Transactions Release (Except Basic Shareholders) of Nepal Investment Bank Limited - NIB
+2022-11-18,MEGA,trading_resume,206937,Transactions Release ( Except Basic Shareholders) of Mega Bank Nepal Limited -MEGA
+2022-11-22,CBL,trading_resume,206938,Transactions Release (Except Basic Shareholders) of Civil Bank Limited -CBL
+2022-11-22,GBIME,price_adjustment,206939,Price Adjusted - Global IME Bank Limited (GBIME)
+2022-11-23,RIDI,trading_halt,206941,शेयर कारोबार रोक्का राखिएको - Ridi Power Company Limited (RIDI)
+2022-11-23,SKBBL,trading_resume,206942,Transactions Release (Except Basic Shareholders) of SKBBL
+2022-11-23,RMDC,trading_resume,206943,Transactions Release (Except Basic Shareholders) of RMDC
+2022-11-24,NLICL,price_adjustment,206946,Price Adjusted- National Life Insurance Company Limited (NLICL)
+2022-11-24,KBL,trading_resume,206947,Transactions Release (Except Basic Shareholders) of Kumari Bank Limited -KBL
+2022-11-24,BOKL,price_adjustment,206948,Price Adjusted - Bank of Kathmandu Limited (BOKL)
+2022-11-27,CCBL,trading_resume,206950,Transactions Release (Except Basic Shareholders) of CCBL
+2022-11-28,ALICL,bonus_listing,206951,Listing 14.50% Bonus Shares of Asian Life Insurance Company Limited -ALICL
+2022-11-28,NCCB,trading_resume,206952,Transactions Release (Except Basic Shareholders) of NCCB
+2022-11-28,SIL,trading_resume,206953,Transactions Release (Except Basic Shareholders) of SIL
+2022-11-28,EBL,price_adjustment,206954,Price Adjusted- Everest Bank Limited (EBL)
+2022-11-29,SLI,bonus_listing,206956,Listing 4.20% Bonus Shares of Sanima Life Insurance Limited - SLI
+2022-11-30,ADLB,trading_resume,206957,Transactions Release (Except Basic Shareholders) of ADLB
+2022-12-01,PRIN,trading_resume,206958,Transactions Release (Except Basic Shareholders) of PRIN
+2022-12-01,PIC,trading_resume,206959,Transactions Release (Except Basic Shareholders) of PIC
+2022-12-04,AIL,trading_resume,206961,Transactions Release (Except Basic Shareholders) of AJOD Insurance Limited (AIL)
+2022-12-04,BARUN,right_listing,206962,Listing 100% Right Shares of Barun Hydropower Company Limited -BARUN
+2022-12-04,RIDI,trading_resume,206963,Transactions Release of Ridi Power Company Limited -RIDI
+2022-12-04,SANIMA,price_adjustment,206964,Price Adjusted- Sanima Bank Limited (SANIMA)
+2022-12-06,GBIME,trading_resume,206966,Transactions Release (Except Basic Shareholders) of GBIME
+2022-12-06,BOKL,trading_resume,206967,Transactions Release (Except Basic Shareholders) of BOKL
+2022-12-06,NMFBS,trading_resume,206968,Transactions Release (Except Basic Shareholders) of NMFBS
+2022-12-06,NADEP,trading_resume,206969,Transactions Release (Except Basic Shareholders) of NADEP
+2022-12-06,NIB,price_adjustment,206970,Price Adjusted – Nepal Investment Bank Limited (NIB)
+2022-12-07,SMFDB,trading_resume,206972,Transactions Release (Except Basic Shareholders) of SMFDB
+2022-12-07,SLI,trading_resume,206973,Transactions Release (Except Basic Shareholders) of SLI
+2022-12-07,MEGA,price_adjustment,206974,Price Adjusted – Mega Bank Nepal Limited (MEGA)
+2022-12-09,CYCL,trading_resume,206977,Transactions Release (Except Basic Shareholders) of CYCL
+2022-12-13,SHLB,ipo_listing,206978,Listing IPO Shares of Shrijanshil Laghubitta Bittiya Sanstha Limited – SHLB
+2022-12-13,PHCL,ipo_listing,206979,Listing IPO Shares of Peoples Hydropower Company Limited – PHCL
+2022-12-13,EHPL,ipo_listing,206980,Listing IPO Shares of Eastern Hydropower Limited – EHPL
+2022-12-14,RLI,trading_resume,206981,Transactions Release (Except Basic Shareholders) of RLI
+2022-12-14,RADHI,right_listing,206983,Listing 147.52% Right Shares of Radhi Bidyut Company Limited - RADHI
+2022-12-15,SPC,trading_resume,206984,कारोबार फुकुवा गरिएको - Samling Power Company Limited (SPC)
+2022-12-15,PRVU,price_adjustment,206985,Price Adjusted – Prabhu Bank Limited (PRVU)
+2022-12-15,CHCL,price_adjustment,206986,Price Adjusted – Chilime Hydropower Company Limited (CHCL)
+2022-12-18,CCBL,price_adjustment,206990,Price Adjusted – Century Commercial Bank Limited (CCBL)
+2022-12-19,AKBSL,trading_resume,206992,Transactions Release (Except Basic Shareholders) of AKBSL
+2022-12-19,MMFDB,fund_listing,206993,Listing Shares of Mirmire Lagubitta Bittiya Sanstha Limited – MMFDB
+2022-12-21,NCCB,bonus_listing,206994,Listing 3.3663% Bonus Shares of Nepal Credit & Commerce Bank Limited -NCCB
+2022-12-21,SHL,price_adjustment,206996,Price Adjusted- Soaltee Hotel Limited (SHL)
+2022-12-21,CFCL,trading_halt,206997,Transactions Suspended of Central Finance Limited -CFCL
+2022-12-22,GBBL,price_adjustment,207000,Price Adjusted – Garima Bikas Bank Limited (GBBL)
+2022-12-22,NICL,price_adjustment,207001,Price Adjusted – Nepal Insurance Company Limited (NICL)
+2022-12-22,MHNL,trading_halt,207002,Transactions Suspended of Mountain Hydro Nepal Limited -MHNL
+2022-12-22,PLIC,price_adjustment,207003,Price Adjusted – Prime Life Insurance Company Limited (PLIC)
+2022-12-23,NHDL,price_adjustment,207008,Price Adjusted - Nepal Hydro Developers Limited (NHDL)
+2022-12-23,JLI,promoter_conversion,207009,Conversion of Promoter Shares of Jyoti Life Insurance Company Limited - JLI
+2022-12-26,SHINE,price_adjustment,207014,Price Adjusted – Shine Resunga Development Bank Limited (SHINE)
+2022-12-27,PLI,trading_resume,207017,Transactions Release (Except Basic Shareholders) of PLI
+2022-12-27,CFCL,trading_resume,207018,Transactions Release of Central Finance Limited -CFCL
+2022-12-27,BHDC,price_adjustment,207019,Price Adjusted – Bindhyabasini Hydropower Development Company Limited (BHDC)
+2022-12-27,LBBL,price_adjustment,207020,Price Adjusted – Lumbini Bikas Bank Limited (LBBL)
+2022-12-27,RADHI,price_adjustment,207021,Price Adjusted – Radhi Bidyut Company Limited (RADHI)
+2022-12-27,SBI,price_adjustment,207023,Price Adjusted – Nepal SBI Bank Limited (SBI)
+2022-12-27,SBL,price_adjustment,207024,Price Adjusted – Siddhartha Bank Limited (SBL)
+2022-12-28,MDB,price_adjustment,207031,Price Adjusted – MDB
+2022-12-28,HIDCL,price_adjustment,207034,Price Adjusted – HIDCL
+2022-12-28,NBL,price_adjustment,207035,Price Adjusted – NBL
+2022-12-28,PCBL,price_adjustment,207036,Price Adjusted – PCBL
+2022-12-29,FMDBL,price_adjustment,207041,Price Adjusted - FMDBL
+2022-12-29,FOWAD,price_adjustment,207042,Price Adjusted - FOWAD
+2022-12-29,KBL,trading_halt,207043,Transactions Suspended of KBL & NCCB
+2022-12-29,NCCB,trading_halt,207043,Transactions Suspended of KBL & NCCB
+2022-12-29,KPCL,price_adjustment,207044,Price Adjusted - KPCL
+2022-12-29,RSDC,price_adjustment,207045,Price Adjusted - RSDC
+2022-12-29,UIC,price_adjustment,207046,Price Adjusted - UIC
+2023-01-01,BPCL,price_adjustment,207052,Price Adjusted – BPCL
+2023-01-01,HBL,price_adjustment,207053,Price Adjusted - HBL
+2023-01-01,MLBL,price_adjustment,207054,Price Adjusted - MLBL
+2023-01-01,NABIL,price_adjustment,207055,Price Adjusted - NABIL
+2023-01-01,SIL,price_adjustment,207056,Price Adjusted – SIL
+2023-01-02,BHPL,ipo_listing,207062,Listing IPO Shares of Barahi Hydropower Public Limited – BHPL
+2023-01-02,SFCL,right_listing,207063,Listing Right Shares of Samriddhi Finance Company Limited – SFCL
+2023-01-02,CYCL,price_adjustment,207065,Price Adjusted - CYCL
+2023-01-02,ICFC,price_adjustment,207066,Price Adjusted - ICFC
+2023-01-02,PFL,price_adjustment,207067,Price Adjusted - PFL
+2023-01-02,SIFC,price_adjustment,207068,Price Adjusted - SIFC
+2023-01-02,CBL,price_adjustment,207069,Price Adjusted - CBL
+2023-01-03,GLBSL,price_adjustment,207075,Price Adjusted - GLBSL
+2023-01-03,HDL,price_adjustment,207076,Price Adjusted - HDL
+2023-01-03,MMFDB,price_adjustment,207077,Price Adjusted - MMFDB
+2023-01-03,MNBBL,price_adjustment,207078,Price Adjusted - MNBBL
+2023-01-03,SDLBSL,price_adjustment,207079,Price Adjusted - SDLBSL
+2023-01-04,DDBL,bonus_listing,207086,Listing 20% Bonus Shares of Deprosc Laghubitta Bittiya Sanstha Limited – DDBL
+2023-01-05,EBL,debt_listing,207087,Listing Shares (Converted Preference Shares) of EBL
+2023-01-05,MERO,price_adjustment,207088,Price Adjusted - MERO
+2023-01-05,PIC,price_adjustment,207089,Price Adjusted – PIC
+2023-01-06,BOKL,bonus_listing,207092,Listing 6% Bonus Shares of Bank of Kathmandu Limited –BOKL
+2023-01-08,BOKL,trading_halt,207093,Transactions Suspended of GBIME & BOKL
+2023-01-08,GBIME,trading_halt,207093,Transactions Suspended of GBIME & BOKL
+2023-01-09,CCBL,trading_halt,207094,Transactions Suspended of CCBL
+2023-01-10,MLBSL,trading_halt,207096,Transactions Suspended of MLBSL
+2023-01-10,MSLB,trading_halt,207097,Transactions Suspended of MSLB
+2023-01-10,MEGA,trading_halt,207098,Transactions Suspended of NIB & MEGA
+2023-01-10,NIB,trading_halt,207098,Transactions Suspended of NIB & MEGA
+2023-01-10,IGI,price_adjustment,207099,Price Adjusted – IGI
+2023-01-12,CORBL,dividend_book_closure,207101,Dividend Declaration of CORBL
+2023-01-12,STC,trading_halt,207102,Transactions Suspended of STC
+2023-01-13,AKBSL,bonus_listing,207103,Listing 19% Bonus Shares of Adhikhola Laghubitta Bittiya Sanstha Limited – AKBSL
+2023-01-16,NIL,price_adjustment,207104,Price Adjusted - NIL
+2023-01-16,AKBSL,price_adjustment,207105,Price Adjusted - AKBSL
+2023-01-17,STC,trading_resume,207108,Transactions Release of STC
+2023-01-17,MLBSL,trading_resume,207109,Transactions Release of MLBSL
+2023-01-17,MSLB,trading_resume,207110,Transactions Release of MSLB
+2023-01-18,GLICL,bonus_listing,207111,Listing 7.4425% Bonus Shares of Gurans Life Insurance Company Limited -GLICL
+2023-01-18,MEGA,bonus_listing,207112,Listing 4% Bonus Shares of Mega Bank Nepal Limited -MEGA
+2023-01-18,RURU,bonus_listing,207113,Listing 10% Bonus Shares of RU RU Jalbidhyut Pariyojana Limited -RURU
+2023-01-19,KBL,merger,207114,Listing Shares of Kumari Bank Limited (KBL) After Merger
+2023-01-19,SGIC,merger,207115,Listing Shares of Sanima GIC Insurance Limited (SGIC) After Merger
+2023-01-23,NMFBS,trading_halt,207116,Transactions Suspended of NMFBS
+2023-01-23,EDBL,bonus_listing,207117,Listing 8.5% Bonus Shares of Excel Development Bank Limited -EDBL
+2023-01-24,NMFBS,trading_resume,207119,Transactions Release of NMFBS
+2023-01-25,PRIN,trading_resume,207120,आधारभूत शेयरधनीको शेयर कारोबार फुकुवा गरिएको बारे - PRIN
+2023-01-25,LGIL,trading_resume,207121,Transactions Release (Except Basic Shareholders) of LGIL
+2023-01-25,SIC,trading_resume,207122,Transactions Release (Except Basic Shareholders) of SIC
+2023-01-29,ULI,price_adjustment,207123,Price Adjusted- ULI
+2023-01-30,CBL,bonus_listing,207125,Listing 5% Bonus Shares of Civil Bank Limited - CBL
+2023-01-30,KLBSL,bonus_listing,207126,Listing 20% Bonus Shares of Kisan Laghubitta Bittiya Sanstha Limited - KLBSL
+2023-01-30,ULI,trading_resume,207127,Transactions Release (Except Basic Shareholders) of ULI
+2023-01-30,GLICL,trading_resume,207128,Transactions Release (Except Basic Shareholders) of GLICL
+2023-01-30,PLIC,trading_resume,207129,Transactions Release (Except Basic Shareholders) of PLIC
+2023-01-30,SICL,price_adjustment,207130,Price Adjusted - SICL
+2023-01-30,NLBBL,price_adjustment,207131,Price Adjusted - NLBBL
+2023-01-31,NIB,bonus_listing,207135,Listing 4% Bonus Shares of Nepal Investment Bank Limited -NIB
+2023-01-31,RIDI,price_adjustment,207136,Price Adjusted - RIDI
+2023-01-31,AHPC,price_adjustment,207137,Price Adjusted - AHPC
+2023-02-01,HBLD86,debt_listing,207140,"Listing Himalayan Bank Limited Bond, 2086 -HBLD86"
+2023-02-02,GMFIL,price_adjustment,207141,Price Adjusted - GMFIL
+2023-02-05,SBID79,other,207143,Delisting 8% Nepal SBI Bank Debenture 2079 - SBID79
+2023-02-07,SAGF,fund_listing,207145,Listing Sanima Growth Fund (SAGF)
+2023-02-07,NIBLGF,fund_listing,207146,Listing NIBL Growth Fund (NIBLGF)
+2023-02-09,VLBS,trading_halt,207150,Transactions Suspended of VLBS
+2023-02-12,GBIME,bonus_listing,207157,Listing 3% Bonus Shares of Global IME Bank Limited - GBIME
+2023-02-12,NLICL,bonus_listing,207158,Listing 15% Bonus Shares of National Life Insurance Co. Ltd. - NLICL
+2023-02-15,ULBSL,price_adjustment,207165,Price Adjusted - Upakar Laghubitta Bittiya Sanstha Limited
+2023-02-15,API,price_adjustment,207166,Price Adjusted - Api Power Company Limited
+2023-02-16,HDL,bonus_listing,207171,Listing 60% Bonus Shares of Himalayan Distillery Limited – HDL
+2023-02-16,UNLB,other,207172,Listing Shares of Unique Nepal Laghubitta Bittiya Sanstha Limited - UNLB
+2023-02-16,MLBBL,price_adjustment,207173,Price Adjusted – Mithila Laghubitta Bittiya sanstha Limited
+2023-02-16,MLBSL,price_adjustment,207175,Price Adjusted – Mahila Laghubitta Bittiya sanstha Limited
+2023-02-17,HBL,bonus_listing,207176,Listing 8% Bonus Shares of Himalayan Bank Limited - HBL
+2023-02-17,RADHI,bonus_listing,207177,Listing 4.75% Bonus Shares of Radhi Bidyut Company Limited - RADHI
+2023-02-20,GBIME,merger,207182,Listing Shares of Global IME Bank Limited After Merger - GBIME
+2023-02-20,CORBL,price_adjustment,207183,Price Adjusted – Corporate Development Bank Limited
+2023-02-20,SWBBL,price_adjustment,207184,Price Adjusted – Swabalamban Laghubitta Bittiya Sanstha Limited
+2023-02-20,NGPL,price_adjustment,207185,Price Adjusted – Ngadi Group Power Limited.
+2023-02-22,KLBSL,dividend_book_closure,207189,Dividend Declaration of Kisan Laghubitta Bittiya Sanstha Limited - KLBSL
+2023-02-22,NIMB,merger,207190,Listing Shares of Nepal Investment Mega Bank Limited After Merger - NIMB
+2023-02-22,EBL,bonus_listing,207191,Listing 13% Bonus Shares of Everest Bank Limited - EBL
+2023-02-23,CBL,trading_halt,207193,Transactions Suspended of Civil Bank Limited -CBL
+2023-02-23,CLBSL,price_adjustment,207194,Price Adjusted – CLBSL
+2023-02-23,PRIN,price_adjustment,207195,Price Adjusted – PRIN
+2023-02-23,SABSL,price_adjustment,207196,Price Adjusted – SABSL
+2023-02-26,BOKD86KA,debt_listing,207200,Listing BOK Debenture 2086 KA -BOKD86KA
+2023-02-26,SIL,bonus_listing,207201,Listing 9% Bonus Shares of Siddhartha Insurance Limited - SIL
+2023-02-27,SHL,bonus_listing,207202,Listing 5% Bonus Shares of Soaltee Hotel Limited - SHL
+2023-02-27,MERO,bonus_listing,207203,Listing 10% Bonus Shares of Meromicrofinance Laghubitta Bittiya Sanstha Limited - MERO
+2023-02-27,NICL,bonus_listing,207204,Listing 8% Bonus Shares of Nepal Insurance Company Limited - NICL
+2023-02-27,PIC,bonus_listing,207205,Listing 14.25% Bonus Shares of Premier Insurance Company (Nepal) Limited -PIC
+2023-02-27,ADLB,price_adjustment,207206,Price Adjusted - Adarsha Laghubitta Bittiya Sanstha Limited
+2023-02-27,GILB,price_adjustment,207207,Price Adjusted – Global IME Laghubitta Bittiya Sanstha Limited
+2023-02-28,PIC,trading_halt,207214,Transactions Suspended of SIL & PIC
+2023-02-28,SIL,trading_halt,207214,Transactions Suspended of SIL & PIC
+2023-02-28,LLBS,price_adjustment,207215,Price Adjusted - Laxmi Laghubitta Bittiya Sanstha Limited
+2023-03-01,CYCL,bonus_listing,207217,Listing 30% Bonus Shares of Cyc Nepal Laghubitta Bittiya Sanstha Limited -CYCL
+2023-03-01,SANIMA,bonus_listing,207218,Listing 10% Bonus Shares of Sanima Bank Limited - SANIMA
+2023-03-02,SMHL,ipo_listing,207219,Listing IPO Shares of Super madi HydroPower Limited (SMHL)
+2023-03-02,DDBL,price_adjustment,207221,Price Adjusted - Deprosc Laghubitta Bittiya Sanstha Limited
+2023-03-02,SMB,price_adjustment,207222,Adjusted Price - Support Microfinance Laghubitta Bittiya Sanstha Limited
+2023-03-05,PRVU,bonus_listing,207225,Listing 6.50% Bonus Shares of Prabhu Bank Limited -PRVU
+2023-03-05,CCBL,bonus_listing,207226,Listing 4.75% Bonus Shares of Century Commercial Bank Limited -CCBL
+2023-03-05,ICFC,bonus_listing,207227,Listing 5% Bonus Shares of ICFC Finance Limited - ICFC
+2023-03-05,AKBSL,bonus_listing,207228,Listing 30% Bonus Shares of Aadhikhola Laghubitta Bittiya Sanstha Limited - AKBSL
+2023-03-05,FMDBL,bonus_listing,207229,Listing 19% Bonus Shares of First Microfinance Laghubitta Bittiya Sanstha Limited - FMDBL
+2023-03-07,CBBL,price_adjustment,207230,Price Adjusted – Chhimek Laghubitta Bittiya Sanstha Limited
+2023-03-09,CBL,merger,207232,Listing Shares of Himalayan Bank Limited After Acquisition of CBL
+2023-03-09,PLIC,bonus_listing,207233,Listing 13% Bonus Shares of Prime Life Insurance Company Limited - PLIC
+2023-03-09,BPCL,bonus_listing,207234,Listing 5% Bonus Shares of Butwal Power Company Limited - BPCL
+2023-03-09,ALBSL,price_adjustment,207235,Price Adjusted – Asha Laghubitta Bittiya Sanstha Limited
+2023-03-09,SADBL,price_adjustment,207236,Price Adjusted – Shangrila Development Bank Limited
+2023-03-09,STC,price_adjustment,207237,Price Adjusted – Salt Trading Corporation
+2023-03-09,SKBBL,price_adjustment,207238,Price Adjusted – Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited
+2023-03-10,NABIL,bonus_listing,207243,Listing 18.50% Bonus Shares of Nabil Bank Limited - NABIL
+2023-03-12,HIDCL,right_listing,207244,Listing Right Shares (Auction of Promoter) of HIDCL
+2023-03-12,LGIL,trading_halt,207245,Transactions Suspended of SIC & LGIL
+2023-03-12,SIC,trading_halt,207245,Transactions Suspended of SIC & LGIL
+2023-03-13,CHCL,bonus_listing,207246,Listing 7.5% Bonus Shares of Chilime Jalvidyut Company Limited - CHCL
+2023-03-13,AKBSL,trading_halt,207247,Transactions Suspended of CYCL & AKBSL
+2023-03-13,CYCL,trading_halt,207247,Transactions Suspended of CYCL & AKBSL
+2023-03-13,SLBBL,price_adjustment,207248,Price Adjusted - Swarojgar Laghubitta Bittiya Sanstha Limited
+2023-03-13,ADBL,price_adjustment,207249,Price Adjusted - Agricultural Development Bank Limited
+2023-03-14,RMDC,price_adjustment,207252,Price Adjusted - RMDC Laghubitta Bittiya Sanstha Limited
+2023-03-14,SMATA,price_adjustment,207253,Price Adjusted - Samata Gharelu Laghubitta Bittiya Sanstha Limited
+2023-03-14,MKLB,price_adjustment,207254,Price Adjusted - Manakamana Smart Laghubitta Bittiya Sanstha Limited
+2023-03-15,CCBL,merger,207258,Listing Shares of Prabhu Bank Limited After Acquisition of CCBL
+2023-03-16,PCBL,bonus_listing,207260,Listing 4% Bonus Shares of Prime Commercial Bank Limited - PCBL
+2023-03-16,GLBSL,bonus_listing,207261,Listing 4% Bonus Shares of Gurans Laghubitta Bittiya Sanstha Limited - GLBSL
+2023-03-16,SMFBS,price_adjustment,207262,Price Adjusted - Swabhimaan Laghubitta Bittiya Sanstha Limited
+2023-03-16,PICL,price_adjustment,207263,Price Adjusted - Prudential Insurance Company Limited
+2023-03-16,HEI,price_adjustment,207264,Price Adjusted - Himalayan Everest Insurance Limited
+2023-03-19,BHDC,bonus_listing,207268,Listing 5% Bonus Shares of Bindhyabasini Hydropower Development Company Limited - BHDC
+2023-03-19,SBL,bonus_listing,207269,Listing 12.50% Bonus Shares of Siddhartha Bank Limited - SBL
+2023-03-20,MKHC,ipo_listing,207270,Listing IPO Shares of Maya Khola Hydropower Company Limited - MKHC
+2023-03-20,SMH,ipo_listing,207271,Listing IPO Shares of Supermai Hydropower Limited - SMH
+2023-03-20,LBBL,bonus_listing,207272,Listing 3% Bonus Shares of Lumbini Bikas Bank Limited - LBBL
+2023-03-20,SHINE,bonus_listing,207273,Listing 13.30% Bonus Shares of Shine Resunga Development Bank Limited - SHINE
+2023-03-22,KDL,ipo_listing,207274,Listing IPO Shares of Kalinchowk Darshan Limited - KDL
+2023-03-22,AHL,ipo_listing,207275,Listing IPO Shares of Asian Hydropower Limited - AHL
+2023-03-22,RLI,trading_halt,207276,Transactions Suspended of RLI & SLI
+2023-03-22,SLI,trading_halt,207276,Transactions Suspended of RLI & SLI
+2023-03-22,UMHL,price_adjustment,207277,Price Adjusted - United Modi Hydropower Limited
+2023-03-23,JSLBB,price_adjustment,207279,Price Adjusted - Janautthan Samudayic Laghubitta Bittya Sanstha Limited
+2023-03-26,GIMES1,other,207281,Delisting of Global IME Samunnat Scheme -1 (GIMES1)
+2023-03-26,SBI,bonus_listing,207282,Listing 3% Bonus Shares of Nepal SBI Bank Limited - SBI
+2023-03-26,NLG,price_adjustment,207283,Price Adjusted - NLG Insurance Company Limited
+2023-03-26,SICL,bonus_listing,207285,Listing 16% Bonus Shares of Shikhar Insurance Company Limited - SICL
+2023-03-28,SDLBSL,bonus_listing,207286,Listing 19% Bonus Shares of Sadhana Laghubitta Bittiya Sanstha Limited - SDLBSL
+2023-03-28,RSDC,bonus_listing,207287,Listing 8% Bonus Shares of RSDC Laghubitta Bittiya Sanstha Limited - RSDC
+2023-03-28,API,bonus_listing,207288,Listing 7.5% Bonus Shares of Api Power Company Limited - API
+2023-03-28,NIL,bonus_listing,207289,Listing 15% Bonus Shares of Neco Insurance Limited - NIL
+2023-03-28,NSLB,price_adjustment,207290,Price Adjusted - Naya Sarathi Laghubitta Bittiya Sanstha Limited (NSLB)
+2023-03-29,MNBBL,bonus_listing,207294,Listing 13.50% Bonus Shares of Muktinath Bikas Bank Limited - MNBBL
+2023-03-29,VLBS,price_adjustment,207295,Price Adjusted - Vijaya Laghubitta Bittiya Sanstha Limited (VLBS)
+2023-03-29,KMCDB,price_adjustment,207296,Price Adjusted - Kalika Laghubitta Bittiya Sanstha Limited (KMCDB)
+2023-03-30,RIDI,bonus_listing,207299,Listing 40% Bonus Shares of Ridi Power Company Limited - RIDI
+2023-03-30,JBLB,price_adjustment,207300,Price Adjusted - Jeevan Bikas Laghubitta Bittiya Sanstha Limited (JBLB)
+2023-03-30,NMBMF,price_adjustment,207301,Price Adjusted - NMB Laghubitta Bittiya Sanstha Limited (NMBMF)
+2023-04-02,KLBSL,price_adjustment,207309,Price Adjusted - KLBSL
+2023-04-03,IGI,bonus_listing,207311,Listing 6% Bonus Shares of IME General Insurance Limited – IGI
+2023-04-03,WNLB,bonus_listing,207312,Listing 9.33% Bonus Shares of Wean Nepal Laghubitta Bittiya Sanstha Limited – WNLB
+2023-04-03,SPIL,merger,207313,Listing Shares of Siddhartha Premier Insurance Limited after merger - SPIL
+2023-04-04,MLBSL,bonus_listing,207314,Listing 47.50% Bonus Shares of Mahila Laghubitta Bittiya Sanstha Limited - MLBSL
+2023-04-05,SFEF,fund_listing,207315,Listing Sunrise Focused Equity Fund - SFEF
+2023-04-05,EBLEB89,debt_listing,207316,Listing Everest Bank Limited Urja Rinpatra 2089 - EBLEB89
+2023-04-05,GLICL,price_adjustment,207317,Price Adjusted – GLICL
+2023-04-06,UIC,bonus_listing,207319,Listing 5% Bonus Shares of United Insurance Company (Nepal) Limited – UIC
+2023-04-09,TAMOR,ipo_listing,207320,Listing IPO Shares of Sanima Middle Tamor Hydropower Limited – TAMOR
+2023-04-09,NGPL,bonus_listing,207321,Listing 4.75% Bonus Shares of Ngadi Group Power Limited – NGPL
+2023-04-09,SIFC,bonus_listing,207322,Listing 2.40% Bonus Shares of Shree Investment and Finance Company Limited – SIFC
+2023-04-11,MSLB,price_adjustment,207323,Price Adjusted - Mahuli Laghubitta Bittiya Sanstha Limited (MSLB)
+2023-04-12,NIMBPO,other,207325,नेपाल इन्भेष्टमेन्ट मेगा बैंक लि. ( NIMBPO) को संस्थापक शेयर कारोबार सम्बन्धमा ।
+2023-04-12,SMJC,ipo_listing,207326,Listing IPO Shares of Sagarmatha Jalbidhyut Company Limited - SMJC
+2023-04-12,MHCL,ipo_listing,207327,Listing IPO Shares of Molung Hydropower Company Limited - MHCL
+2023-04-13,PFL,bonus_listing,207328,Listing 4% Bonus Shares of Pokhara Finance Limited – PFL
+2023-04-13,ULI,bonus_listing,207329,Listing 8.97% Bonus Shares of Union Life Insurance Company Limited – ULI
+2023-04-13,MLBL,bonus_listing,207331,Listing 4% Bonus Shares of Mahalaxmi Bikas Bank Limited – MLBL
+2023-04-16,NMFBS,price_adjustment,207332,Price Adjusted – NMFBS
+2023-04-20,ALICL,price_adjustment,207334,Price Adjusted – ALICL
+2023-04-23,ULI,promoter_conversion,207338,Conversion of Promoter Shares of Union Life Insurance Company Limited - ULI
+2023-04-23,PLIC,promoter_conversion,207339,Conversion of Promoter Shares of Prime Life Insurance Company Limited - PLIC
+2023-04-25,NHDL,bonus_listing,207341,Listing 5% Bonus Shares of Nepal Hydro Developer Limited – NHDL
+2023-04-25,LGIL,bonus_listing,207342,Listing 6.99% Bonus Shares of Lumbini General Insurance Company Limited – LGIL
+2023-04-25,SIC,bonus_listing,207343,Listing 12.40% Bonus Shares of Sagarmatha Insurance Company Limited – SIC
+2023-04-26,SWMF,price_adjustment,207344,Price Adjusted – SWMF
+2023-04-27,NUBL,bonus_listing,207346,Listing 19% Bonus Shares of Nirdhan Utthan Laghubitta Bittiya Sanstha Limited – NUBL
+2023-04-27,DDBL,bonus_listing,207347,Listing 10% Bonus Shares of Deprosc Laghubitta Bittiya Sanstha Limited – DDBL
+2023-04-27,PICL,bonus_listing,207348,Listing 3.325% Bonus Shares of Prudential Insurance Company Limited – PICL
+2023-04-27,NRIC,bonus_listing,207349,Listing 5% Bonus Shares of Nepal Reinsurance Company Limited – NRIC
+2023-04-27,GBBL,bonus_listing,207350,Listing 13% Bonus Shares of Garima Bikas Bank Limited – GBBL
+2023-04-27,AHPC,bonus_listing,207351,Listing 8% Bonus Shares of Arun Valley Hydropower Development Co. Limited – AHPC
+2023-04-27,KSBBL,price_adjustment,207352,Price Adjusted – Kamana Sewa Bikas Bank Limited (KSBBL)
+2023-04-30,SSHL,other,207354,Information Regarding Right Shares - SSHL
+2023-04-30,ANLB,ipo_listing,207355,Listing IPO Shares of Aatmanirbhar Laghubitta Bittiya sanstha Limited – ANLB
+2023-04-30,BPW,ipo_listing,207356,Listing IPO Shares of BPW laghubitta Bittiya Sanstha Limited – BPW
+2023-04-30,GMFIL,bonus_listing,207357,Listing 6.5% Bonus Shares of Guheshowori Merchant Banking & Finance Limited – GMFIL
+2023-05-02,RULB,trading_halt,207358,Transactions Suspended of Rastra Utthan Laghubitta Sanstha Limited - RULB
+2023-05-03,SWBBL,bonus_listing,207359,Listing 15% Bonus Shares of Swabalamban Laghubitta Bittiya Sanstha Limited – SWBBL
+2023-05-04,MAKAR,ipo_listing,207360,Listing IPO Shares of Makar Jitumaya Suri Hydropower Limited - MAKAR
+2023-05-04,RULB,trading_resume,207361,Transactions Release of Rastra Utthan Laghubitta Bittiya Sanstha Limited - RULB
+2023-05-07,ADLB,bonus_listing,207362,Listing 20% Bonus Shares of Adarsha Laghubitta Bittiya Sanstha Limited – ADLB
+2023-05-08,GLICL,bonus_listing,207363,Listing 13.2712772% Bonus Shares of Gurans Life Insurance Company Limited – GLICL
+2023-05-08,BFC,right_listing,207364,Listing Right Shares (Auction) of BFC
+2023-05-08,GLICL,trading_halt,207365,"Transactions Suspended of PLIC, GLICL & ULI"
+2023-05-08,PLIC,trading_halt,207365,"Transactions Suspended of PLIC, GLICL & ULI"
+2023-05-08,ULI,trading_halt,207365,"Transactions Suspended of PLIC, GLICL & ULI"
+2023-05-09,HDHPC,price_adjustment,207366,Price Adjusted – Himal Dolakha Hydropower Company Limited (HDHPC)
+2023-05-09,IGI,trading_halt,207367,Transactions Suspended of IGI & PICL
+2023-05-09,PICL,trading_halt,207367,Transactions Suspended of IGI & PICL
+2023-05-11,SGIC,promoter_conversion,207369,Conversion of Promoter Shares of Sanima GIC Insurance Limited - SGIC
+2023-05-11,GILB,bonus_listing,207370,Listing 12% Bonus Shares of Global IME Laghubitta Bittiya Sanstha Limited – GILB
+2023-05-11,JBBL,bonus_listing,207371,Listing 3% Bonus Shares of Jyoti Bikas Bank Limited Limited – JBBL
+2023-05-11,NLO,bonus_listing,207372,Listing 25% Bonus Shares of Nepal Lube Oil Limited – NLO
+2023-05-12,ALBSL,bonus_listing,207373,Listing 14.2857% Bonus Shares of Asha Laghubitta Bittiya Sanstha Limited – ALBSL
+2023-05-14,SALICO,merger,207374,Listing Shares of Sagarmatha Lumbini Insurance Company Limited after Merger - SALICO
+2023-05-15,MKHL,ipo_listing,207375,Listing IPO Shares of Mai Khola Hydropower Limited - MKHL
+2023-05-15,MMFDB,bonus_listing,207377,Listing 23% Bonus Shares of Mirmire Laghubitta Bittya Sanstha Limited – MMFDB
+2023-05-15,SMFBS,bonus_listing,207378,Listing 20% Bonus Shares of Swabhimaan Laghubitta Bittiya Sanstha Limited – SMFBS
+2023-05-15,STC,bonus_listing,207379,Listing 10% Bonus Shares of Salt Trading Corporation Limited – STC
+2023-05-15,ADBL,bonus_listing,207380,Listing 2% Bonus Shares of Agricultural Development Bank Limited – ADBL
+2023-05-17,FOWAD,bonus_listing,207381,Listing 25% Bonus Shares of Forward Microfinance Laghubitta Bittiya Sanstha Limited – FOWAD
+2023-05-17,NBL,bonus_listing,207382,Listing 2% Bonus Shares of Nepal Bank Limited – NBL
+2023-05-18,MDB,bonus_listing,207383,Listing 12.35% Bonus Shares of Miteri Development Bank Limited – MDB
+2023-05-18,SRLI,merger,207384,Listing Shares of Sanima Reliance Life Insurance Limited (SRLI) After Merger
+2023-05-21,SABSL,bonus_listing,207385,Listing 18% Bonus Shares of Sabaiko Laghubitta Bittiya Sanstha Limited – SABSL
+2023-05-21,ILBS,bonus_listing,207386,Listing 20% Bonus Shares of Infinity Laghubitta Bittiya Sanstha Limited – ILBS
+2023-05-21,LLBS,bonus_listing,207387,Listing 15% Bonus Shares of Laxmi Laghubitta Bittiya Sanstha Limited – LLBS
+2023-05-21,NLG,bonus_listing,207388,Listing 10% Bonus Shares of NLG Insurance Company Limited – NLG
+2023-05-21,SADBL,bonus_listing,207389,Listing 8.534% Bonus Shares of Shangrila Development Bank Limited – SADBL
+2023-05-22,NLBBL,bonus_listing,207390,Listing 22% Bonus Shares of Nerude Laghubitta Bittiya Sanstha Limited – NLBBL
+2023-05-22,SWBBL,promoter_conversion,207391,Conversion of Promoter Shares of Swabalamban Laghubitta Bittiya Sanstha Limited - SWBBL
+2023-05-24,CBBL,bonus_listing,207392,Listing 22% Bonus Shares of Chhimek Laghubitta Bittiya Sanstha Limited – CBBL
+2023-05-24,AIL,promoter_conversion,207393,Conversion of Promoter Shares of AJOD Insurance Limited - AIL
+2023-05-24,UMHL,bonus_listing,207394,Listing 7% Bonus Shares of United Modi Hydropower Limited – UMHL
+2023-05-24,SIFC,promoter_conversion,207395,Conversion of Promoter Shares of Shree Investment & Finance Company Limited - SIFC
+2023-05-24,NLICL,price_adjustment,207396,Price Adjusted – National Life Insurance Company Limited (NLICL)
+2023-05-24,PLI,price_adjustment,207397,Price Adjusted – Prabhu Life Insurance Limited (PLI)
+2023-05-26,AIL,trading_halt,207398,Transactions Suspended of UIC & AIL
+2023-05-26,UIC,trading_halt,207398,Transactions Suspended of UIC & AIL
+2023-05-28,HIDCL,bonus_listing,207401,Listing 5% Bonus Shares of Hydorelectricity Investment and Development Company Limited – HIDCL
+2023-05-28,PRIN,bonus_listing,207402,Listing 6.70% Bonus Shares of Prabhu Insurance Limited – PRIN
+2023-05-28,SLBBL,bonus_listing,207403,Listing 22% Bonus Shares of Swarojgar Laghubitta Bittiya Sanstha Limited – SLBBL
+2023-05-30,MLBBL,bonus_listing,207404,Listing 15% Bonus Shares of Mithila Laghubitta Bittiya Sanstha Limited – MLBBL
+2023-05-31,SMB,bonus_listing,207405,Listing 11% Bonus Shares of Support Laghubitta Bittiya Sanstha Limited – SMB
+2023-06-01,IGI,merger,207406,Listing Shares of IGI Prudential Insurance Limited (IGI) After Merger
+2023-06-04,RMDC,bonus_listing,207407,Listing 26% Bonus Shares of RMDC Laghubitta Bittiya Sanstha Limited – RMDC
+2023-06-04,SMFDB,price_adjustment,207408,Price Adjusted – Summit Laghubitta Bittiya Sanstha Limited (SMFDB)
+2023-06-04,HEI,bonus_listing,207409,Listing 2.75% Bonus Shares of Himalayan Everest Insurance Limited – HEI
+2023-06-05,JALPA,price_adjustment,207411,Price Adjusted – Jalpa Samudayik Laghubitta Bittiya Sanstha Limited (JALPA)
+2023-06-06,PRSF,fund_listing,207413,Listing Prabhu Smart Fund - PRSF
+2023-06-06,KPCL,bonus_listing,207415,Listing 15% Bonus Shares of Kalika Power Company Limited – KPCL
+2023-06-07,NHPC,dividend_book_closure,207416,Book Closure Notice of Right Shares - NHPC
+2023-06-07,BEDC,ipo_listing,207417,Listing IPO Shares of Bhugol Energy Development Company Limited - BEDC
+2023-06-07,DOLTI,ipo_listing,207418,Listing IPO Shares of Dolti Power Company Limited - DOLTI
+2023-06-08,MPFL,promoter_conversion,207419,Conversion of Promoter Shares of Multipurpose Finance Limited - MPFL
+2023-06-08,CITY,ipo_listing,207420,Listing IPO Shares of CITY Hotel Limited - CITY
+2023-06-09,NMFBS,bonus_listing,207421,Listing 15% Bonus Shares of National Microfinance Laghubitta Bittiya Sanstha Limited – NMFBS
+2023-06-11,EBLD79,other,207422,Delisting of 8% Everest Bank Limited Rinpatra 2079 - EBLD79
+2023-06-14,KMCDB,bonus_listing,207423,Listing 19% Bonus Shares of Kalika Laghubitta Bittiya Sanstha Limited – KMCDB
+2023-06-15,MCHL,ipo_listing,207424,Listing IPO Shares of Menchhiyam Hydropower Limited – MCHL
+2023-06-15,ADLB,trading_halt,207425,शेयर कारोबार रोक्का राखिएको बारे (ADLB)
+2023-06-15,NHPC,price_adjustment,207426,Price Adjusted – National Hydro Power Company Limited (NHPC)
+2023-06-18,UNLB,ipo_listing,207428,Listing FPO Shares of Unique Nepal Laghubitta Bittiya Sanstha Limited – UNLB
+2023-06-18,ULBSL,bonus_listing,207429,Listing 61.75% Bonus Shares of Upakar Laghubitta Bittiya Sanstha Limited – ULBSL
+2023-06-18,SKBBL,bonus_listing,207430,Listing 26% Bonus Shares of Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited – SKBBL
+2023-06-18,NSLB,bonus_listing,207431,Listing 19% Bonus Shares of Naya Sarathi Laghubitta Bittiya Sanstha Limited – NSLB
+2023-06-19,IHL,ipo_listing,207432,Listing IPO Shares of Ingwa Hydropower Limited - IHL
+2023-06-19,ALICL,bonus_listing,207433,Listing 8.50% Bonus Shares of Asian Life Insurance Company Limited – ALICL
+2023-06-21,KSBBL,bonus_listing,207434,Listing 4.41% Bonus Shares of Kamana Sewa Bikas Bank Limited – KSBBL
+2023-06-21,HLI,merger,207435,Listing Shares of Himalayan Life Insurance Limited after merger (HLI)
+2023-06-21,NRIC,price_adjustment,207436,Price Adjusted – Nepal Reinsurance Company Limited (NRIC)
+2023-06-22,VLBS,bonus_listing,207438,Listing 20% Bonus Shares of Vijaya Laghubitta Bittiya Sanstha Limited – VLBS
+2023-06-26,RMF2,fund_listing,207440,Listing RBB Mutual Fund 2 - RMF2
+2023-06-27,SMATA,bonus_listing,207441,Listing 15% Bonus Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited – SMATA
+2023-06-27,MSLB,bonus_listing,207442,Listing 14.25% Bonus Shares of Mahuli Laghubitta Bittiya Sanstha Limited – MSLB
+2023-06-28,SLBSL,price_adjustment,207443,Price Adjusted – Samudayik Laghubitta Bittiya Sanstha Limited (SLBSL)
+2023-06-28,JBLB,bonus_listing,207444,Listing 14.285% Bonus Shares of Jeevan Bikas Laghubitta Bittya Sanstha Limited – JBLB
+2023-07-02,JSLBB,bonus_listing,207446,Listing 15% Bonus Shares of Janautthan Samudayic Laghubitta Bittiya Sanstha Limited – JSLBB
+2023-07-02,CYCL,merger,207447,Listing Shares of CYC Nepal Laghubitta Bittiya Sanstha Limited after merger (CYCL)
+2023-07-03,CIT,price_adjustment,207448,Price Adjusted – CIT
+2023-07-04,MEL,ipo_listing,207450,Listing IPO Shares of Modi Energy Limited (MEL)
+2023-07-04,RAWA,ipo_listing,207451,Listing IPO Shares of Rawa Energy Development Limited (RAWA)
+2023-07-04,RLFL,price_adjustment,207453,Price Adjusted – Reliance Finance Limited (RLFL)
+2023-07-05,SCBD,debt_listing,207455,Listing 10.30% Standard Chartered Bank Nepal Limited Debenture (SCBD)
+2023-07-06,API,price_adjustment,207457,Price Adjusted – Api Power Company Limited (API)
+2023-07-07,RMDC,trading_halt,207459,मर्जर प्रयोजनका लागि शेयर कारोबार रोक्का राखिएको बारे (SKBBL & RMDC)
+2023-07-07,SKBBL,trading_halt,207459,मर्जर प्रयोजनका लागि शेयर कारोबार रोक्का राखिएको बारे (SKBBL & RMDC)
+2023-07-09,SMFDB,bonus_listing,207460,Listing 13.562753% Bonus Shares of Summit Laghubitta Bittiya Sanstha Limited – SMFDB
+2023-07-09,AKPL,price_adjustment,207461,Price Adjusted – Arun Kabeli Power Limited (AKPL)
+2023-07-13,LBL,trading_halt,207465,Transactions Suspended of LBL & SRBL
+2023-07-13,SRBL,trading_halt,207465,Transactions Suspended of LBL & SRBL
+2023-07-13,NMFBS,trading_halt,207466,Transactions Suspended of NMFBS & SMFDB
+2023-07-13,SMFDB,trading_halt,207466,Transactions Suspended of NMFBS & SMFDB
+2023-07-13,RULB,trading_halt,207467,Transactions Suspended of RULB
+2023-07-13,PLI,trading_halt,207468,Transactions Suspended of PLI
+2023-07-13,NSLB,trading_halt,207469,Transactions Suspended of VLBS & NSLB
+2023-07-13,VLBS,trading_halt,207469,Transactions Suspended of VLBS & NSLB
+2023-07-13,SAMAJ,trading_resume,207470,Transactions Release (Except Basic Shareholders) of Samaj Laghubitta Bittiya Sanstha Limited - SAMAJ
+2023-07-16,SIGS3,fund_listing,207471,Listing Siddhartha Investment Growth Scheme 3 (SIGS3)
+2023-07-16,KLBSL,bonus_listing,207472,Listing 7% Bonus Shares of Kisan Lagubitta Bittiya Sanstha Limited – KLBSL
+2023-07-16,UAIL,merger,207473,Listing Shares of United Ajod Insurance Limited (UAIL) after merger
+2023-07-19,AKPL,bonus_listing,207474,Listing 10% Bonus Shares of Arun Kabeli Power Limited – AKPL
+2023-07-20,HLBSL,bonus_listing,207476,Listing 11% Bonus Shares of Himalayan Laghubitta Bittiya Sanstha Limited - HLBSL
+2023-07-20,PRIN,trading_halt,207477,Transactions Suspended of Prabhu Insurance Limited - PRIN
+2023-07-24,NLICL,bonus_listing,207478,Listing 8% Bonus Shares of National Life Insurance Company Limited - NLICL
+2023-07-24,PRIN,trading_resume,207480,Transactions Release of Prabhu Insurance Limited - PRIN
+2023-07-25,MKLB,bonus_listing,207481,Listing 4.75% Bonus Shares of Manakamana Smart Laghubitta Bittiya Sanstha Limited - MKLB
+2023-07-26,NMBMF,bonus_listing,207482,Listing 10% Bonus Shares of NMB Laghubitta Bittiya Sanstha Limited - NMBMF
+2023-07-27,SPDL,price_adjustment,207483,Price Adjusted – Synergy Power Development Limited (SPDL)
+2023-07-27,MPFL,price_adjustment,207484,Price Adjusted – Multipurpose Finance Company Limited (MPFL)
+2023-07-31,LEMF,dividend_book_closure,207487,Dividend Declaration of Laxmi Equity Fund - LEMF
+2023-07-31,LUK,dividend_book_closure,207488,Dividend Declaration of Laxmi Unnati Kosh - LUK
+2023-08-03,ILI,ipo_listing,207489,Listing IPO Shares of I.M.E. Life Insurance Company Limited - ILI
+2023-08-03,NRM,ipo_listing,207490,Listing IPO Shares of Nepal Republic Media Limited - NRM
+2023-08-04,SAMAJ,price_adjustment,207492,Price Adjusted- Samaj Laghubitta Bittiya Sanstha Limited (SAMAJ)
+2023-08-06,RULB,merger,207493,Listing Shares of Asha Laghubitta Bittiya Sanstha Limited after acquisition of RULB
+2023-08-06,VLBS,merger,207494,Listing Shares of Vijaya Laghubitta Bittiya Sanstha Limited after merger (VLBS)
+2023-08-06,SKBBL,merger,207495,Listing Shares of Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited after merger (SKBBL)
+2023-08-08,C30MF,fund_listing,207496,Listing Citizens Super 30 Mutual Fund - C30MF
+2023-08-09,SWMF,bonus_listing,207497,Listing 15% Bonus Shares of Suryodaya Womi Laghubitta Bittiya Sanstha Limited - SWMF
+2023-08-10,LUK,dividend_book_closure,207498,Book Closure Notice of Laxmi Unnati Kosh - LUK
+2023-08-10,LEMF,dividend_book_closure,207499,Book Closure Notice of Laxmi Equity Fund- LEMF
+2023-08-10,USHL,ipo_listing,207500,Listing IPO Shares of Upper Syange Hydropower Limited - USHL
+2023-08-10,TSHL,ipo_listing,207501,Listing IPO Shares of Three Star Hydropower Limited - TSHL
+2023-08-10,GCIL,ipo_listing,207502,Listing IPO Shares of Ghorahi Cement Industry Limited - GCIL
+2023-08-10,UPPER,price_adjustment,207503,Price Adjusted – Upper Tamakoshi Hydropower Limited (UPPER)
+2023-08-11,SFMF,dividend_book_closure,207505,Dividend Declaration of Sunrise First Mutual Fund - SFMF
+2023-08-11,KDBY,dividend_book_closure,207506,Dividend Declaration of Kumari Equity Fund (KEF) & Kumari Dhanabriddhi Yojana (KDBY)
+2023-08-11,KEF,dividend_book_closure,207506,Dividend Declaration of Kumari Equity Fund (KEF) & Kumari Dhanabriddhi Yojana (KDBY)
+2023-08-15,DLBS,merger,207507,Listing Shares of Dhaulagiri Laghubitta Bittiya Sanstha Limited after merger (DLBS)
+2023-08-15,NMFBS,merger,207508,Listing Shares of National Laghubitta Bittiya Sanstha Limited after merger (NMFBS)
+2023-08-16,LUK,price_adjustment,207509,Price Adjusted- Laxmi Unnati Kosh (LUK)
+2023-08-17,SLBSL,bonus_listing,207511,Listing 10% Bonus Shares of Samudayik Laghubitta Bittiya Sanstha Limited - SLBSL
+2023-08-17,PLI,bonus_listing,207513,Listing 9.8% Bonus Shares of Prabhu Life Insurance Limited - PLI
+2023-08-18,SIGS2,dividend_book_closure,207514,Dividend Declaration of Siddhartha Investment Growth Scheme - 2 (SIGS2)
+2023-08-18,SEF,dividend_book_closure,207515,Dividend Declaration of Siddhartha Equity Fund (SEF)
+2023-08-18,SIGS3,dividend_book_closure,207516,Dividend Declaration of Siddhartha Investment Growth Scheme 3 -(SIGS3)
+2023-08-20,KBSH,ipo_listing,207517,Listing IPO Shares of Kutheli Bukhari Small Hydropower Limited - KBSH
+2023-08-23,SEF,dividend_book_closure,207518,Book Closure Notice of SEF & SIGS2
+2023-08-23,SIGS2,dividend_book_closure,207518,Book Closure Notice of SEF & SIGS2
+2023-08-24,JALPA,bonus_listing,207519,Listing 14.25% Bonus Shares of Jalpa Samudayik Laghubitta Bittiya Sanstha Limited - JALPA
+2023-08-27,CMF2,dividend_book_closure,207520,Dividend Declaration of Citizens Mutual Fund 2 - (CMF2)
+2023-08-27,JOSHI,dividend_book_closure,207521,AGM and Book Close Notice of JOSHI
+2023-08-27,LSL,merger,207522,Listing Shares of Laxmi Sunrise Bank Limited (LSL) after merger
+2023-08-28,KDBY,dividend_book_closure,207523,Book Closure Notice of KEF & KDBY
+2023-08-28,KEF,dividend_book_closure,207523,Book Closure Notice of KEF & KDBY
+2023-08-29,MLBBL,promoter_conversion,207524,Conversion of Promoter Shares of Mithila Laghubitta Bittiya Sanstha Limited - MLBBL
+2023-08-30,MLBLD89,debt_listing,207525,Listing 11% Mahalaxmi Debenture 2089 - MLBLD89
+2023-08-30,LBBLD89,debt_listing,207526,Listing 11% L.B.B.L Debenture 2089 - LBBLD89
+2023-09-01,NIBLPF,dividend_book_closure,207528,Dividend Declaration of NIBL Pragati Fund -NIBLPF
+2023-09-03,KEF,price_adjustment,207530,Price Adjusted - Kumari Equity Fund (KEF)
+2023-09-07,HDHPC,right_listing,207531,Listing 75% Right Shares of Himal Dolakha Hydropower Company Limited - HDHPC
+2023-09-10,SAEF,dividend_book_closure,207532,Dividend Declaration of Sanima Equity Fund -(SAEF)
+2023-09-10,NFS,right_listing,207533,Listing Right Shares (Auction of Promoter) of Nepal Finance Limited - NFS
+2023-09-10,NIBLPF,dividend_book_closure,207534,Book Closure Notice of NIBL Pragati Fund -NIBLPF
+2023-09-12,PSF,dividend_book_closure,207535,Dividend announcement of Prabhu Select Fund- (PSF)
+2023-09-13,RNLI,ipo_listing,207536,Listing IPO Shares of Reliable Nepal Life Insurance Limited - RNLI
+2023-09-13,LVF2,fund_listing,207537,Listing Laxmi Value Fund 2 - LVF2
+2023-09-15,HLBSL,promoter_conversion,207538,Conversion of Promoter Shares of Himalayan Laghubitta Bittiya Sanstha Limited - HLBSL
+2023-09-17,SAEF,dividend_book_closure,207539,Book Closure Notice of Sanima Equity Fund - SAEF
+2023-09-18,PSF,dividend_book_closure,207540,Book Closure Notice of Prabhu Select Fund - PSF
+2023-09-19,NMB50,dividend_book_closure,207541,Dividend Declaration and Book Closure of NMBHF1 & NMB50
+2023-09-19,NMBHF1,dividend_book_closure,207541,Dividend Declaration and Book Closure of NMBHF1 & NMB50
+2023-09-19,SNLI,ipo_listing,207542,Listing IPO Shares of Sun Nepal Life Insurance Company Limited - SNLI
+2023-09-21,SFMF,dividend_book_closure,207543,Book Closure Notice of Sunrise First Mutual Fund - SFMF
+2023-09-24,ULHC,ipo_listing,207544,Listing IPO Shares of Upper Lohore Khola Hydropower Company Limited - ULHC
+2023-09-24,CIT,bonus_listing,207546,Listing 25% Bonus Shares of Citizen Investment Trust - CIT
+2023-09-24,MEHL,ipo_listing,207547,Listing IPO Shares of Manakamana Engineering Hydropower Limited - MEHL
+2023-09-24,MBL,price_adjustment,207548,Price Adjusted - Machhapuchhre Bank Limited (MBL)
+2023-09-27,CLI,ipo_listing,207551,Listing IPO Shares of Citizen Life Insurance Company Limited - CLI
+2023-09-27,PSF,price_adjustment,207552,Price Adjusted - Prabhu Select Fund (PSF)
+2023-09-27,SAEF,price_adjustment,207553,Price Adjusted - Sanima Equity Fund (SAEF)
+2023-09-27,SFMF,price_adjustment,207554,Price Adjusted - Sunrise First Mutual Fund (SFMF)
+2023-09-27,NMBHF1,price_adjustment,207555,Price Adjusted - NMB Hybrid Fund L-1 (NMBHF1)
+2023-09-27,NMB50,price_adjustment,207556,Price Adjusted - NMB 50 (NMB50)
+2023-09-29,NBF2,dividend_book_closure,207561,Dividend Declaration of Nabil Balanced Fund 2 - NBF2
+2023-10-02,NICA,price_adjustment,207565,Price Adjusted - NIC Asia Bank Limited (NICA)
+2023-10-02,EBL,price_adjustment,207566,Price Adjusted - Everest Bank Limited (EBL)
+2023-10-03,GIBF1,dividend_book_closure,207567,Dividend Declaration of Global IME Balanced Fund -1 (GIBF1)
+2023-10-03,SBID89,debt_listing,207568,Listing 9% Nepal SBI Bank Rinpatra 2089 - SBID89
+2023-10-04,NRIC,bonus_listing,207569,Listing 4.75% Bonus Shares of Nepal Reinsurance Company Limited - NRIC
+2023-10-05,GIBF1,dividend_book_closure,207570,Book Closure Notice of Global IME Balanced Fund 1 - GIBF1
+2023-10-08,SANIMA,price_adjustment,207572,Price Adjusted - Sanima Bank Limited (SANIMA)
+2023-10-10,MANDU,ipo_listing,207573,Listing IPO Shares of Mandu Hydropower Limited - MANDU
+2023-10-10,HATHY,ipo_listing,207574,Listing IPO Shares of Hathway Investment Nepal Limited - HATHY
+2023-10-10,SHPC,price_adjustment,207576,Price Adjusted - Sanima Mai Hydropower Limited (SHPC)
+2023-10-11,BGWT,ipo_listing,207577,Listing IPO Shares of Bhagawati Hydropower Development Company Limited - BGWT
+2023-10-11,MSHL,ipo_listing,207578,Listing IPO Shares of Mid Solu Hydropower Limited - MSHL
+2023-10-12,NBF2,price_adjustment,207580,Price Adjusted - NABIL BALANCED FUND-2 (NBF2)
+2023-10-13,RLFL,bonus_listing,207582,Listing 6.50% Bonus Shares of Reliance Finance Limited - RLFL
+2023-10-13,NMBHF1,other,207583,Delisting NMB Hybrid Fund L 1 - NMBHF1
+2023-10-16,NICBF,dividend_book_closure,207584,Dividend Declaration of NICGF & NICBF
+2023-10-16,NICGF,dividend_book_closure,207584,Dividend Declaration of NICGF & NICBF
+2023-10-19,NHPC,right_listing,207585,Listing 50% Right Shares of National Hydro Power Company Limited - NHPC
+2023-10-19,SONA,ipo_listing,207586,Listing IPO Shares of Sonapur Minerals and Oil Limited - SONA
+2023-10-19,GHL,price_adjustment,207588,Price Adjusted – Ghalemdi Hydro Limited (GHL)
+2023-11-01,NICBF,dividend_book_closure,207590,Book Closure Notice of NICBF
+2023-11-01,NICGF,dividend_book_closure,207591,Book Closure Notice of NICGF
+2023-11-01,NEF,other,207592,Delisting of Nabil Equity Fund - NEF
+2023-11-07,NICBF,price_adjustment,207593,Price Adjusted - NIC ASIA Balanced Fund (NICBF)
+2023-11-07,NICGF,price_adjustment,207594,Price Adjusted - NIC ASIA Growth Fund (NICGF)
+2023-11-09,MMKJL,ipo_listing,207597,Listing IPO Shares of Mathillo Mailun Khola Jalvidhyut Limited - MMKJL
+2023-11-10,DLBS,trading_halt,207598,Transactions Suspended of DLBS
+2023-11-10,MPFL,right_listing,207599,Listing 35% Right Shares of Multipurpose Finance Limited - MPFL
+2023-11-10,API,right_listing,207600,Listing 40% Right Shares of Api Power Company Limited - API
+2023-11-21,MBL,bonus_listing,207601,Listing 13.30% Bonus Shares of Machhapuchhre Bank Limited - MBL
+2023-11-21,DLBS,trading_resume,207602,Transactions Release of Dhaulagiri Laghubitta Bittiya Sanstha Limited - DLBS
+2023-11-22,RSDC,price_adjustment,207603,Price Adjusted - RSDC Laghubitta Bittiya Sanstha Limited (RSDC)
+2023-11-26,SADBL,price_adjustment,207608,Price Adjusted - SADBL
+2023-11-26,SHINE,price_adjustment,207609,Price Adjusted - SHINE
+2023-11-27,MMFDB,ipo_listing,207610,Listing FPO Shares of Mirmire Laghubitta Bittya Sanstha Limited – MMFDB
+2023-11-28,TVCL,ipo_listing,207611,Listing IPO Shares of Trishuli Jal Vidhyut Company Limited - TVCL
+2023-11-28,GBIME,price_adjustment,207612,Price Adjusted - GBIME
+2023-12-01,NADEP,bonus_listing,207615,Listing 20% Bonus Shares of Nadep Laghubitta Bittiya Sanstha Limited - NADEP
+2023-12-04,TRH,trading_halt,207616,Transactions Suspended of Taragaon Regency Hotel Limited - TRH
+2023-12-04,USLB,ipo_listing,207617,Listing FPO Shares of Unnati Sahakarya Laghubitta Bittiya Sanstha Limited – USLB
+2023-12-05,TRH,trading_resume,207618,Transactions Release of Taragaon Regency Hotel Limited - TRH
+2023-12-07,SWBBL,price_adjustment,207619,Price Adjusted - SWBBL
+2023-12-10,SRLI,dividend_book_closure,207622,Information Regarding Dividend - SRLI
+2023-12-10,SPDL,right_listing,207623,Listing 50% Right Shares of Synergy Power Development Limited - SPDL
+2023-12-10,NHDL,price_adjustment,207628,Price Adjusted - NHDL
+2023-12-11,AKPL,right_listing,207631,Listing 100% Right Shares of Arun Kabeli Power Limited - AKPL
+2023-12-13,LSL,dividend_book_closure,207633,Dividend Declaration of Laxmi Sunrise Bank Limited - LSL
+2023-12-13,MKCL,ipo_listing,207634,Listing IPO Shares of Muktinath Krishi Company Limited - MKCL
+2023-12-13,KBLD90,debt_listing,207635,Listing 10% KBL Debenture 2090 - KBLD90
+2023-12-13,H8020,other,207636,Listing Himalayan 80-20 - H8020
+2023-12-13,NICL,price_adjustment,207639,Price Adjusted - NICL
+2023-12-13,MDB,price_adjustment,207640,Price Adjusted - MDB
+2023-12-14,SKBBL,dividend_book_closure,207641,Revised Dividend Notice of SKBBL
+2023-12-14,FOWAD,trading_halt,207642,Transactions Suspended of Forward Microfinance Laghubitta Bittiya Sanstha Limited - FOWAD
+2023-12-14,SBI,price_adjustment,207644,Price Adjusted - Nepal SBI Bank Limited (SBI)
+2023-12-18,PMLI,merger,207645,Listing Shares of Prabhu Mahalaxmi Life Insurance Limited After Merger - PMLI
+2023-12-20,FOWAD,trading_resume,207646,Transactions Release of Forward Microfinance Laghubitta Bittiya Sanstha Limited - FOWAD
+2023-12-20,NWCL,ipo_listing,207647,Listing IPO Shares of Nepal Warehousing Company Limited - NWCL
+2023-12-20,CKHL,ipo_listing,207648,Listing IPO Shares of Chirkhwa Hydropower Limited - CKHL
+2023-12-20,VLUCL,ipo_listing,207649,Listing IPO Shares of Vision Lumbini Urja Company Limited - VLUCL
+2023-12-20,SHL,price_adjustment,207650,Price Adjusted - Soaltee Hotel Limited (SHL)
+2023-12-21,LSL,dividend_book_closure,207652,AGM & Book Closure Notice of Laxmi Sunrise Bank Limited - LSL
+2023-12-21,CHCL,price_adjustment,207653,Price Adjusted - Chilime Hydropower Company Limited (CHCL)
+2023-12-22,MNBBL,trading_halt,207655,Transactions Suspended of Muktinath Bikas Bank Limited - MNBBL
+2023-12-22,MMFDB,promoter_conversion,207656,Conversion of Promoter Shares of Mirmire Laghubitta Bittiya Sanstha Limited - MMFDB
+2023-12-24,NLO,price_adjustment,207657,Price Adjusted - Nepal Lube Oil Limited (NLO)
+2023-12-27,MNBBL,trading_resume,207659,Transactions Release of Muktinath Bikas Bank Limited - MNBBL
+2023-12-27,FMDBL,price_adjustment,207660,Price Adjusted - FMDBL
+2023-12-27,TRH,price_adjustment,207661,Price Adjusted - TRH
+2023-12-27,HATHY,price_adjustment,207662,Price Adjusted - HATHY
+2023-12-28,RADHI,price_adjustment,207672,Price Adjusted - RADHI
+2023-12-28,ANLB,price_adjustment,207673,Price Adjusted - ANLB
+2023-12-28,SMB,price_adjustment,207674,Price Adjusted - SMB
+2023-12-28,GCIL,price_adjustment,207675,Price Adjusted - GCIL
+2023-12-28,SKBBL,price_adjustment,207676,Price Adjusted - SKBBL
+2023-12-28,HDL,price_adjustment,207677,Price Adjusted - HDL
+2024-01-01,EBL,bonus_listing,207678,Listing 10% Bonus Shares of Everest Bank Limited - EBL
+2024-01-01,ALICL,promoter_conversion,207679,Conversion of Promoter Shares of Asian Life Insurance Company Limited - ALICL
+2024-01-01,LBBL,price_adjustment,207683,Price Adjusted - LBBL
+2024-01-01,GBBL,price_adjustment,207684,Price Adjusted - GBBL
+2024-01-01,CBBL,price_adjustment,207685,Price Adjusted - CBBL
+2024-01-02,KPCL,price_adjustment,207689,Price Adjusted - KPCL
+2024-01-02,UPCL,price_adjustment,207690,Price Adjusted - UPCL
+2024-01-02,JBLB,price_adjustment,207691,Price Adjusted - JBLB
+2024-01-03,SHIVM,price_adjustment,207695,Price Adjusted - SHIVM
+2024-01-03,MNBBL,price_adjustment,207696,Price Adjusted - MNBBL
+2024-01-03,LSL,price_adjustment,207697,Price Adjusted - LSL
+2024-01-04,MHL,price_adjustment,207700,Price Adjusted - MHL
+2024-01-04,SHEL,price_adjustment,207701,Price Adjusted - SHEL
+2024-01-05,NICA,bonus_listing,207702,Listing 29% Bonus Shares of NIC Asia Bank Limited - NICA
+2024-01-07,HRL,ipo_listing,207703,Listing IPO Shares of Himalayan Reinsurance Limited - HRL
+2024-01-08,CIZBD90,debt_listing,207704,Listing 10% Citizens Bank Debenture 2090 - CIZBD90
+2024-01-08,NIBLPF,other,207705,Delisting NIBL Pragati Fund - NIBLPF
+2024-01-10,SANIMA,bonus_listing,207706,Listing 9% Bonus Shares of Sanima Bank Limited - SANIMA
+2024-01-11,CLI,price_adjustment,207707,Price Adjusted - CLI
+2024-01-25,HEI,price_adjustment,207709,Price Adjusted - HEI
+2024-01-28,RNLI,price_adjustment,207713,Price Adjusted - RNLI
+2024-01-28,AHPC,price_adjustment,207714,Price Adjusted - AHPC
+2024-02-04,RIDI,price_adjustment,207717,Price Adjusted - RIDI
+2024-02-04,UAIL,price_adjustment,207718,Price Adjusted - UAIL
+2024-02-05,NICGF2,fund_listing,207719,Listing NIC ASIA Growth Fund -2 (NICGF2)
+2024-02-07,NLG,price_adjustment,207720,Price Adjusted - NLG
+2024-02-09,SADBL,bonus_listing,207722,Listing 5% Bonus Shares of Shangrila Development Bank Limited - SADBL
+2024-02-09,HDL,bonus_listing,207723,Listing 10% Bonus Shares of Himalayan Distillery Limited - HDL
+2024-02-09,SWBBL,bonus_listing,207724,Listing 12.3599% Bonus Shares of Swabalamban Laghubitta Bittiya Sanstha Limited - SWBBL
+2024-02-12,GBBL,bonus_listing,207725,Listing 9.50% Bonus Shares of Garima Bikas Bank Limited - GBBL
+2024-02-14,SHPC,bonus_listing,207726,Listing 10% Bonus Shares of Sanima Mai Hydropower Limited - SHPC
+2024-02-14,CHCL,bonus_listing,207727,Listing 10% Bonus Shares of Chilime Hydropower Company Limited - CHCL
+2024-02-15,UMRH,price_adjustment,207729,Price Adjusted - UMRH
+2024-02-18,ALICL,price_adjustment,207733,Price Adjusted - ALICL
+2024-02-18,HRL,price_adjustment,207734,Price Adjusted - HRL
+2024-02-22,MDB,bonus_listing,207735,Listing 9.50% Bonus Shares of Miteri Development Bank Limited - MDB
+2024-02-22,GHL,right_listing,207736,Listing 200% Right Shares of Ghalemdi Hydro Limited - GHL
+2024-02-22,SLBBL,price_adjustment,207738,Price Adjusted - SLBBL
+2024-02-25,JSLBB,dividend_book_closure,207739,Information Regarding Dividend of JSLBB
+2024-02-25,SHINE,bonus_listing,207740,Listing 10.50% Bonus Shares of Shine Resunga Development Bank Limited - SHINE
+2024-02-25,SHIVM,bonus_listing,207741,Listing 14.25% Bonus Shares of Shivm Cements Limited - SHIVM
+2024-02-25,NICL,bonus_listing,207742,Listing 10% Bonus Shares of Nepal Insurance Company Limited - NICL
+2024-02-26,RADHI,bonus_listing,207743,Listing 4.75% Bonus Shares of Radhi Bidyut Company Limited - RADHI
+2024-02-28,NABILD87,debt_listing,207745,Listing 9% Nabil Debenture 2087 - NABILD87
+2024-02-28,HATHY,bonus_listing,207746,Listing 10% Bonus Shares of Hathway Investment Nepal Limited - HATHY
+2024-02-29,CLI,bonus_listing,207747,Listing 5% Bonus Shares of Citizen Life Insurance Company Limited - CLI
+2024-02-29,FMDBL,bonus_listing,207748,Listing 7.50% Bonus Shares of First Micro Finance Laghubitta Bittiya Sanstha Limited - FMDBL
+2024-03-04,CBBL,bonus_listing,207749,Listing 5% Bonus Shares of Chhimek Laghubitta Bittiya Sanstha Limited - CBBL
+2024-03-04,UPCL,bonus_listing,207751,Listing 8.55% Bonus Shares of Universal Power Company Limited - UPCL
+2024-03-06,SHL,bonus_listing,207757,Listing 5% Bonus Shares of Soaltee Hotel Limited - SHL
+2024-03-06,BPW,trading_halt,207758,Transactions Suspended of SLBSL & BPW
+2024-03-06,SLBSL,trading_halt,207758,Transactions Suspended of SLBSL & BPW
+2024-03-07,UAIL,bonus_listing,207759,Listing 10.2612% Bonus Shares of United Ajod Insurance Limited - UAIL
+2024-03-07,JBLB,bonus_listing,207760,Listing 14% Bonus Shares of Jeevan Bikas Laghubitta Bittya Sanstha Limited - JBLB
+2024-03-07,HEI,bonus_listing,207761,Listing 8.63% Bonus Shares of Himalayan Everest Insurance Limited - HEI
+2024-03-10,MNBBL,bonus_listing,207762,Listing 9.75% Bonus Shares of Muktinath Bikas Bank Limited - MNBBL
+2024-03-10,RSDC,bonus_listing,207763,Listing 8.6% Bonus Shares of RSDC Laghubitta Bittiya Sanstha Limited - RSDC
+2024-03-10,SBI,bonus_listing,207764,Listing 3.75% Bonus Shares of Nepal SBI Bank Limited - SBI
+2024-03-10,UPPER,right_listing,207765,Listing 100% Right Shares of Upper Tamakoshi Hydropower Limited - UPPER
+2024-03-12,LBBL,bonus_listing,207766,Listing 4% Bonus Shares of Lumbini Bikas Bank Limited - LBBL
+2024-03-12,MEN,price_adjustment,207767,Price Adjusted - MEN
+2024-03-12,NMFBS,price_adjustment,207768,Price Adjusted - NMFBS
+2024-03-12,MMFDB,trading_halt,207771,Transactions Suspended of NLBBL & MMFDB
+2024-03-12,NLBBL,trading_halt,207771,Transactions Suspended of NLBBL & MMFDB
+2024-03-18,SARBTM,ipo_listing,207772,Listing IPO Shares of Sarbottam Cement Limited - SARBTM
+2024-03-19,KSY,fund_listing,207773,Listing Kumari Sabal Yojana - KSY
+2024-03-21,MKJC,trading_halt,207774,Transactions Suspended of MKJC
+2024-03-21,GCIL,bonus_listing,207775,Listing 15% Bonus Shares of Ghorahi Cement Industry Limited - GCIL
+2024-03-21,STC,price_adjustment,207776,Price Adjusted - STC
+2024-03-21,GRDBL,price_adjustment,207779,Price Adjusted - GRDBL
+2024-03-25,TRH,bonus_listing,207780,Listing 4% Bonus Shares OF Taragaon Regency Hotel Limited (TRH)
+2024-03-25,MKJC,trading_resume,207781,Transactions Release of Mailung Khola Jal Vidhyut Company Limited (MKJC)
+2024-03-27,DDBL,price_adjustment,207783,Price Adjusted - DDBL
+2024-03-28,NIMBD90,debt_listing,207784,Listing 10% NIMB Debenture 2090 - NIMBD90
+2024-03-28,MKJC,price_adjustment,207785,Price Adjusted - MKJC
+2024-03-31,SMATA,price_adjustment,207788,Price Adjusted - SMATA
+2024-04-02,LSL,bonus_listing,207789,Listing 7% Bonus Shares of Laxmi Sunrise Bank Limited - LSL
+2024-04-03,SKBBL,bonus_listing,207790,Listing 14.25% Bonus Shares of Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited - SKBBL
+2024-04-03,RNLI,bonus_listing,207791,Listing 16% Bonus Shares of Reliable Nepal Life Insurance Limited - RNLI
+2024-04-07,MHL,bonus_listing,207792,Listing 4.75% Bonus Shares of Mandakini Hydropower Limited (MHL)
+2024-04-18,PRIN,price_adjustment,207796,Price Adjusted - PRIN
+2024-04-18,SJLIC,price_adjustment,207797,Price Adjusted - SJLIC
+2024-04-21,ALICL,bonus_listing,207799,Listing 7.75% Bonus Share of Asian Life Insurance Company Limited (ALICL)
+2024-04-22,GBIME,bonus_listing,207800,Listing 1% Bonus Share of Global IME Bank Limited (GBIME)
+2024-04-30,CHDC,price_adjustment,207801,Price Adjusted - CHDC
+2024-05-02,SHEL,right_listing,207803,Listing 100% Right Shares of Singati Hydro Energy Limited - SHEL
+2024-05-05,HRL,bonus_listing,207805,Listing 4% Bonus Share of Himalayan Reinsurance Limited (HRL)
+2024-05-08,SNLI,price_adjustment,207807,Price Adjusted - SNLI
+2024-05-12,CLI,trading_resume,207809,Transactions Release of Citizen Life Insurance Company Limited (CLI)
+2024-05-13,RIDI,right_listing,207810,Listing 50% Right Shares of Ridi Power Company Limited - RIDI
+2024-05-13,SRD80,other,207811,Delisting of 10% Sunrise Debenture 2080 - SRD80
+2024-05-15,HIDCL,right_listing,207812,Listing Right Shares (Auction of Promoter) of HIDCL
+2024-05-16,NRIC,price_adjustment,207814,Price Adjusted - NRIC
+2024-05-17,NMLBBL,merger,207815,Listing Shares of Nerude Mirmire Laghubitta Bittiya Sanstha Limited (NMLBBL) after merger
+2024-05-17,SLBSL,merger,207816,Listing Shares of Samudayik Laghubitta Bittiya Sanstha Limited (SLBSL) after merger
+2024-05-17,MERO,promoter_conversion,207817,Conversion of Promoter Shares of Mero Microfinance Laghubitta Bittiya Sanstha Limited - MERO
+2024-05-20,SMATA,bonus_listing,207818,Listing 5.4222% Bonus Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA)
+2024-05-20,UMRH,bonus_listing,207819,Listing 5.50% Bonus Shares of United IDI Mardi RB Hydropower Limited (UMRH)
+2024-05-20,RSDC,promoter_conversion,207820,Conversion of Promoter Shares of RSDC Laghubitta Bittiya Sanstha Limited - RSDC
+2024-05-20,AHPC,right_listing,207821,Listing 100% Right Shares of Arun Valley Hydropower Development Company Limited - AHPC
+2024-05-26,ILI,price_adjustment,207822,Price Adjusted - ILI
+2024-05-27,KPCL,bonus_listing,207824,Listing 10% Bonus Shares of Kalika power Company Limited (KPCL)
+2024-05-27,RHPL,fund_listing,207825,Listing Additional Shares of Rasuwagadhi Hydropower Company Limited (RHPL)
+2024-05-29,NLG,bonus_listing,207826,Listing 5.50 % Bonus Shares of NLG Insurance Company Limited (NLG)
+2024-05-29,SLBBL,bonus_listing,207827,Listing 7 % Bonus Shares of Swarojgar Laghubitta Bittiya Sanstha Limited (SLBBL)
+2024-05-30,NIBLSTF,fund_listing,207828,Listing NIBL Stable Fund - NIBLSTF
+2024-05-31,NHDL,bonus_listing,207829,Listing 7% Bonus Shares of Nepal Hydro Developer Limited (NHDL)
+2024-06-03,STC,bonus_listing,207830,Listing 15% Bonus Shares of Salt Trading Corporation Limited (STC)
+2024-06-03,DDBL,bonus_listing,207831,Listing 10% Bonus Shares of Deprosc Laghubitta Bittiya Sanstha Limited (DDBL)
+2024-06-07,NMFBS,bonus_listing,207832,Listing 7.5% Bonus Shares of National Laghubitta Bittiya Sanstha Limited (NMFBS)
+2024-06-07,MEN,bonus_listing,207833,Listing 15% Bonus Shares of Mountain Energy Nepal Limited (MEN)
+2024-06-09,LEMF,other,207835,Delisting of Laxmi Equity Fund - LEMF
+2024-06-10,NMLBBL,promoter_conversion,207836,Conversion of Promoter Shares of Nerude Mirmire Laghubitta Bittiya Sanstha Limited - NMLBBL
+2024-06-20,ANLB,bonus_listing,207837,Listing 10% Bonus Shares of Aatmanirbhar Laghubitta Bittiya Sanstha Limited (ANLB)
+2024-06-30,SJLIC,bonus_listing,207838,Listing 10.26% Bonus Shares of SuryaJyoti Life Insurance Company Limited (SJLIC)
+2024-07-01,SMB,bonus_listing,207839,Listing 13% Bonus Shares of Support Microfinance Bittiya Sanstha Ltd. (SMB)
+2024-07-03,CIT,price_adjustment,207846,Price Adjusted - CIT
+2024-07-03,HURJA,price_adjustment,207847,Price Adjusted - HURJA
+2024-07-07,MKLB,trading_halt,207849,Transactions Suspended of Manakamana Smart Laghubitta Bittiya Sanstha Limited (MKLB)
+2024-07-10,JALPA,trading_halt,207853,Transactions Suspended of KLBSL & JALPA
+2024-07-10,KLBSL,trading_halt,207853,Transactions Suspended of KLBSL & JALPA
+2024-07-11,SABSL,trading_halt,207858,Transactions Suspended of SDLBSL & SABSL
+2024-07-11,SDLBSL,trading_halt,207858,Transactions Suspended of SDLBSL & SABSL
+2024-07-15,AKLCL,price_adjustment,207860,Price Adjusted - AKLCL
+2024-07-30,LUK,dividend_book_closure,207866,Dividend declaration of Laxmi Unnati kosh -LUK
+2024-07-30,LVF2,dividend_book_closure,207867,Dividend declaration of Laxmi Value Fund 2 - LVF2
+2024-08-02,SMATA,merger,207870,Listing Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA) after acquisition
+2024-08-07,PRIN,bonus_listing,207871,Listing 4.75% Bonus Shares of Prabhu Insurance Ltd. (PRIN)
+2024-08-07,SWMF,price_adjustment,207875,Price Adjusted - Suryodaya Womi Laghubitta Bittiya Sanstha Limited (SWMF)
+2024-08-07,NLICL,price_adjustment,207876,Price Adjusted - National Life Insurance Co. Ltd. (NLICL)
+2024-08-08,LUK,dividend_book_closure,207877,Book Closure Notice of Laxmi Unnati kosh -LUK
+2024-08-08,LVF2,dividend_book_closure,207878,Book Closure Notice Laxmi Value Fund 2 - LVF2
+2024-08-09,SFMF,dividend_book_closure,207879,Dividend declaration of Sunrise First Mutual Fund (SFMF)
+2024-08-09,SFEF,dividend_book_closure,207880,Dividend declaration of Sunrise Focused Equity Fund - SFEF
+2024-08-11,ILI,bonus_listing,207881,Listing 25% Bonus Shares of IME Life Insurance Company Limited (ILI)
+2024-08-12,SRLI,promoter_conversion,207882,Conversion of Promoter Shares of Sanima Reliance Life Insurance Limited (SRLI)
+2024-08-12,MATRI,merger,207883,Listing Shares of Matribhumi Laghubitta Bittiya Sanstha (MATRI) after merger
+2024-08-13,SNLI,bonus_listing,207884,Listing 23.80% Bonus Shares of Sun Nepal Life Insurance Company Limited (SNLI)
+2024-08-15,SFMF,dividend_book_closure,207885,Book Closure Notice Sunrise First Mutual Fund- SFMF
+2024-08-15,SFEF,dividend_book_closure,207886,Book Closure Notice Sunrise Focused Equity Fund - SFEF
+2024-08-15,SMPDA,merger,207887,Listing Shares of Sampada Laghubitta Bittiya Sanstha (SMPDA) after merger
+2024-08-18,SWMF,ipo_listing,207888,Listing FPO Shares of Suryodaya Womi Laghubitta Bittiya Sanstha Limited (SWMF)
+2024-08-21,SIGS3,dividend_book_closure,207889,Dividend declaration of Siddhartha Investment Growth Scheme 3 -SIGS3
+2024-08-22,SFMF,price_adjustment,207891,Price Adjusted - Sunrise First Mutual Fund (SFMF)
+2024-08-27,KEF,dividend_book_closure,207892,Dividend declaration of Kumari Equity Fund - KEF
+2024-08-27,MKJC,bonus_listing,207894,Listing 2.2211% Bonus Shares of Mailung Khola Jal Vidhyut Company Limited (MKJC)
+2024-08-27,CHDC,bonus_listing,207895,Listing 11% Bonus Shares of CEDB Hydropower Development Company Limited (CHDC)
+2024-08-27,KDBY,dividend_book_closure,207896,Book Closure Notice of Kumari Dhanabriddhi Yojana (KDBY)
+2024-08-27,KEF,dividend_book_closure,207897,Book Closure Notice of Kumari Equity Fund (KEF)
+2024-08-29,SIGS3,dividend_book_closure,207898,Book Closure Notice of Siddhartha Investment Growth Scheme 3 (SIGS3)
+2024-09-02,NRIC,bonus_listing,207900,Listing 4.75% Bonus Shares of Nepal Reinsurance Company Limited (NRIC)
+2024-09-04,HIDCL,right_listing,207902,Listing Right Shares (Auction of Promoter) of HIDCL
+2024-09-05,RMF1,dividend_book_closure,207904,Dividend declaration and Book Closure for RBB Mutual Fund 1 (RMF1) and RBB Mutual Fund 2 (RMF2 )
+2024-09-05,RMF2,dividend_book_closure,207904,Dividend declaration and Book Closure for RBB Mutual Fund 1 (RMF1) and RBB Mutual Fund 2 (RMF2 )
+2024-09-06,NIBLGF,dividend_book_closure,207905,Dividend declaration of NIBL Growth Fund (NIBLGF)
+2024-09-09,BFC,right_listing,207906,Listing Right Shares (Auction of Promoter) of BFC
+2024-09-10,SAEF,price_adjustment,207908,Price Adjusted - Sanima Equity Fund (SAEF)
+2024-09-12,NICSF,price_adjustment,207911,Price Adjusted - NIC Asia Select Fund 30 (NICSF)
+2024-09-13,GIBF1,dividend_book_closure,207912,Dividend Declaration of Global IME Balanced Fund-I (GIBF1)
+2024-09-16,BGWT,price_adjustment,207914,Price Adjusted - Bhagawati Hydropower Development Company Limited (BGWT)
+2024-09-18,PRSF,dividend_book_closure,207917,Dividend declaration of Prabhu Select Fund (PSF) and Prabhu Smart Fund (PRSF)
+2024-09-18,PSF,dividend_book_closure,207917,Dividend declaration of Prabhu Select Fund (PSF) and Prabhu Smart Fund (PRSF)
+2024-09-18,NLO,price_adjustment,207919,Price Adjusted - Nepal Lube Oil Limited (NLO)
+2024-09-20,NMB50,dividend_book_closure,207920,Dividend Declaration and Book Close of NMB 50 (NMB50) and NMB Sulav Investment Fund -II (NSIF2).
+2024-09-20,NSIF2,dividend_book_closure,207920,Dividend Declaration and Book Close of NMB 50 (NMB50) and NMB Sulav Investment Fund -II (NSIF2).
+2024-09-22,PRSF,dividend_book_closure,207921,Book Closure Notice of Prabhu Select Fund (PSF) and Prabhu Smart Fund (PRSF)
+2024-09-22,PSF,dividend_book_closure,207921,Book Closure Notice of Prabhu Select Fund (PSF) and Prabhu Smart Fund (PRSF)
+2024-09-22,CHDC,price_adjustment,207922,Price Adjusted - CEDB Hydropower Development Company Limited (CHDC)
+2024-09-22,OHL,price_adjustment,207923,Price Adjusted - Oriental Hotels Limited (OHL)
+2024-09-22,GRDBL,promoter_conversion,207926,Conversion of Promoter Shares of Green Development Bank Ltd. (GRDBL)
+2024-09-23,EBL,price_adjustment,207927,Price Adjusted - Everest Bank Limited (EBL)
+2024-09-24,GUFL,promoter_conversion,207929,Conversion of Promoter Shares of Gurkhas Finance Ltd. (GUFL)
+2024-09-25,NIBLGF,dividend_book_closure,207930,Book Closure Notice of NIBL Growth Fund (NIBLGF)
+2024-09-25,CIT,bonus_listing,207931,Listing 14% Bonus Shares of Citizen Investment Trust (CIT)
+2024-09-26,SAHAS,price_adjustment,207935,Price Adjusted - Sahas Urja Limited (SAHAS)
+2024-09-26,SRLI,price_adjustment,207936,Price Adjusted - Sanima Reliance Life Insurance Limited (SRLI)
+2024-09-26,NMB50,price_adjustment,207937,Price Adjusted - NMB50
+2024-09-26,GRDBL,bonus_listing,207938,Listing 3.80% Bonus Shares of Green Development Bank Ltd. (GRDBL)
+2024-09-29,C30MF,dividend_book_closure,207940,"Dividend declaration & Book Closure notice of CMF-I, CMF-II & C30MF"
+2024-09-29,II,dividend_book_closure,207940,"Dividend declaration & Book Closure notice of CMF-I, CMF-II & C30MF"
+2024-09-30,KSBBL,price_adjustment,207942,Price Adjusted - Kamana Sewa Bikas Bank Limited (KSBBL)
+2024-10-01,NWCL,other,207943,Right share of Nepal Warehousing Company Limited (NWCL)
+2024-10-01,PMLI,price_adjustment,207946,Price Adjusted - Prabhu Mahalaxmi Life Insurance Limited (PMLI)
+2024-10-01,GLBSL,price_adjustment,207947,Price Adjusted - Gurans Laghubitta Bittiya Sanstha Limited (GLBSL)
+2024-10-02,SMHL,price_adjustment,207949,Price Adjusted - Super Madi Hydropower Limited (SMHL)
+2024-10-02,SWMF,bonus_listing,207950,Listing 14.005143% Bonus Shares of Suryodaya Womi Laghubitta Bittiya Sanstha Limited (SWMF)
+2024-10-08,H8020,dividend_book_closure,207951,Dividend declaration notice of Himalayan 80-20 (H8020)
+2024-10-09,CZBIL,price_adjustment,207952,Price Adjusted -Citizens Bank International Limited (CZBIL)
+2024-10-15,RURU,price_adjustment,207954,Price Adjusted -Ru Ru Jalbidhyut Pariyojana Limited (RURU)
+2024-10-16,H8020,dividend_book_closure,207956,Book Closure Notice of Himalayan 80-20 (H8020)
+2024-10-17,API,price_adjustment,207958,Price Adjusted - Api Power Company Ltd. (API)
+2024-10-18,NLICL,bonus_listing,207959,Listing 4% Bonus Shares of National Life Insurance Co. Ltd. (NLICL)
+2024-10-20,AHPC,price_adjustment,207961,Price Adjusted - Arun Valley Hydropower Development Co. Ltd. (AHPC)
+2024-10-22,HATHY,price_adjustment,207963,Price Adjusted - Hathway Investment Nepal Limited (HATHY)
+2024-10-24,SWBBL,price_adjustment,207966,Price Adjusted - Swabalamban Laghubitta Bittiya Sanstha Limited (SWBBL)
+2024-10-24,LICN,price_adjustment,207967,Price Adjusted – Life Insurance Corporation (Nepal) Limited (LICN)
+2024-10-29,HURJA,right_listing,207968,Listing 100% Right Shares of Himalaya Urja Bikas Company Limited (HURJA)
+2024-10-30,NRM,other,207969,AGM Notice of NRM
+2024-11-05,LEC,price_adjustment,207970,Price Adjusted – Liberty Energy Company Limited (LEC)
+2024-11-05,BHL,price_adjustment,207971,Price Adjusted – Balephi Hydropower Limited (BHL)
+2024-11-06,ALBSL,price_adjustment,207974,Price Adjusted - Asha Laghubitta Bittiya Sanstha Ltd (ALBSL)
+2024-11-10,SMJC,price_adjustment,207976,Price Adjusted - Sagarmatha Jalabidhyut Company Limited (SMJC)
+2024-11-11,SAMAJ,bonus_listing,207978,Listing 14.25% Bonus Shares of Samaj Laghubitta Bittiya Sanstha Limited (SAMAJ)
+2024-11-11,CORBL,bonus_listing,207979,Listing 5% Bonus Shares of Corporate Development Bank Limited (CORBL)
+2024-11-11,AKJCL,right_listing,207980,Listing 150% Right Shares of Ankhu Khola Jalvidhyut Company Ltd (AKJCL)
+2024-11-11,NLG,price_adjustment,207981,Price Adjusted – NLG Insurance Company Ltd. (NLG)
+2024-11-12,BHDC,price_adjustment,207983,Price Adjusted - Bindhyabasini Hydropower Development Company Limited (BHDC)
+2024-11-12,MHL,price_adjustment,207984,Price Adjusted - Mandakini Hydropower Limited (MHL)
+2024-11-14,NLO,bonus_listing,207987,Listing 25% Bonus Shares of Nepal Lube Oil Limited (NLO)
+2024-11-20,NMBMF,promoter_conversion,207990,Conversion of Promoter Shares of NMB Laghubitta Bittiya Sanstha Ltd. (NMBMF)
+2024-11-21,GBIME,price_adjustment,207992,Price Adjusted -Global IME Bank Limited (GBIME)
+2024-11-26,SMATA,ipo_listing,207993,Listing FPO share of Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA)
+2024-11-26,BBC,fund_listing,207995,Listing Additional Unit ( Promoter of Nepal Government ) Share of Bishal Bazar Company Limited (BBC)
+2024-11-26,SCB,price_adjustment,207997,Price Adjusted - Standard Chartered Bank Limited (SCB)
+2024-11-27,SHL,price_adjustment,207998,Price Adjusted - Soaltee Hotel Limited (SHL)
+2024-11-28,FOWAD,price_adjustment,208000,Price Adjusted – FOWAD
+2024-11-28,SMB,price_adjustment,208001,Price Adjusted – SMB
+2024-12-01,SMH,price_adjustment,208004,Price Adjusted - Super Mai Hydropower Limited (SMH)
+2024-12-02,NMFBS,price_adjustment,208006,Price Adjusted – NMFBS
+2024-12-02,NGPL,price_adjustment,208007,Price Adjusted – NGPL
+2024-12-04,EBL,bonus_listing,208010,Listing - 10% Bonus Shares of EBL
+2024-12-04,KSBBL,bonus_listing,208011,Listing - 7% Bonus Shares of KSBBL
+2024-12-04,API,bonus_listing,208012,Listing - 5% Bonus Shares of API
+2024-12-04,CHDC,bonus_listing,208013,Listing - 11% Bonus Shares of CHDC
+2024-12-05,NRN,price_adjustment,208014,Price Adjusted - NRN Infrastructure and Development Limited (NRN)
+2024-12-05,FMDBL,price_adjustment,208015,Price Adjusted - First Micro Finance Laghubitta Bittiya Sanstha Limited (FMDBL)
+2024-12-11,GLBSL,bonus_listing,208018,Listing - 14.25% Bonus Shares of GLBSL
+2024-12-11,AHPC,bonus_listing,208019,Listing - 3% Bonus Shares of AHPC
+2024-12-11,SWBBL,bonus_listing,208020,Listing - 14.25% Bonus Shares of SWBBL
+2024-12-16,PMLI,bonus_listing,208021,Listing - 10% Bonus Shares of PMLI
+2024-12-16,BGWT,bonus_listing,208022,Listing - 4% Bonus Shares of BGWT
+2024-12-17,BNL,trading_halt,208025,Transactions Suspended of Bottlers Nepal (Balaju) Limited (BNL)
+2024-12-17,SHINE,price_adjustment,208026,Price Adjusted – SHINE
+2024-12-18,BNL,trading_resume,208029,Transactions Release of Bottlers Nepal (Balaju) Limited (BNL)
+2024-12-18,RADHI,price_adjustment,208030,Price Adjusted – RADHI
+2024-12-19,SBI,price_adjustment,208032,Price Adjusted – SBI
+2024-12-22,NHDL,price_adjustment,208035,Price Adjusted – NHDL
+2024-12-22,SAEF,other,208037,Delisting of Sanima Equity Fund (SAEF)
+2024-12-23,ANLB,trading_halt,208039,Transactions Suspended of Aatmanirbhar Laghubitta Bittiya Sanstha Limited (ANLB)
+2024-12-23,SHPC,price_adjustment,208040,Price Adjusted – SHPC
+2024-12-24,ANLB,trading_resume,208043,Transactions Release of Aatmanirbhar Laghubitta Bittiya Sanstha Limited (ANLB)
+2024-12-24,MLBBL,price_adjustment,208044,Price Adjusted – MLBBL
+2024-12-24,RSDC,price_adjustment,208045,Price Adjusted – RSDC
+2024-12-24,KBSH,price_adjustment,208046,Price Adjusted – KBSH
+2024-12-24,MEN,price_adjustment,208047,Price Adjusted – MEN
+2024-12-26,KRBL,trading_halt,208054,Transactions Suspended of Karnali Development Bank Limited (KRBL)
+2024-12-26,SARBTM,price_adjustment,208055,Price Adjusted – SARBTM
+2024-12-26,GVL,price_adjustment,208056,Price Adjusted – GVL
+2024-12-27,ALBSL,bonus_listing,208059,Listing 14.25% Bonus Shares of Asha Laghubitta Bittiya Sanstha Ltd (ALBSL)
+2024-12-29,CHCL,price_adjustment,208060,Price Adjusted – CHCL
+2024-12-29,MDB,price_adjustment,208061,Price Adjusted – MDB
+2024-12-29,CBBL,price_adjustment,208062,Price Adjusted – CBBL
+2024-12-29,ADBL,price_adjustment,208063,Price Adjusted – ADBL
+2024-12-29,ANLB,price_adjustment,208064,Price Adjusted – ANLB
+2024-12-29,JBLB,price_adjustment,208065,Price Adjusted – JBLB
+2024-12-29,MLBL,price_adjustment,208066,Price Adjusted – MLBL
+2024-12-31,LSL,price_adjustment,208074,Price Adjusted – LSL
+2024-12-31,SKBBL,price_adjustment,208075,Price Adjusted – SKBBL
+2024-12-31,DDBL,price_adjustment,208076,Price Adjusted – DDBL
+2024-12-31,SHIVM,price_adjustment,208077,Price Adjusted – SHIVM
+2024-12-31,SADBL,price_adjustment,208078,Price Adjusted – SADBL
+2025-01-01,CZBIL,bonus_listing,208084,Listing - 4% Bonus Shares of CZBIL
+2025-01-01,HATHY,bonus_listing,208085,Listing 10% Bonus Shares of HATHY
+2025-01-02,HDL,price_adjustment,208086,Price Adjusted – HDL
+2025-01-02,KMCDB,price_adjustment,208087,Price Adjusted – KMCDB
+2025-01-02,KPCL,price_adjustment,208088,Price Adjusted – KPCL
+2025-01-02,LBBL,price_adjustment,208089,Price Adjusted – LBBL
+2025-01-02,SIFC,price_adjustment,208091,Price Adjusted – SIFC
+2025-01-02,SWMF,price_adjustment,208092,Price Adjusted – SWMF
+2025-01-02,MERO,price_adjustment,208093,Price Adjusted – MERO
+2025-01-05,CIT,price_adjustment,208101,Price Adjusted – CIT
+2025-01-06,MNMF1,fund_listing,208103,Listing Muktinath Mutual Fund 1- MNMF1
+2025-01-16,SMHL,bonus_listing,208105,Listing 5% Bonus Shares of Super Madi Hydropower Limited (SMHL)
+2025-01-19,SRLI,bonus_listing,208106,Listing 18.3811% Bonus Shares of Sanima Reliance Life Insurance Limited (SRLI)
+2025-01-22,SAHAS,bonus_listing,208107,Listing - 8% Bonus Shares of SAHAS
+2025-01-22,SMJC,bonus_listing,208108,Listing – 4.75% Bonus Shares of SMJC
+2025-01-22,NLIC,price_adjustment,208109,Price Adjusted – NLIC
+2025-01-24,OHL,bonus_listing,208111,Listing - 5% Bonus Shares of OHL
+2025-01-26,RURU,bonus_listing,208112,Listing 15% Bonus Shares of Ru Ru Jalbidhyut Pariyojana Limited (RURU)
+2025-01-26,NMFBS,bonus_listing,208113,Listing 14.25% Bonus Shares of National Laghubitta Bittiya Sanstha Limited (NMFBS)
+2025-01-27,MSLB,ipo_listing,208114,Listing FPO share of Mahuli Laghubitta Bittiya Sanstha Limited (MSLB)
+2025-01-28,NIL,price_adjustment,208115,Price Adjusted – NIL
+2025-02-05,SMATA,price_adjustment,208117,Price Adjusted – SMATA
+2025-02-06,HLI,price_adjustment,208120,Price Adjusted – HLI
+2025-02-06,GMLI,ipo_listing,208121,Listing IPO Shares of Guardian Micro Life Insurance Limited - GMLI
+2025-02-10,SHL,bonus_listing,208123,Listing 10% Bonus Shares of Soaltee Hotel Limited (SHL)
+2025-02-10,NRN,bonus_listing,208124,Listing 5% Bonus Shares of NRN Infrastructure and Development Limited (NRN)
+2025-02-10,MHL,bonus_listing,208125,Listing 5% Bonus Shares of Mandakini Hydropower Limited (MHL)
+2025-02-11,SICL,price_adjustment,208127,Price Adjusted – SICL
+2025-02-12,LICN,promoter_conversion,208128,Conversion of Promoter Shares of Life Insurance Corporation (Nepal) Limited (LICN)
+2025-02-13,GSY,fund_listing,208129,Listing Garima Samriddhi Yojana - GSY
+2025-02-14,LEC,right_listing,208130,Listing 50% Right Shares of Liberty Energy Company Limited (LEC)
+2025-02-16,SFCL,promoter_conversion,208131,Conversion of Promoter Shares of Samriddhi Finance Company Limited (SFCL)
+2025-02-16,GBIME,bonus_listing,208132,Listing 5.50% Bonus Shares of Global IME Bank Limited (GBIME)
+2025-02-16,CBBL,bonus_listing,208133,Listing 8% Bonus Shares of Chhimek Laghubitta Bittiya Sanstha Limited (CBBL)
+2025-02-18,SJCL,fund_listing,208134,Listing Additional Shares of SANJEN JALAVIDHYUT COMPANY LIMITED (SJCL)
+2025-02-20,ADBL,bonus_listing,208135,Listing 3% Bonus Share of Agricultural Development Bank Limited (ADBL)
+2025-02-20,FMDBL,bonus_listing,208136,Listing 9% Bonus Share of First Micro Finance Laghubitta Bittiya Sanstha Limited (FMDBL)
+2025-02-20,SHIVM,bonus_listing,208137,Listing 8.55% Bonus Share of SHIVAM CEMENTS LTD (SHIVM)
+2025-02-23,HDL,bonus_listing,208138,Listing 15% Bonus Share of Himalayan Distillery Limited (HDL)
+2025-02-23,DDBL,bonus_listing,208139,Listing 9.50% Bonus Share of Deprosc Laghubitta Bittiya Sanstha Limited (DDBL)
+2025-02-25,DORDI,price_adjustment,208140,Price Adjusted – DORDI
+2025-02-27,CMF1,other,208142,Delisting of Citizens Mutual Fund -1 (CMF1)
+2025-03-02,ICFCD88,debt_listing,208143,Listing 9% ICFC Finance Limited Debenture 2088 - ICFCD88
+2025-03-05,SHPC,bonus_listing,208144,Listing 10% Bonus Share of Sanima Mai Hydropower Ltd. (SHPC)
+2025-03-06,UMRH,price_adjustment,208145,Price Adjusted – UMRH
+2025-03-09,NLO,bonus_listing,208147,Listing 20% Bonus Share of Nepal Lube Oil Limited (NLO)
+2025-03-09,NLG,right_listing,208148,Listing 62.56% Right Shares of NLG Insurance Company Ltd. (NLG)
+2025-03-09,SRLI,price_adjustment,208149,Price Adjusted – SRLI
+2025-03-09,NICGF,other,208150,Delisting of NIC Asia Growth Fund (NICGF)
+2025-03-11,SCB,bonus_listing,208152,Listing 6.50% Bonus Share of Standard Chartered Bank Limited (SCB)
+2025-03-11,NESDO,price_adjustment,208153,Price Adjusted – NESDO
+2025-03-11,CLI,price_adjustment,208154,Price Adjusted – CLI
+2025-03-16,LICN,right_listing,208157,Listing 88.45168% Right Shares of Life Insurance Corporation (Nepal) Limited (LICN)
+2025-03-19,NICL,price_adjustment,208159,Price Adjusted – NICL
+2025-03-20,SKBBL,bonus_listing,208160,Listing 13.30% Bonus Share of Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited (SKBBL)
+2025-03-20,SLBBL,ipo_listing,208161,Listing FPO Share of Swarojgar Laghubitta Bittiya Sanstha Ltd. (SLBBL)
+2025-03-20,LSL,bonus_listing,208162,Listing 5% Bonus Share of Laxmi Sunrise Bank Limited (LSL)
+2025-03-20,BHDC,bonus_listing,208163,Listing 7.60% Bonus Share of Bindhyabasini Hydropower Development Company Limited (BHDC)
+2025-03-20,SGIC,price_adjustment,208165,Price Adjusted – SGIC
+2025-03-23,SMB,bonus_listing,208166,Listing 13.775% Bonus Share of Support Laghubitta Bittiya Sanstha Ltd. (SMB)
+2025-03-23,SWMF,bonus_listing,208167,Listing 6% Bonus Share of Suryodaya Womi Laghubitta Bittiya Sanstha Limited (SWMF)
+2025-03-24,MERO,bonus_listing,208168,Listing 7.5% Bonus Share of Mero Microfinance Laghubitta Bittiya Sanstha Ltd. (MERO)
+2025-03-24,SARBTM,bonus_listing,208169,Listing 7% Bonus Share of Sarbottam Cement Limited (SARBTM)
+2025-03-24,SHINE,bonus_listing,208170,Listing 3% Bonus Share of Shine Resunga Development Bank Ltd. (SHINE)
+2025-03-25,KBSH,bonus_listing,208171,Listing 10% Bonus Share of Kutheli Bukhari Small Hydropower Limited (KBSH)
+2025-03-25,SMH,bonus_listing,208172,Listing 7% Bonus Share of Super Mai Hydropower Limited (SMH)
+2025-03-25,CHCL,bonus_listing,208174,Listing 10% Bonus Share of Chilime Hydropower Company Limited (CHCL)
+2025-03-25,SADBL,bonus_listing,208175,Listing 3.6516% Bonus Share of Shangrila Development Bank Ltd. (SADBL)
+2025-03-27,GRDBL,price_adjustment,208177,Price Adjusted – GRDBL
+2025-03-27,BFC,promoter_conversion,208178,Conversion of Promoter Shares of Best Finance Company Ltd. (BFC)
+2025-03-27,MLBL,bonus_listing,208179,Listing 3% Bonus Share of Mahalaxmi Bikas Bank Ltd. (MLBL)
+2025-03-27,MEN,bonus_listing,208180,Listing 15% Bonus Share of Mountain Energy Nepal Limited (MEN)
+2025-03-30,MDB,bonus_listing,208181,Listing 9.5079% Bonus Share of Miteri Development Bank Limited (MDB)
+2025-04-01,BHL,right_listing,208183,Listing 100% Right Shares of Balephi Hydropower Limited
+2025-04-01,FOWAD,bonus_listing,208185,Listing 13.30% Bonus Share of Forward Microfinance Laghubitta Bittiya Sanstha Limited (FOWAD)
+2025-04-01,SBI,bonus_listing,208186,Listing 3.80% Bonus Share of Nepal SBI Bank Limited (SBI)
+2025-04-03,NMIC,ipo_listing,208187,Listing IPO Share of Nepal Micro Insurance Company Limited - NMIC
+2025-04-07,RADHI,bonus_listing,208189,Listing 4.75% Bonus Share of Radhi Bidyut Company Ltd (RADHI)
+2025-04-07,KMCDB,bonus_listing,208190,Listing 9.50% Bonus Share of Kalika Laghubitta Bittiya Sanstha Ltd (KMCDB)
+2025-04-07,JBLB,bonus_listing,208191,Listing 14% Bonus Share of Jeevan Bikas Laghubitta Bittya Sanstha Ltd (JBLB)
+2025-04-07,CIT,bonus_listing,208192,Listing 7% Bonus Share of Citizen Investment Trust (CIT)
+2025-04-08,SMATA,bonus_listing,208193,Listing 5% Bonus Share of SMATA
+2025-04-08,MERO,promoter_conversion,208195,Conversion Promoter Shares of Mero Microfinance Bittiya Sanstha Ltd. (MERO)
+2025-04-09,CREST,ipo_listing,208196,Listing IPO Shares of Crest Micro Life Insurance Limited - CREST
+2025-04-13,LBBL,bonus_listing,208198,Listing 3% Bonus Share of Lumbini Bikas Bank Ltd. (LBBL)
+2025-04-17,SNLI,price_adjustment,208200,Price Adjusted – Sun Nepal Life Insurance Company Limited (SNLI)
+2025-04-20,NMBHF2,fund_listing,208201,Listing NMB Hybrid Fund L- II (NMBHF2)
+2025-04-21,EBLD91,debt_listing,208203,Listing Everest Bank Limited Debenture 2091 (EBLD91)
+2025-04-23,SLBBL,price_adjustment,208204,Price Adjusted – Swarojgar Laghubitta Bittiya Sanstha Ltd. (SLBBL)
+2025-04-23,SMFBS,price_adjustment,208205,Price Adjusted – Swabhimaan Laghubitta Bittiya Sanstha Limited (SMFBS)
+2025-04-24,SMATA,promoter_conversion,208208,Conversion Promoter Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA)
+2025-04-25,MLBBL,bonus_listing,208209,Listing 14.25% Bonus Share of Mithila LaghuBitta Bittiya Sanstha Limited (MLBBL)
+2025-04-25,SIFC,bonus_listing,208210,Listing 1.8659% Bonus Share of Shree Investment Finance Co. Ltd. (SIFC)
+2025-04-28,GVL,bonus_listing,208211,Listing 10% Bonus Share of Green Ventures Limited (GVL)
+2025-04-30,OMPL,ipo_listing,208212,Listing IPO Share of Om Megashree Pharmaceuticals Limited - OMPL
+2025-05-05,RSDC,bonus_listing,208213,Listing 9.50% Bonus Share of RSDC Laghubitta Bittiya Sanstha Ltd. (RSDC)
+2025-05-05,NHDL,bonus_listing,208214,Listing 8% Bonus Share of Nepal Hydro Developers Ltd. (NHDL)
+2025-05-09,ANLB,bonus_listing,208215,Listing 14.25% Bonus Share of Aatmanirbhar Laghubitta Bittiya Sanstha Limited (ANLB)
+2025-05-09,NLIC,bonus_listing,208216,Listing 10% Bonus Share of Nepal Life Insurance Co. Ltd. (NLIC)
+2025-05-11,NIL,price_adjustment,208218,Price Adjusted –Neco Insurance Limited (NIL)
+2025-05-15,WNLB,ipo_listing,208219,Listing FPO Share of Wean Nepal Laghubitta Bittiya Sanstha Limited (WNLB)
+2025-05-15,HLI,bonus_listing,208220,Listing 14% Bonus Share of Himalayan Life Insurance Limited (HLI)
+2025-05-15,LICN,promoter_conversion,208221,Conversion of Promoter Shares of Life Insurance Corporation (Nepal) Limited (LICN)
+2025-05-15,CHL,price_adjustment,208223,Price Adjusted – Chhyangdi Hydropower Ltd. (CHL)
+2025-05-18,TPC,price_adjustment,208225,Price Adjusted – Terhathum Power Company Limited (TPC)
+2025-05-19,RHGCL,price_adjustment,208226,Price Adjusted – Rapti Hydro And General Construction Limited (RHGCL)
+2025-05-21,MBLEF,fund_listing,208228,Listing - MBL Equity Fund (MBLEF)
+2025-05-22,HRL,price_adjustment,208229,Price Adjusted –Himalayan Reinsurance Limited (HRL)
+2025-05-25,CLI,bonus_listing,208232,Listing 26.98412698% Bonus Share of Citizen Life Insurance Company Limited (CLI)
+2025-05-26,PURE,ipo_listing,208233,Listing IPO Share of Pure Energy Limited (PURE)
+2025-05-28,PMLI,price_adjustment,208236,Price Adjusted – Prabhu Mahalaxmi Life Insurance Limited (PMLI)
+2025-05-28,ALICL,price_adjustment,208237,Price Adjusted – Asian Life Insurance Co. Limited (ALICL)
+2025-06-02,SICL,bonus_listing,208238,Listing 10% Bonus Share of Shikhar Insurance Co. Ltd. (SICL)
+2025-06-02,SLBSL,promoter_conversion,208239,Conversion of Promoter Shares of Samudayik Laghubitta Bittiya Sanstha Limited (SLBSL)
+2025-06-03,NESDO,bonus_listing,208240,Listing 14.25% Bonus Share of NESDO Sambridha Laghubitta Bittiya Sanstha Limited (NESDO)
+2025-06-04,BARUN,price_adjustment,208241,Price Adjusted – Barun Hydropower Co. Ltd. (BARUN)
+2025-06-04,NLG,price_adjustment,208242,Price Adjusted – NLG Insurance Company Ltd. (NLG)
+2025-06-04,NLICL,price_adjustment,208243,Price Adjusted – National Life Insurance Co. Ltd. (NLICL)
+2025-06-08,SRLI,bonus_listing,208247,Listing 1.2489% Bonus Share of Sanima Reliance Life Insurance Limited (SRLI)
+2025-06-08,RNLI,price_adjustment,208248,Price Adjusted – Reliable Nepal Life Insurance Limited (RNLI)
+2025-06-12,NICL,price_adjustment,208250,Price Adjusted – Nepal Insurance Co. Ltd. (NICL)
+2025-06-12,NIL,right_listing,208252,Listing 25% Right Shares of Neco Insurance Limited (NIL)
+2025-06-15,PPL,price_adjustment,208253,Price Adjusted – People's Power Limited (PPL)
+2025-06-16,SGIC,bonus_listing,208255,Listing 7.5% Bonus Share of Sanima GIC Insurance Limited (SGIC)
+2025-06-19,JOSHI,price_adjustment,208256,Price Adjusted – Joshi Hydropower Development Company Ltd (JOSHI)
+2025-06-23,RSY,fund_listing,208258,Listing - Reliable Samriddhi Yojana (RSY)
+2025-06-29,LICN,price_adjustment,208260,Price Adjusted – Life Insurance Corporation (Nepal) Limited (LICN)
+2025-07-01,UMRH,bonus_listing,208262,Listing 4% Bonus Share of United IDI Mardi RB Hydropower Limited. (UMRH)
+2025-07-02,UAIL,price_adjustment,208263,Price Adjusted – United Ajod Insurance Limited (UAIL)
+2025-07-03,ALICL,price_adjustment,208266,Price Adjusted – Asian Life Insurance Co. Limited (ALICL)
+2025-07-06,PMLI,bonus_listing,208267,Listing - 8% Bonus Shares of Prabhu Mahalaxmi Life Insurance Limited (PMLI)
+2025-07-09,NIFRAGED,debt_listing,208268,Listing Nifra Green Energy Debenture 6% - 2088/89 (NIFRAGED)
+2025-07-10,KKHC,price_adjustment,208270,Price Adjusted – Khanikhola Hydropower Co. Ltd. (KKHC)
+2025-07-13,NICL,bonus_listing,208271,Listing - 15% Bonus Shares of Nepal Insurance Co. Ltd. (NICL)
+2025-07-14,NFS,right_listing,208272,Listing Right Share (Auction of Promoter) of Nepal Finance Ltd. (NFS)
+2025-07-14,SNLI,right_listing,208273,Listing 27% Right Shares of Sun Nepal Life Insurance Company Limited (SNLI)
+2025-07-15,TTL,ipo_listing,208274,Listing IPO Share of Trade Tower Limited (TTL)
+2025-07-17,PRIN,price_adjustment,208277,Price Adjusted – Prabhu Insurance Ltd. (PRIN)
+2025-07-17,SANVI,ipo_listing,208279,Listing IPO Share of Sanvi Energy Limited (SANVI)
+2025-07-21,KPCL,bonus_listing,208280,Listing 7% Bonus Share of Kalika power Company Ltd (KPCL)
+2025-07-30,RBBD2088,debt_listing,208281,Listing 7% RBBL Debenture 2088 (RBBD2088)
+2025-07-31,SMFBS,bonus_listing,208282,Listing 5% Bonus Share of Swabhimaan Laghubitta Bittiya Sanstha Limited (SMFBS)
+2025-07-31,SSHL,price_adjustment,208283,Price Adjusted – Shiva Shree Hydropower Ltd (SSHL)
+2025-08-03,NICBF,dividend_book_closure,208285,"Dividend Declaration of NICBF, NICSF, NICFC"
+2025-08-03,NICFC,dividend_book_closure,208285,"Dividend Declaration of NICBF, NICSF, NICFC"
+2025-08-03,NICSF,dividend_book_closure,208285,"Dividend Declaration of NICBF, NICSF, NICFC"
+2025-08-05,SLBBL,bonus_listing,208286,Listing 13.5% Bonus Share of Swarojgar Laghubitta Bittiya Sanstha Ltd. (SLBBL)
+2025-08-07,LVF2,price_adjustment,208290,Price Adjusted – Laxmi Value Fund 2 (LVF2)
+2025-08-07,SBCF,price_adjustment,208291,Price Adjusted – Sunrise Bluechip Fund (SBCF)
+2025-08-07,RFPL,price_adjustment,208292,Price Adjusted – River Falls Power Limited (RFPL)
+2025-08-11,SEF,dividend_book_closure,208293,"Dividend Declaration of SEF, SIGS2 and SIGS3"
+2025-08-11,SIGS2,dividend_book_closure,208293,"Dividend Declaration of SEF, SIGS2 and SIGS3"
+2025-08-11,SIGS3,dividend_book_closure,208293,"Dividend Declaration of SEF, SIGS2 and SIGS3"
+2025-08-11,CITY,price_adjustment,208295,Price Adjusted – City Hotel Limited (CITY)
+2025-08-13,NICAD2091,debt_listing,208296,Listing 7% NIC ASIA Debenture 2091 (NICAD2091)
+2025-08-14,KDBY,dividend_book_closure,208297,"Dividend Declaration letter of KEF, KDBY & KSY"
+2025-08-14,KEF,dividend_book_closure,208297,"Dividend Declaration letter of KEF, KDBY & KSY"
+2025-08-14,KSY,dividend_book_closure,208297,"Dividend Declaration letter of KEF, KDBY & KSY"
+2025-08-14,SNLI,right_listing,208298,Listing Right Shares (Auction) of Sun Nepal Life Insurance Company Limited (SNLI)
+2025-08-14,RNLI,bonus_listing,208299,Listing 12% Bonus Shares of Reliable Nepal Life Insurance Limited - RNLI
+2025-08-14,SAGF,dividend_book_closure,208300,Book close notice of SAGF & SLCF
+2025-08-14,SLCF,dividend_book_closure,208300,Book close notice of SAGF & SLCF
+2025-08-14,KDBY,dividend_book_closure,208301,"Book close notice of KEF, KDBY & KSY"
+2025-08-14,KEF,dividend_book_closure,208301,"Book close notice of KEF, KDBY & KSY"
+2025-08-14,KSY,dividend_book_closure,208301,"Book close notice of KEF, KDBY & KSY"
+2025-08-15,RMF1,dividend_book_closure,208303,Dividend Declaration of RBB Mutual Fund 1 (RMF1) & RBB Mutual Fund 2 (RMF2)
+2025-08-15,RMF2,dividend_book_closure,208303,Dividend Declaration of RBB Mutual Fund 1 (RMF1) & RBB Mutual Fund 2 (RMF2)
+2025-08-15,PRSF,dividend_book_closure,208304,Dividend Declaration of Prabhu Select Fund (PSF) & Prabhu Smart Fund (PRSF)
+2025-08-15,PSF,dividend_book_closure,208304,Dividend Declaration of Prabhu Select Fund (PSF) & Prabhu Smart Fund (PRSF)
+2025-08-18,C30MF,dividend_book_closure,208305,Dividend declaration & Book Closure notice of CMF2 & C30MF
+2025-08-18,CMF2,dividend_book_closure,208305,Dividend declaration & Book Closure notice of CMF2 & C30MF
+2025-08-18,NLICL,bonus_listing,208306,Listing 5% Bonus Shares of National Life Insurance Co. Ltd. (NLICL)
+2025-08-18,NICLBSL,promoter_conversion,208307,Conversion of Promoter Shares of NIC ASIA Laghubitta Bittiya Sanstha Limited (NICLBSL)
+2025-08-18,LUK,price_adjustment,208312,Price Adjusted – Laxmi Unnati Kosh (LUK)
+2025-08-18,SFMF,price_adjustment,208313,Price Adjusted – Sunrise First Mutual Fund (SFMF)
+2025-08-18,SFEF,price_adjustment,208314,Price Adjusted – Sunrise Focused Equity Fund (SFEF)
+2025-08-19,NMB50,dividend_book_closure,208315,Dividend declaration & Book Closure notice of NMB 50 (NMB50) & NMB Sulav Investment Fund - 2 (NSIF2)
+2025-08-19,NSIF2,dividend_book_closure,208315,Dividend declaration & Book Closure notice of NMB 50 (NMB50) & NMB Sulav Investment Fund - 2 (NSIF2)
+2025-08-19,HRL,bonus_listing,208316,Listing 4.50% Bonus Share of Himalayan Reinsurance Limited (HRL)
+2025-08-19,BHCL,ipo_listing,208317,Listing IPO Share of Bikash Hydropower Company Limited (BHCL)
+2025-08-21,SEF,price_adjustment,208323,Price Adjusted – Siddhartha Equity Fund (SEF)
+2025-08-21,SIGS2,price_adjustment,208324,Price Adjusted – Siddhartha Investment Growth Scheme - 2 (SIGS2)
+2025-08-21,SIGS3,price_adjustment,208325,Price Adjusted – Siddhartha Investment Growth Scheme 3 (SIGS3)
+2025-08-21,SLCF,price_adjustment,208326,Price Adjusted – Sanima Large Cap Fund (SLCF)
+2025-08-21,SAGF,price_adjustment,208327,Price Adjusted – Sanima Growth Fund (SAGF)
+2025-08-22,PRSF,dividend_book_closure,208328,Book Closure notice of Prabhu Select Fund (PSF) & Prabhu Smart Fund (PRSF)
+2025-08-22,PSF,dividend_book_closure,208328,Book Closure notice of Prabhu Select Fund (PSF) & Prabhu Smart Fund (PRSF)
+2025-08-24,GBIMESY2,fund_listing,208329,Listing - Global IME Sammunat Yojana -2 (GBIMESY2)
+2025-08-24,NABBC,price_adjustment,208330,Price Adjusted – Narayani Development Bank Limited (NABBC)
+2025-08-24,RMF1,price_adjustment,208331,Price Adjusted – RBB Mutual Fund 1 (RMF1)
+2025-08-24,RMF2,price_adjustment,208332,Price Adjusted – RBB Mutual Fund 2 (RMF2)
+2025-08-24,KEF,price_adjustment,208333,Price Adjusted – Kumari Equity Fund (KEF)
+2025-08-24,KDBY,price_adjustment,208334,Price Adjusted – Kumari Dhanabriddhi Yojana (KDBY)
+2025-08-25,CHL,right_listing,208340,Listing 100% Right Shares of Chhyangdi Hydropower Ltd. (CHL)
+2025-08-26,GIBF1,dividend_book_closure,208341,Dividend Declaration letter of Global IME Balanced Fund-1 (GIBF1)
+2025-08-26,NIL,bonus_listing,208342,Listing 7% Bonus Shares of Neco Insurance Limited (NIL)
+2025-08-28,HIMSTAR,ipo_listing,208343,Listing IPO Share of Him Star Urja Company Limited (HIMSTAR)
+2025-08-28,HATHY,price_adjustment,208344,Price Adjusted – Hathway Investment Nepal Limited (HATHY)
+2025-08-28,PSF,price_adjustment,208345,Price Adjusted – Prabhu Select Fund (PSF)
+2025-08-28,NMB50,price_adjustment,208346,Price Adjusted – NMB 50 (NMB50)
+2025-08-28,NSIF2,price_adjustment,208347,Price Adjusted – NMB Sulav Investment Fund - 2 (NSIF2)
+2025-08-28,C30MF,price_adjustment,208348,Price Adjusted – Citizens Super 30 Mutual Fund (C30MF)
+2025-08-29,NBF2,dividend_book_closure,208354,Dividend Declaration letter of NABIL BALANCED FUND-2 (NBF2) & Nabil Balanced Fund-3 (NBF3)
+2025-08-29,NBF3,dividend_book_closure,208354,Dividend Declaration letter of NABIL BALANCED FUND-2 (NBF2) & Nabil Balanced Fund-3 (NBF3)
+2025-08-29,UAIL,bonus_listing,208355,Listing 10% Bonus Shares of United Ajod Insurance Limited (UAIL)
+2025-08-31,H8020,dividend_book_closure,208356,Dividend Declaration letter of Himalayan 80-20 (H8020)
+2025-08-31,DORDI,right_listing,208357,Listing 100% Right Shares of Dordi Khola Jal Bidyut Company Limited (DORDI)
+2025-08-31,HBL,ipo_listing,208358,Listing FPO Share of Himalayan Bank Limited (HBL)
+2025-09-01,USHL,trading_halt,208360,Suspension of Upper Syange Hydropower Limited (USHL)
+2025-09-01,USHL,trading_halt,208361,Transactions Suspended of Upper Syange Hydropower Limited (USHL)
+2025-09-01,SBLD2091,debt_listing,208362,Listing 7.25% SBL Debenture 2091 (SBLD2091)
+2025-09-02,USHL,trading_resume,208364,Transactions Release of Upper Syange Hydropower Limited (USHL)
+2025-09-04,NBF2,price_adjustment,208365,Price Adjusted – NABIL BALANCED FUND-2 (NBF2)
+2025-09-04,NBF3,price_adjustment,208366,Price Adjusted – Nabil Balanced Fund-3 (NBF3)
+2025-09-04,MMF1,dividend_book_closure,208369,"Dividend declaration & Book Closure notice of (NIBLGF), (NIBSF2) & (MMF1)"
+2025-09-04,NIBLGF,dividend_book_closure,208369,"Dividend declaration & Book Closure notice of (NIBLGF), (NIBSF2) & (MMF1)"
+2025-09-04,NIBSF2,dividend_book_closure,208369,"Dividend declaration & Book Closure notice of (NIBLGF), (NIBSF2) & (MMF1)"
+2025-09-16,GIBF1,price_adjustment,208370,Price Adjusted –Global IME Balanced Fund-1 (GIBF1)
+2025-09-16,H8020,price_adjustment,208371,Price Adjusted –Himalayan 80-20 (H8020)
+2025-09-16,NIBLGF,price_adjustment,208372,Price Adjusted –NIBL Growth Fund (NIBLGF)
+2025-09-16,MMF1,price_adjustment,208373,Price Adjusted –Mega Mutual Fund -1 (MMF1)
+2025-09-16,MBL,price_adjustment,208374,Price Adjusted - Machhapuchhre Bank Limited (MBL)
+2025-09-18,NICAD8283,other,208385,Delisting of 11% NIC Asia Debenture 082/83 (NICAD8283)
+2025-09-23,RHGCL,right_listing,208387,Listing 100% Right Shares of Rapti Hydro And General Construction Limited (RHGCL)
+2025-09-23,KSBBL,price_adjustment,208389,Price Adjusted - Kamana Sewa Bikas Bank Limited (KSBBL)
+2025-09-23,UPCL,price_adjustment,208390,Price Adjusted - UNIVERSAL POWER COMPANY LTD (UPCL)
+2025-09-25,NLO,price_adjustment,208393,Price Adjusted - Nepal Lube Oil Limited (NLO)
+2025-09-25,TPC,right_listing,208395,Listing 100% Right Shares of Terhathum Power Company Limited (TPC)
+2025-10-06,BGWT,price_adjustment,208397,Price Adjusted - Bhagawati Hydropower Development Company Limited (BGWT)
+2025-10-09,EBL,price_adjustment,208400,Price Adjusted - Everest Bank Limited (EBL)
+2025-10-16,GBLBS,trading_halt,208407,Transactions Suspended of GBLBS & SAMAJ
+2025-10-16,SAMAJ,trading_halt,208407,Transactions Suspended of GBLBS & SAMAJ
+2025-10-16,MNBBL,price_adjustment,208408,Price Adjusted - Muktinath Bikas Bank Ltd. (MNBBL)
+2025-10-30,NLG,bonus_listing,208409,Listing 2.50% Bonus Shares of NLG Insurance Company Ltd. (NLG)
+2025-10-30,LICN,bonus_listing,208410,Listing 10% Bonus Shares of Life Insurance Corporation (Nepal) Limited (LICN)
+2025-10-30,MKCL,price_adjustment,208411,Price Adjusted - Muktinath Krishi Company Limited (MKCL)
+2025-10-30,GLBSL,price_adjustment,208412,Price Adjusted - Gurans Laghubitta Bittiya Sanstha Limited (GLBSL)
+2025-10-31,PPL,right_listing,208415,Listing 50% Right Shares of People's Power Limited (PPL)
+2025-11-02,CZBIL,price_adjustment,208416,Price Adjusted - Citizens Bank International Limited (CZBIL)
+2025-11-02,SBL,price_adjustment,208417,Price Adjusted - Siddhartha Bank Limited (SBL)
+2025-11-03,MABEL,ipo_listing,208420,Listing IPO Share of Mabilung Energy Limited (MABEL)
+2025-11-03,GBBL,price_adjustment,208421,Price Adjusted - Garima Bikas Bank Limited (GBBL)
+2025-11-04,NICL,right_listing,208423,Listing 40% Right Shares of Nepal Insurance Co. Ltd. (NICL)
+2025-11-04,ALICL,right_listing,208424,Listing 42% Right Shares of Asian Life Insurance Co. Limited (ALICL)
+2025-11-04,HLICF,fund_listing,208425,Listing - HLI Large Cap Fund (HLICF)
+2025-11-05,SBID2090,debt_listing,208426,Listing 7% Nepal SBI Bank Debenture 2090 (SBID2090)
+2025-11-05,DHEL,ipo_listing,208427,Listing IPO Share of Daramkhola Hydro Energy Limited (DHEL)
+2025-11-05,HDL,price_adjustment,208429,Price Adjusted - Himalayan Distillery Limited (HDL)
+2025-11-06,SAGAR,ipo_listing,208432,Listing IPO Share of Sagar Distillery Limited (SAGAR)
+2025-11-09,BUNGAL,ipo_listing,208433,Listing IPO Share of Bungal Hydro Limited (BUNGAL)
+2025-11-10,BANDIPUR,ipo_listing,208434,Listing IPO Share of Bandipur Cablecar and Tourism Limited (BANDIPUR)
+2025-11-10,SHINED,debt_listing,208435,Listing Shine Resunga Debenture (SHINED)
+2025-11-10,SWASTIK,ipo_listing,208436,Listing IPO Share of Swastik Laghubitta Bittiya Sanstha Limited (SWASTIK)
+2025-11-12,NABILD2089,debt_listing,208437,Listing 7% Nabil Debenture 2089 (NABILD2089)
+2025-11-13,BARUN,right_listing,208438,Listing 100% Right Shares of Barun Hydropower Co. Ltd. (BARUN)
+2025-11-14,JHAPA,ipo_listing,208439,Listing IPO Share of Jhapa Energy Limited (JHAPA)
+2025-11-20,SAHAS,price_adjustment,208440,Price Adjusted - Sahas Urja Limited (SAHAS)
+2025-11-20,SHL,price_adjustment,208441,Price Adjusted - Soaltee Hotel Limited (SHL)
+2025-11-21,SAIL,ipo_listing,208444,Listing IPO Share of Shreenagar Agritech Industries Limited (SAIL)
+2025-11-25,USLB,promoter_conversion,208445,Conversion of Promoter Shares of Unnati Sahakarya Laghubitta Bittiya Sanstha Limited (USLB)
+2025-11-26,JOSHI,right_listing,208446,Listing 65% Right Shares of Joshi Hydropower Development Company Ltd (JOSHI)
+2025-11-26,SHIVM,price_adjustment,208447,Price Adjusted - SHIVAM CEMENTS LTD (SHIVM)
+2025-11-26,NRN,price_adjustment,208448,Price Adjusted - NRN Infrastructure and Development Limited (NRN)
+2025-11-27,SHINE,price_adjustment,208451,Price Adjusted - Shine Resunga Development Bank Ltd. (SHINE)
+2025-11-27,NGPL,price_adjustment,208453,Price Adjusted - Ngadi Group Power Ltd. (NGPL)
+2025-11-27,SARBTM,price_adjustment,208454,Price Adjusted - Sarbottam Cement Limited (SARBTM)
+2025-11-27,BARUN,price_adjustment,208455,Price Adjusted - Barun Hydropower Co. Ltd. (BARUN)
+2025-11-27,ADBL,price_adjustment,208456,Price Adjusted - Agricultural Development Bank Limited (ADBL)
+2025-12-01,SMB,promoter_conversion,208463,Conversion of Promoter Shares of Support Microfinance Bittiya Sanstha Ltd. (SMB)
+2025-12-02,MEN,price_adjustment,208464,Price Adjusted - Mountain Energy Nepal Limited (MEN)
+2025-12-02,SMHL,price_adjustment,208465,Price Adjusted - Super Madi Hydropower Limited (SMHL)
+2025-12-02,GRDBL,bonus_listing,208466,Listing 5.75% Bonus Shares of Green Development Bank Ltd. (GRDBL)
+2025-12-02,MBL,bonus_listing,208467,Listing 4% Bonus Shares of Machhapuchhre Bank Limited (MBL)
+2025-12-03,SIKLES,price_adjustment,208471,Price Adjusted - Sikles Hydropower Limited (SIKLES)
+2025-12-07,ALBSL,price_adjustment,208473,Price Adjusted - Asha Laghubitta Bittiya Sanstha Ltd (ALBSL)
+2025-12-08,SADBL,price_adjustment,208475,Price Adjusted - Shangrila Development Bank Ltd. (SADBL)
+2025-12-09,SYPNL,ipo_listing,208477,Listing IPO Share of SY Panel Nepal Limited (SYPNL)
+2025-12-11,CITY,right_listing,208478,Listing 80% Right Shares of City Hotel Limited (CITY)
+2025-12-11,GCIL,price_adjustment,208479,Price Adjusted - Ghorahi Cement Industry Limited (GCIL)
+2025-12-12,KSBBL,bonus_listing,208481,Listing 10% Bonus Shares of Kamana Sewa Bikas Bank Limited (KSBBL)
+2025-12-12,KKHC,right_listing,208482,Listing 100% Right Shares of Khanikhola Hydropower Co. Ltd. (KKHC)
+2025-12-15,LSL,price_adjustment,208483,Price Adjusted - Laxmi Sunrise Bank Limited (LSL)
+2025-12-15,KDL,price_adjustment,208484,Price Adjusted - Kalinchowk Darshan Limited (KDL)
+2025-12-16,ALICL,bonus_listing,208488,Listing 5.1% Bonus Shares of Asian Life Insurance Co. Limited (ALICL)
+2025-12-16,PRIN,bonus_listing,208489,Listing 18% Bonus Shares of Prabhu Insurance Ltd. (PRIN)
+2025-12-16,HATHY,bonus_listing,208490,Listing 12% Bonus Shares of Hathway Investment Nepal Limited (HATHY)
+2025-12-17,SSHL,right_listing,208491,Listing 100% Right Shares of Shiva Shree Hydropower Ltd (SSHL)
+2025-12-17,RFPL,right_listing,208492,Listing 100% Right Shares of River Falls Power Limited (RFPL)
+2025-12-18,SBI,price_adjustment,208493,Price Adjusted -Nepal SBI Bank Limited (SBI)
+2025-12-21,EBL,bonus_listing,208495,Listing 6% Bonus Shares of Everest Bank Limited (EBL)
+2025-12-21,NLIC,price_adjustment,208496,Price Adjusted - Nepal Life Insurance Co. Ltd. (NLIC)
+2025-12-21,SHEL,price_adjustment,208497,Price Adjusted - Singati Hydro Energy Limited (SHEL)
+2025-12-21,MLBL,price_adjustment,208498,Price Adjusted -Mahalaxmi Bikas Bank Ltd. (MLBL)
+2025-12-21,NHDL,price_adjustment,208499,Price Adjusted - Nepal Hydro Developers Ltd. (NHDL)
+2025-12-22,MNBBL,bonus_listing,208504,Listing 13.53% Bonus Shares of Muktinath Bikas Bank Ltd. (MNBBL)
+2025-12-22,GBLBS,merger,208505,Listing Shares of Grameen Bikas Laghubitta Bittiya Sanstha Ltd. (GBLBS) after merger
+2025-12-22,HIDCL,price_adjustment,208506,Price Adjusted -Hydorelectricity Investment and Development Company Ltd (HIDCL)
+2025-12-23,SKBBL,price_adjustment,208509,Price Adjusted -Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited (SKBBL)
+2025-12-23,NMB,price_adjustment,208510,Price Adjusted - NMB Bank Limited (NMB)
+2025-12-24,CGH,price_adjustment,208513,Price Adjusted - Chandragiri Hills Limited (CGH)
+2025-12-24,SWBBL,price_adjustment,208514,Price Adjusted - Swabalamban Laghubitta Bittiya Sanstha Limited (SWBBL)
+2025-12-24,MSHL,price_adjustment,208515,Price Adjusted - Mid Solu Hydropower Limited (MSHL)
+2025-12-24,RURU,price_adjustment,208516,Price Adjusted - Ru Ru Jalbidhyut Pariyojana Limited (RURU)
+2025-12-28,KBSH,price_adjustment,208521,Price Adjusted - Kutheli Bukhari Small Hydropower Limited (KBSH)
+2025-12-28,SICL,price_adjustment,208522,Price Adjusted - Shikhar Insurance Co. Ltd. (SICL)
+2025-12-28,SNLI,price_adjustment,208523,Price Adjusted - Sun Nepal Life Insurance Company Limited (SNLI)
+2025-12-28,SPDL,price_adjustment,208524,Price Adjusted - Synergy Power Development Ltd. (SPDL)
+2025-12-29,MKCL,bonus_listing,208529,Listing 8% Bonus Shares of Muktinath Krishi Company Limited (MKCL)
+2025-12-29,SMB,price_adjustment,208530,Price Adjusted - Support Microfinance Bittiya Sanstha Ltd. (SMB)
+2025-12-29,DDBL,price_adjustment,208531,Price Adjusted - Deprosc Laghubitta Bittiya Sanstha Limited (DDBL)
+2025-12-29,CBBL,price_adjustment,208532,Price Adjusted - Chhimek Laghubitta Bittiya Sanstha Limited (CBBL)
+2025-12-29,MLBBL,price_adjustment,208533,Price Adjusted - Mithila LaghuBitta Bittiya Sanstha Limited (MLBBL)
+2025-12-31,NLICL,price_adjustment,208538,Price Adjusted - National Life Insurance Co. Ltd. (NLICL)
+2025-12-31,GRDBL,price_adjustment,208539,Price Adjusted - Green Development Bank Ltd. (GRDBL)
+2025-12-31,MSLB,price_adjustment,208540,Price Adjusted - Mahuli Laghubitta Bittiya Sanstha Limited (MSLB)
+2025-12-31,NUBL,price_adjustment,208542,Price Adjusted - Nirdhan Utthan Laghubitta Bittiya Sanstha Limited (NUBL)
+2025-12-31,CHCL,price_adjustment,208543,Price Adjusted - Chilime Hydropower Company Limited (CHCL)
+2026-01-01,UHEWA,price_adjustment,208550,Price Adjusted - Upper Hewakhola Hydropower Company Limited (UHEWA)
+2026-01-01,HDL,bonus_listing,208551,Listing 20% Bonus Shares of Himalayan Distillery Limited (HDL)
+2026-01-01,KPCL,price_adjustment,208557,Price Adjusted - Kalika power Company Ltd (KPCL)
+2026-01-01,MERO,price_adjustment,208560,Price Adjusted - Mero Microfinance Bittiya Sanstha Ltd. (MERO)
+2026-01-01,SLBBL,price_adjustment,208563,Price Adjusted - Swarojgar Laghubitta Bittiya Sanstha Ltd. (SLBBL)
+2026-01-01,API,price_adjustment,208564,Price Adjusted - Api Power Company Ltd. (API)
+2026-01-01,AHPC,price_adjustment,208565,Price Adjusted - Arun Valley Hydropower Development Co. Ltd. (AHPC)
+2026-01-01,GILB,price_adjustment,208566,Price Adjusted - Global IME Laghubitta Bittiya Sanstha Ltd. (GILB)
+2026-01-01,HLBSL,price_adjustment,208567,Price Adjusted - Himalayan Laghubitta Bittiya Sanstha Limited (HLBSL)
+2026-01-01,SMATA,price_adjustment,208568,Price Adjusted - Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA)
+2026-01-01,UMRH,price_adjustment,208569,Price Adjusted - United IDI Mardi RB Hydropower Limited. (UMRH)
+2026-01-04,CIT,price_adjustment,208570,Price Adjusted - Citizen Investment Trust (CIT)
+2026-01-04,PCBL,price_adjustment,208571,Price Adjusted - Prime Commercial Bank Ltd. (PCBL)
+2026-01-04,KMCDB,price_adjustment,208572,Price Adjusted - Kalika Laghubitta Bittiya Sanstha Ltd (KMCDB)
+2026-01-04,PMLI,price_adjustment,208573,Price Adjusted - Prabhu Mahalaxmi Life Insurance Limited (PMLI)
+2026-01-04,JBLB,price_adjustment,208574,Price Adjusted - Jeevan Bikas Laghubitta Bittya Sanstha Ltd (JBLB)
+2026-01-05,NLG,price_adjustment,208580,Price Adjusted - NLG Insurance Company Ltd. (NLG)
+2026-01-05,NMFBS,price_adjustment,208581,Price Adjusted - National Laghubitta Bittiya Sanstha Limited (NMFBS)
+2026-01-05,BHDC,price_adjustment,208582,Price Adjusted - Bindhyabasini Hydropower Development Company Limited (BHDC)
+2026-01-06,NFS,right_listing,208586,Listing Right Share (Auction of Promoter) of Nepal Finance Ltd. (NFS)
+2026-01-08,SBLD2082,other,208587,Delisting of 10.50% SBL Debenture 2082 (SBLD2082)
+2026-02-04,SMHL,bonus_listing,208588,Listing 5% Bonus Shares of Super Madi Hydropower Limited (SMHL)
+2026-02-04,GBBL,bonus_listing,208589,Listing 6% Bonus Shares of Garima Bikas Bank Limited (GBBL)
+2026-02-05,NIL,price_adjustment,208591,Price Adjusted - Neco Insurance Limited (NIL)
+2026-02-09,SAHAS,bonus_listing,208593,Listing 21% Bonus Shares of Sahas Urja Limited (SAHAS)
+2026-02-09,CSY,fund_listing,208594,Listing - Citizens Santulit Yojana (CSY)
+2026-02-11,ALICL,price_adjustment,208595,Price Adjusted - Asian Life Insurance Co. Limited (ALICL)
+2026-02-12,BNHC,price_adjustment,208598,Price Adjusted - Buddha Bhumi Nepal Hydropower Company Limited (BNHC)
+2026-02-13,RSML,ipo_listing,208599,Listing IPO Share of Reliance Spinning Mills Limited (RSML)
+2026-02-13,SABBL,ipo_listing,208601,Listing IPO Share of Salapa Bikas Bank Limited (SABBL)
+2026-02-17,ADBL,bonus_listing,208602,Listing 3.25% Bonus Shares of Agricultural Development Bank Limited (ADBL)
+2026-02-17,ALBSL,bonus_listing,208603,Listing 9.5% Bonus Asha Laghubitta Bittiya Sanstha Ltd (ALBSL)
+2026-02-17,SHIVM,bonus_listing,208604,Listing 2.5% Bonus Shares of SHIVAM CEMENTS LTD (SHIVM)
+2026-02-24,GLBSL,bonus_listing,208605,Listing 14.25% Bonus Shares of Gurans Laghubitta Bittiya Sanstha Limited (GLBSL)
+2026-02-24,SMH,price_adjustment,208606,Price Adjusted - Super Mai Hydropower Limited (SMH)
+2026-02-25,CZBIL,bonus_listing,208608,Listing 5% Bonus Shares of Citizens Bank International Limited (CZBIL)
+2026-02-26,UAIL,price_adjustment,208609,Price Adjusted - United Ajod Insurance Limited (UAIL)
+2026-02-27,BARUN,bonus_listing,208611,Listing 4.75% Bonus Shares of Barun Hydropower Co. Ltd. (BARUN)
+2026-03-01,API,bonus_listing,208612,Listing 5% Bonus Shares of Api Power Company Ltd. (API)
+2026-03-01,SHL,bonus_listing,208613,Listing 15% Bonus Shares of Soaltee Hotel Limited (SHL)
+2026-03-01,BGWT,bonus_listing,208614,Listing 14% Bonus Shares of Bhagawati Hydropower Development Company Limited (BGWT)
+2026-03-03,GCIL,bonus_listing,208615,Listing 10% Bonus Shares of Ghorahi Cement Industry Limited (GCIL)
+2026-03-03,HLBSL,bonus_listing,208616,Listing 6.65% Bonus Shares of Himalayan Laghubitta Bittiya Sanstha Limited (HLBSL)
+2026-03-11,HFIN,ipo_listing,208623,Listing IPO Share of Hotel Forest Inn Limited (HFIN)
+2026-03-12,SOHL,ipo_listing,208625,Listing IPO Share of Solu Hydropower Limited (SOHL)
+2026-03-13,SARBTM,bonus_listing,208626,Listing 5% Bonus Shares of Sarbottam Cement Limited (SARBTM)
+2026-03-13,SIKLES,bonus_listing,208627,Listing 15% Bonus Shares of Sikles Hydropower Limited (SIKLES)
+2026-03-13,CBBL,bonus_listing,208628,Listing 12.5% Bonus Shares of Chhimek Laghubitta Bittiya Sanstha Limited (CBBL)
+2026-03-13,SWBBL,bonus_listing,208629,Listing 5.6365% Bonus Shares of Swabalamban Laghubitta Bittiya Sanstha Limited (SWBBL)
+2026-03-13,SLBBL,bonus_listing,208630,Listing 14.25% Bonus Shares of Swarojgar Laghubitta Bittiya Sanstha Ltd. (SLBBL)
+2026-03-13,SNLI,bonus_listing,208631,Listing 5% Bonus Shares of Sun Nepal Life Insurance Company Limited (SNLI)
+2026-03-16,NSY,fund_listing,208632,Listing Nepal Life Samriddhi Lagani Yojana - NSY
+2026-03-16,NRN,bonus_listing,208633,Listing 40% Bonus Shares of NRN Infrastructure and Development Limited (NRN)
+2026-03-16,SHINE,bonus_listing,208634,Listing 3% Bonus Shares of Shine Resunga Development Bank Ltd. (SHINE)
+2026-03-16,UMRH,bonus_listing,208635,Listing 5% Bonus Shares of United IDI Mardi RB Hydropower Limited. (UMRH)
+2026-03-17,NGPL,bonus_listing,208636,Listing 4.75% Bonus Shares of Ngadi Group Power Ltd. (NGPL)
+2026-03-17,HIDCL,bonus_listing,208637,Listing 1.5% Bonus Shares of Hydroelectricity Investment and Development Company Ltd (HIDCL)
+2026-03-17,VLBS,ipo_listing,208638,Listing FPO Share of Vijaya laghubitta Bittiya Sanstha Ltd. (VLBS)
+2026-03-19,BJHL,ipo_listing,208639,Listing IPO Share of Bhujung Hydropower Limited (BJHL)
+2026-03-20,JBLB,bonus_listing,208640,Listing 14% Bonus Shares of Jeevan Bikas Laghubitta Bittya Sanstha Ltd (JBLB)
+2026-03-20,LSL,bonus_listing,208641,Listing 10% Bonus Shares of Laxmi Sunrise Bank Limited (LSL)
+2026-03-20,DDBL,bonus_listing,208642,Listing 10% Bonus Shares of Deprosc Laghubitta Bittiya Sanstha Limited (DDBL)
+2026-03-22,SBL,bonus_listing,208643,Listing 5% Bonus Shares of Siddhartha Bank Limited (SBL)
+2026-03-22,SBI,bonus_listing,208644,Listing 4% Bonus Shares of Nepal SBI Bank Limited (SBI)
+2026-03-22,SKBBL,bonus_listing,208645,Listing 14.25% Bonus Shares of Sana Kisan Bikas Laghubitta Bittiya Sanstha Limited (SKBBL)
+2026-03-22,NLICL,bonus_listing,208646,Listing 4% Bonus Shares of National Life Insurance Co. Ltd. (NLICL)
+2026-03-22,KDL,bonus_listing,208647,Listing 5% Bonus Shares of Kalinchowk Darshan Limited (KDL)
+2026-03-22,MEN,bonus_listing,208648,Listing 20% Bonus Shares of Mountain Energy Nepal Limited (MEN)
+2026-03-23,HPPL,price_adjustment,208650,Price Adjusted - Himalayan Power Partner Ltd. (HPPL)
+2026-03-23,NMBMF,promoter_conversion,208651,Conversion of Promoter Shares of NMB Microfinance Bittiya Sanstha Ltd. (NMBMF)
+2026-03-24,SKHL,ipo_listing,208653,Listing IPO Share of Super Khudi Hydropower Limited (SKHL)
+2026-03-25,NUBL,bonus_listing,208654,Listing 5% Bonus Shares of Nirdhan Utthan Laghubitta Bittiya Sanstha Limited (NUBL)
+2026-03-25,SHEL,bonus_listing,208655,Listing 5% Bonus Shares of Singati Hydro Energy Limited (SHEL)
+2026-03-25,MERO,bonus_listing,208656,Listing 4.75% Bonus Shares of Mero Microfinance Bittiya Sanstha Ltd. (MERO)
+2026-03-25,NMFBS,bonus_listing,208657,Listing 14.25% Bonus Shares of National Laghubitta Bittiya Sanstha Limited (NMFBS)
+2026-03-25,RLEL,ipo_listing,208658,Listing IPO Share of Ridge Line Energy Limited (RLEL)
+2026-03-26,CGH,bonus_listing,208660,Listing 5% Bonus Shares of Chandragiri Hills Limited (CGH)
+2026-03-26,UHEWA,bonus_listing,208661,Listing 15% Bonus Shares of Upper Hewakhola Hydropower Company Limited (UHEWA)
+2026-03-26,SKHEL,ipo_listing,208663,Listing IPO Share of Suryakunda Hydro Electric Limited (SKHEL)
+2026-03-29,NABILPNP,debt_listing,208664,Listing Nabil 8% Perpetual Non Cumulative Preference Share (NABILPNP)
+2026-03-30,PMLI,bonus_listing,208665,Listing 4% Bonus Shares of Prabhu Mahalaxmi Life Insurance Limited (PMLI)
+2026-03-30,BHDC,bonus_listing,208666,Listing 5% Bonus Shares of Bindhyabasini Hydropower Development Company Limited (BHDC)
+2026-03-30,NLG,bonus_listing,208667,Listing 4% Bonus Shares of NLG Insurance Company Ltd. (NLG)
+2026-03-30,UPCL,bonus_listing,208668,Listing 9% Bonus Shares of UNIVERSAL POWER COMPANY LTD (UPCL)
+2026-03-30,SWBBL,promoter_conversion,208669,Conversion of Promoter Shares of Swabalamban Laghubitta Bittiya Sanstha Limited (SWBBL)
+2026-03-31,KMCDB,promoter_conversion,208670,Conversion of Promoter Shares of Kalika Laghubitta Bittiya Sanstha Ltd (KMCDB)
+2026-03-31,SWMF,promoter_conversion,208671,Conversion of Promoter Shares of Suryodaya Womi Laghubitta Bittiya Sanstha Limited (SWMF)
+2026-03-31,SMATA,bonus_listing,208672,Listing 5% Bonus Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA)
+2026-03-31,SADBL,bonus_listing,208673,Listing 5% Bonus Shares of Shangrila Development Bank Ltd. (SADBL)
+2026-03-31,PCBL,bonus_listing,208674,Listing 8% Bonus Shares of Prime Commercial Bank Ltd. (PCBL)
+2026-03-31,MSLB,bonus_listing,208675,Listing 4.75% Bonus Shares of Mahuli Laghubitta Bittiya Sanstha Limited (MSLB)
+2026-03-31,MLBL,bonus_listing,208676,Listing 5% Bonus Shares of Mahalaxmi Bikas Bank Ltd. (MLBL)
+2026-03-31,AHPC,bonus_listing,208677,Listing 5% Bonus Shares of Arun Valley Hydropower Development Co. Ltd. (AHPC)
+2026-04-06,ICFCD89,debt_listing,208678,Listing 8% ICFC Finance Limited Debenture 2089 - ICFCD89
+2026-04-06,KSBBLPNP,debt_listing,208679,Listing KSBBL 9% Perpetual Non Cumulative Preference Share (KSBBLPNP)
+2026-04-08,ANLB,price_adjustment,208680,Price Adjusted - Aatmanirbhar Laghubitta Bittiya Sanstha Limited (ANLB)
+2026-04-08,PRIN,price_adjustment,208681,Price Adjusted - Prabhu Insurance Ltd. (PRIN)
+2026-04-09,RURU,bonus_listing,208684,Listing 10% Bonus Shares of Ru Ru Jalbidhyut Pariyojana Limited (RURU)
+2026-04-09,SIPD,ipo_listing,208686,Listing IPO Share of Shikhar Power Development Limited (SIPD)
+2026-04-09,PCIL,ipo_listing,208687,Listing IPO Share of Palpa Cement Industries Limited (PCIL)
+2026-04-10,SMATA,promoter_conversion,208688,Conversion of Promoter Shares of Samata Gharelu Laghubitta Bittiya Sanstha Limited (SMATA)
+2026-04-10,KMCDB,bonus_listing,208689,Listing 10% Bonus Shares of Kalika Laghubitta Bittiya Sanstha Ltd (KMCDB)
+2026-04-10,SICL,bonus_listing,208690,Listing 6% Bonus Shares of Shikhar Insurance Co. Ltd. (SICL)
+2026-04-16,UMHL,price_adjustment,208691,Price Adjusted - United Modi Hydropower Ltd. (UMHL)
+2026-04-20,MLBBL,bonus_listing,208694,Listing 14.25% Bonus Share of Mithila Laghubitta Bittiya Sanstha Limited (MLBBL)
+2026-04-22,GILB,bonus_listing,208697,Listing 4.75% Bonus Share of Global IME Laghubitta Bittiya Sanstha Ltd. (GILB)
+2026-04-22,GRDBL,bonus_listing,208698,Listing 8.0396% Bonus Share of Green Development Bank Ltd. (GRDBL)
+2026-05-05,SGIC,price_adjustment,208700,Price Adjusted - Sanima GIC Insurance Limited (SGIC)
+2026-05-06,CIT,bonus_listing,208702,Listing 5% Bonus Shares of Citizen Investment Trust (CIT)
+2026-05-06,SMB,bonus_listing,208703,Listing 9.5% Bonus Shares of Support Microfinance Bittiya Sanstha Ltd. (SMB)
+2026-05-15,MSHL,bonus_listing,208704,Listing 15% Bonus Shares of Mid Solu Hydropower Limited (MSHL)
+2026-05-21,GBLBS,other,208705,जवाफ पेश गर्ने सम्बन्धमा - ग्रामीण विकास लघुवित्त वित्तीय संस्था लिमिटेड (GBLBS)
+2026-05-21,SANIMAPNP,debt_listing,208706,Listing 8.25% Sanima Perpetual Non Cumulative Preference Share (SANIMAPNP)
+2026-05-22,KHPL,ipo_listing,208707,Listing IPO Share of Kalinchock Hydropower Limited (KHPL)
+2026-05-26,STC,price_adjustment,208708,Price Adjusted - Salt Trading Corporation (STC)
+2026-06-02,NMBPNP,debt_listing,208712,Listing NMB Perpetual Non Cumulative Preference Share - 2081/82-8.25% (NMBPNP)
+2026-06-02,MBLPNP,debt_listing,208713,Listing 8.25% Machhapuchchhre Perpetual Non Cumulative Preference Share (MBLPNP)
+2026-06-05,SOPL,ipo_listing,208714,Listing IPO Share of Sopan Pharmaceuticals Limited (SOPL)
+2026-06-08,APHL,ipo_listing,208717,Listing IPO Share of Appolo Hydropower Limited (APHL)
+2026-06-15,NABBC,right_listing,208718,Listing Right Shares of Narayani Development Bank Limited (NABBC)
+2026-06-19,YMHL,ipo_listing,208720,Listing IPO Share of Yambaling Hydropower Limited (YMHL)
+2026-06-19,TPKHL,ipo_listing,208721,Listing IPO Share of Taksar Pikhuwa Khola Hydropower Limited (TPKHL)
+2026-06-24,ALICL,bonus_listing,208722,Listing 5% Bonus Shares of Asian Life Insurance Co. Limited (ALICL)
+2026-06-24,SLBSL,promoter_conversion,208724,Conversion of Promoter Shares of Samudayik Laghubitta Bittiya Sanstha Limited (SLBSL)
+2026-06-25,SNORL,ipo_listing,208725,Listing IPO Share of Snow Rivers Limited (SNORL)
+2026-06-29,SMH,bonus_listing,208726,Listing 20% Bonus Shares of Super Mai Hydropower Limited (SMH)
+2026-06-29,NIL,bonus_listing,208727,Listing 3% Bonus Shares of Neco Insurance Limited (NIL)
+2026-06-29,NMB,bonus_listing,208728,Listing 5% Bonus Shares of NMB Bank Limited (NMB)
+2026-07-01,SGHL,ipo_listing,208729,Listing IPO Share of Sanigad Hydro Limited (SGHL)
+2026-07-01,KAHL,ipo_listing,208730,Listing IPO Share of Kalanga Hydro Limited (KAHL)
+2026-07-02,NHDL,bonus_listing,208731,Listing 9% Bonus Shares of Nepal Hydro Developers Ltd. (NHDL)
+2026-07-02,KBSH,bonus_listing,208732,Listing 10% Bonus Shares of Kutheli Bukhari Small Hydropower Limited (KBSH)
+2026-07-02,UAIL,price_adjustment,208733,Price Adjusted - United Ajod Insurance Limited (UAIL)
+2026-07-03,CMF2,other,208735,Delisting of CITIZENS MUTUAL FUND 2 (CMF2)
+2026-07-09,PFL,trading_halt,208743,मर्जर प्रयोजनका लागि धितोपत्रको कारोबार रोक्का राखिएको बारे - (PFL & SFCL)
+2026-07-09,SFCL,trading_halt,208743,मर्जर प्रयोजनका लागि धितोपत्रको कारोबार रोक्का राखिएको बारे - (PFL & SFCL)
+2026-07-10,HPPL,right_listing,208744,Listing 50% Right Shares of Himalayan Power Partner Ltd. (HPPL)
+2026-07-10,BNHC,right_listing,208745,Listing 100% Right Shares of Buddha Bhumi Nepal Hydropower Company Limited (BNHC)
+2026-07-16,ECL,ipo_listing,208746,Listing IPO Share of Everest Colour Limited (ECL)
+2026-08-04,SEF2,fund_listing,208747,Listing Siddhartha Equity Fund 2 - SEF2
+2026-08-04,NLIC,bonus_listing,208748,Listing 5% Bonus Shares of Nepal Life Insurance Co. Ltd. (NLIC)
+2026-08-05,SAEF2,fund_listing,208749,Listing Sanima Equity Fund -2 ( SAEF2)
+2026-08-05,LSH12,fund_listing,208750,Listing LS Horizon 12 (LSH12)
+2026-08-07,RSY2,fund_listing,208752,Listing Reliable Samriddhi Yojana-2 (RSY2)
+2026-08-11,MEPDL,ipo_listing,208753,Listing IPO Share of Mount Everest Power Development Limited (MEPDL)
+2026-08-12,SAPIL,ipo_listing,208754,Listing IPO Share of Sarvottam Paints Industries Limited (SAPIL)
+2026-08-19,STC,bonus_listing,208755,Listing 9.5% Bonus Shares of Salt Trading Corporation (STC)
+2026-08-19,UAIL,right_listing,208756,Listing 10% Right Shares of United Ajod Insurance Limited (UAIL)
+2026-08-20,SGIC,bonus_listing,208757,Listing 5% Bonus Shares of Sanima GIC Insurance Limited (SGIC)
+2026-08-20,MANDU,price_adjustment,208758,Price Adjusted - Mandu Hydropower Limited (MANDU)
+2026-08-26,NMB50,other,208769,De-listing of NMB 50 (NMB50)
+2026-08-27,CHCL,bonus_listing,208770,Listing 8% Bonus Shares of Chilime Hydropower Company Limited (CHCL)
+2026-08-27,PRIN,bonus_listing,208771,Listing 8.70% Bonus Shares of Prabhu Insurance Ltd. (PRIN)
+2026-09-03,WNLB,trading_halt,208772,Transactions Suspended of Wean Nepal Laghubitta Bittiya Sanstha Limited (WNLB)
+2026-09-07,PBD93,debt_listing,208775,Listing 6.25 % Prime Bank Debenture 2093 (PBD93)
+2026-09-07,SMHL,price_adjustment,208776,Price Adjusted - Super Madi Hydropower Limited (SMHL)
+2026-09-10,UMHL,bonus_listing,208778,Listing 7% Bonus Shares of United Modi Hydropower Ltd. (UMHL)
+2026-09-10,SBLD83,other,208779,Delisting of 10.25% SBL Debenture 2083 (SBLD83)
+2026-09-15,PFL,merger,208780,Listing Shares of Pokhara Finance Limited (PFL) after merger.
+2026-09-16,EBL,price_adjustment,208781,Price Adjusted - Everest Bank Limited (EBL)
+2026-09-17,ANLB,bonus_listing,208783,Listing 14.25% Bonus Shares of Aatmanirbhar Laghubitta Bittiya Sanstha Limited (ANLB)
+2026-09-18,NLO,price_adjustment,208784,Price Adjusted - Nepal Lube Oil Limited (NLO)
+2026-09-18,GBIME,price_adjustment,208785,Price Adjusted - Global IME Bank Limited (GBIME)
+2026-09-21,H8020,price_adjustment,208789,Price Adjusted - Himalayan 80-20 (H8020)
+2026-09-23,LSD92,debt_listing,208791,Listing 7% Laxmi Sunrise Debenture 2092 (LSD92)
+2026-09-23,SADBL,price_adjustment,208792,Price Adjusted - Shangrila Development Bank Ltd. (SADBL)
+2026-09-23,SNORL,price_adjustment,208793,Price Adjusted - Snow Rivers Limited (SNORL)
+2026-09-24,SPDL,bonus_listing,208796,Listing 10% Bonus Shares of Synergy Power Development Ltd. (SPDL)
+2026-09-24,GIBF1,price_adjustment,208797,Price Adjusted - Global IME Balanced Fund-1 (GIBF1)
+2026-09-24,MBL,price_adjustment,208798,Price Adjusted - Machhapuchchhre Bank Limited (MBL)
+2026-09-24,KDL,price_adjustment,208799,Price Adjusted - Kalinchowk Darshan Limited (KDL)

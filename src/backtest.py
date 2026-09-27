@@ -403,6 +403,100 @@ def build_classifier_report(df: pd.DataFrame, retrains: list[str], h_list=(5, 20
     return "\n".join(lines)
 
 
+EVENT_DEDUPE_SESSIONS = 5
+EVENT_MAX_LAG_SESSIONS = 5
+MIN_EVENTS_REPORTED = 5
+
+
+def event_rows(df: pd.DataFrame, events: pd.DataFrame) -> pd.DataFrame:
+    """
+    Attach each notice event to the stock's last traded session on or before the notice date
+    (notices are posted after the close, so entry is the next close, as for every signal).
+    Repeats of the same event type for a symbol within EVENT_DEDUPE_SESSIONS are dropped.
+    """
+    if events.empty:
+        return pd.DataFrame()
+    dates = df.index.get_level_values("date")
+    day_mean_ret20 = df["ret_20d"].groupby(dates).transform("mean")
+    pre20 = (df["ret_20d"] - day_mean_ret20).rename("pre_excess_20")
+    cal = pd.Index(sorted(dates.unique()))
+    by_sym = {sym: g.index.get_level_values("date") for sym, g in df.groupby(level="symbol")}
+    rows, last_seen = [], {}
+    for ev in events.sort_values("date").itertuples(index=False):
+        sess = by_sym.get(ev.symbol)
+        if sess is None:
+            continue
+        prior = sess[sess <= ev.date]
+        if len(prior) == 0:
+            continue
+        d = prior[-1]
+        lag = cal.get_indexer([ev.date])[0] if ev.date in cal else cal.searchsorted(ev.date, side="right") - 1
+        if lag - cal.get_loc(d) > EVENT_MAX_LAG_SESSIONS:
+            continue
+        key = (ev.symbol, ev.event)
+        pos = cal.get_loc(d)
+        if key in last_seen and pos - last_seen[key] <= EVENT_DEDUPE_SESSIONS:
+            continue
+        last_seen[key] = pos
+        r = df.loc[(d, ev.symbol)]
+        rows.append({
+            "event": ev.event, "symbol": ev.symbol, "date": d,
+            **{f"fwd_excess_{h}": r.get(f"fwd_excess_{h}") for h in F.HORIZONS},
+            "fwd_mdd_20": r.get("fwd_mdd_20"), "pre_excess_20": pre20.loc[(d, ev.symbol)],
+            "classification": r.get("classification"),
+        })
+    return pd.DataFrame(rows)
+
+
+def _event_t(x: pd.Series) -> float:
+    x = x.dropna()
+    if len(x) < 3 or x.std(ddof=1) == 0:
+        return float("nan")
+    return float(x.mean() / (x.std(ddof=1) / math.sqrt(len(x))))
+
+
+def build_event_report(ev: pd.DataFrame, window: tuple[str, str]) -> str:
+    lines = [
+        "## Notice events",
+        "",
+        f"NEPSE exchange notices typed by `src/events.py`, {window[0]} → {window[1]}, matched to universe stocks. "
+        "Signal = the stock's last session on or before the notice (posted after the close); entry at the "
+        "next close. *Pre 20d* = excess return over the 20 sessions **before** the event (already happened; "
+        "not tradeable). *t events* treats each event as independent; *t dates* averages events on the same "
+        "day first, which is the fairer test when events cluster (e.g. bonus season). "
+        f"Types with fewer than {MIN_EVENTS_REPORTED} events are listed "
+        "but not analysed. Prices are adjusted, so ex-dates are not counted as losses.",
+        "",
+    ]
+    if ev.empty:
+        return "\n".join(lines + ["No events matched the price history.", ""])
+    lines += [
+        "| Event | n | Dates | Pre 20d | After 1d | After 5d | After 10d | After 20d | t events | t dates "
+        "| Median 20d | Hit 20d | Avg max DD 20d | Model setup at signal |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    small = []
+    for etype, g in sorted(ev.groupby("event"), key=lambda kv: -len(kv[1])):
+        if len(g) < MIN_EVENTS_REPORTED:
+            small.append(f"{etype} ({len(g)})")
+            continue
+        e20 = g["fwd_excess_20"].dropna()
+        by_date = g.dropna(subset=["fwd_excess_20"]).groupby("date")["fwd_excess_20"].mean()
+        setup = g["classification"].isin(["STRONG_SETUP", "SETUP"]).mean()
+        lines.append(
+            f"| `{etype}` | {len(g)} | {g['date'].nunique()} | {_pct(g['pre_excess_20'].mean())} "
+            f"| {_pct(g['fwd_excess_1'].mean())} "
+            f"| {_pct(g['fwd_excess_5'].mean())} | {_pct(g['fwd_excess_10'].mean())} | {_pct(e20.mean())} "
+            f"| {_num(_event_t(e20))} | {_num(_event_t(by_date))} | {_pct(e20.median())} "
+            f"| {_num((e20 > 0).mean() * 100, 0)}% "
+            f"| {_pct(g['fwd_mdd_20'].mean(), 1)} | {setup * 100:.0f}% |"
+        )
+    lines.append("")
+    if small:
+        lines += [f"Too few to analyse: {', '.join(small)}.", ""]
+    return "\n".join(lines)
+
+
 def run(data_dir: Path = history_store.DATA_DIR) -> str:
     p = F.load_panel(data_dir)
     df = F.build_dataset(p)
@@ -411,8 +505,11 @@ def run(data_dir: Path = history_store.DATA_DIR) -> str:
     df.attrs["n_actions"] = len(history_store.load_corporate_actions(data_dir))
     scored, weights, reg = score_dataset(df, p)
     with_clf, retrains = add_classifier_predictions(scored, reg)
+    events = pd.DataFrame(history_store.load_events(data_dir))
+    dates = sorted(df.index.get_level_values("date").unique())
+    ev = event_rows(scored, events) if not events.empty else pd.DataFrame()
     return "\n".join([build_report(df), build_scoring_report(scored, weights, reg),
-                      build_classifier_report(with_clf, retrains)])
+                      build_classifier_report(with_clf, retrains), build_event_report(ev, (dates[0], dates[-1]))])
 
 
 def main() -> None:

@@ -103,6 +103,7 @@ Every run appends to plain CSVs committed to the repo — the research record fo
 | `data/signals/YYYY-MM.csv` | one per (date, symbol): class, score, opportunity, risk, regime, close | daily run |
 | `data/securities.csv` | one per symbol: NOTS id, sector, first/last seen | both |
 | `data/corporate_actions.csv` | one per (date, symbol): bonus/rights/cash-dividend adjustment factor | NOTS news notices |
+| `data/events.csv` | one per (notice, symbol): typed exchange notice (listing, halt, ex-date, …) | NOTS news notices |
 
 Prices are stored **raw**; `features.build_panel` back-adjusts them with `corporate_actions.csv`
 (parsed from NOTS "Price Adjusted" notices: factor = adjusted ÷ previous close) so bonus and rights
@@ -132,6 +133,11 @@ The backtest enters at the **next day's close** (history has no opens), skips li
 no-trade days, reports returns in excess of the same-day universe average, and excludes each new
 listing's first 120 sessions. Open/VWAP features exist only from daily snapshots onward.
 See the header of `reports/backtest.md` for how to read it.
+
+Notice events (`src/events.py`, keyword rules in English and Nepali) are evaluated as an event study
+in the same report: excess return before and after each event type, with a date-clustered t. So far only
+the bonus ex-date shows a pattern (run-up before, about -2.3% vs the market over the next 20 sessions),
+and it comes from a single bonus season, so it is reported but not used in the score.
 
 ### Dashboard
 
@@ -175,6 +181,7 @@ src/
   features.py           # Point-in-time features + forward-return labels
   backtest.py           # Rule replay, vote/feature statistics, model comparisons, report
   classifier.py         # Walk-forward logistic / gradient-boosting benchmark (not used live)
+  events.py             # Types NOTS notices into per-symbol events
   build_dashboard.py     # Dashboard data + HTML render
   dashboard_template.html
 reports/backtest.md     # Latest backtest output

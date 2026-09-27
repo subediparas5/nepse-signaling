@@ -22,6 +22,7 @@ _SRC_DIR = Path(__file__).resolve().parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
+import events
 import history_store
 from nepse_official import (
     get_business_date,
@@ -50,6 +51,8 @@ def backfill(days: int, symbols: set[str] | None = None) -> None:
     actions = get_price_adjustments()
     changed_actions = history_store.upsert_corporate_actions(actions)
     logger.info("Corporate actions: %s notices, %s changed", len(actions), changed_actions)
+    notice_events = events.fetch_events()
+    logger.info("Notice events: %s rows, %s changed", len(notice_events), history_store.upsert_events(notice_events))
 
     listed = get_official_listed_stocks()
     if symbols:
