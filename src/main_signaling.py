@@ -2,8 +2,8 @@ import html
 import json
 import logging
 import os
+import re
 import sys
-import textwrap
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -41,29 +41,36 @@ LLM_FIELDS = [
     "symbol", "sector", "ltp", "classification", "score", "opportunity_score", "risk_score",
     "trend", "momentum", "low_risk", "calm", "liquidity",
     "ret_20d", "ret_60d", "dist_sma50", "dist_sma120", "drawdown_120", "range_pos",
-    "rsi14", "vol_20d", "atr14_pct", "turnover_med_20", "week_52_high", "week_52_low",
+    "rsi14", "vol_20d", "atr14_pct", "turnover_med_20",
+    "flagged_since", "sessions", "since_ret", "recent_scores",
 ]
+
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-reasoner")
 
 SYSTEM_PROMPT = """\
 You are a Nepal stock market analyst writing short notes for a retail trader. You receive the \
-top-ranked NEPSE stocks from a quantitative model; you do NOT pick or re-rank them.
+top-ranked NEPSE stocks from a quantitative model. You do NOT pick, drop or re-rank them — you \
+explain what the numbers show and what could go wrong.
 
-The model ranks stocks against each other each day using official exchange prices. In its \
-backtest, names with steady uptrends (price above 50/120-day averages, shallow drawdowns), low \
-volatility and no one-day shock outperformed; volatile names and names near 52-week lows lagged. \
-Scores are 0-100 percentiles within today's market; component values (trend, momentum, low_risk, \
-calm, liquidity) are 0-1 ranks. Returns and distances are fractions (0.05 = 5%). \
-turnover_med_20 is the 20-day median daily turnover in Rs. There is no P/E or EPS data.
+The model ranks stocks against each other each day using official exchange prices (adjusted for \
+bonus/rights). In its backtest, steady uptrends (price above 50/120-day averages, shallow \
+drawdowns), low volatility and no one-day shock outperformed; volatile names and names near \
+52-week lows lagged. Scores are 0-100 percentiles within today's market; trend, momentum, \
+low_risk, calm and liquidity are 0-1 ranks. Returns and distances are fractions (0.05 = 5%). \
+turnover_med_20 is the 20-day median daily turnover in Rs. flagged_since / sessions / since_ret \
+describe how long the stock has been a setup and its return since then; recent_scores are the \
+last few daily scores. There is no P/E, EPS or news data: do not invent fundamentals, news or \
+price targets.
 
-For each stock write one line: what the numbers say, and the main risk to watch (e.g. extended \
-above averages, thin turnover, sector concentration). Do not invent news, fundamentals or targets.
-
-Output format — return ONLY this, nothing else:
-
-SYMBOL | Rs PRICE | note (15 words max)
-
-One stock per line, same order as given. No numbering, no markdown, no headers.\
+Return ONLY a JSON object, no prose and no code fences, in exactly this shape:
+{"notes": [{"symbol": "ABC", "summary": "<= 20 words on what the numbers show",
+            "risks": ["<= 12 words each, at most 3"]}]}
+Include every symbol you were given, once each, in the same order.\
 """
+
+LLM_SUMMARY_MAX = 160
+LLM_RISK_MAX = 90
+LLM_RISKS = 3
 
 
 def _compute_sector_medians(stocks: list[dict]) -> dict[str, float]:
@@ -137,6 +144,7 @@ SCORE_FIELDS = [
     "trend", "momentum", "low_risk", "calm", "liquidity",
     "ret_20d", "ret_60d", "dist_sma50", "dist_sma120", "drawdown_120", "range_pos",
     "rsi14", "vol_20d", "atr14_pct", "turnover_med_20",
+    "flagged_since", "sessions", "since_ret", "recent_scores",
 ]
 TOP_SETUPS = 8
 
@@ -173,31 +181,78 @@ def compact_for_llm(candidates: list[dict]) -> list[dict]:
     ]
 
 
-def get_llm_picks(
-    candidates: list[dict],
-    *,
-    system_prompt: str | None = None,
-    log_label: str = "BUY",
-) -> str:
+def get_llm_notes(candidates: list[dict], *, log_label: str = "SETUPS") -> str:
+    """Raw DeepSeek reply for `candidates` ('' when skipped). Parse with `parse_llm_notes`."""
     if not candidates:
-        logger.warning("get_llm_picks(%s): empty candidate list — skipping API", log_label)
+        logger.warning("get_llm_notes(%s): empty candidate list — skipping API", log_label)
         return ""
     if not OPEN_AI_API_KEY:
-        logger.warning("get_llm_picks(%s): OPEN_AI_API_KEY not set — skipping DeepSeek", log_label)
+        logger.warning("get_llm_notes(%s): OPEN_AI_API_KEY not set — skipping DeepSeek", log_label)
         return ""
     client = OpenAI(api_key=OPEN_AI_API_KEY, base_url="https://api.deepseek.com")
     payload = compact_for_llm(candidates)
-    user_content = json.dumps(payload, default=str)
-    logger.info("Calling DeepSeek (%s) with %s candidates", log_label, len(payload))
+    logger.info("Calling DeepSeek %s (%s) with %s candidates", DEEPSEEK_MODEL, log_label, len(payload))
+    try:
+        response = client.chat.completions.create(
+            model=DEEPSEEK_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": json.dumps(payload, default=str)},
+            ],
+        )
+    except Exception:
+        # Notes are optional; the digest goes out without them.
+        logger.exception("DeepSeek call failed")
+        return ""
+    return response.choices[0].message.content or ""
 
-    response = client.chat.completions.create(
-        model="deepseek-reasoner",
-        messages=[
-            {"role": "system", "content": system_prompt or SYSTEM_PROMPT},
-            {"role": "user", "content": user_content},
-        ],
-    )
-    return response.choices[0].message.content
+
+def _clip(text: object, limit: int) -> str:
+    t = " ".join(str(text).split())
+    return t if len(t) <= limit else t[: limit - 1].rstrip() + "…"
+
+
+def parse_llm_notes(raw: str, allowed_symbols: list[str]) -> dict[str, dict]:
+    """
+    Validate DeepSeek's JSON: keep only notes for symbols we sent, clip lengths, drop anything
+    malformed. Returns {symbol: {"summary": str, "risks": [str]}} in `allowed_symbols` order.
+    """
+    if not raw or not raw.strip():
+        return {}
+    text = raw.strip()
+    fenced = re.search(r"```(?:json)?\s*(\{.*\})\s*```", text, re.DOTALL)
+    if fenced:
+        text = fenced.group(1)
+    start, end = text.find("{"), text.rfind("}")
+    if start == -1 or end <= start:
+        logger.warning("DeepSeek reply has no JSON object")
+        return {}
+    try:
+        data = json.loads(text[start : end + 1])
+    except json.JSONDecodeError:
+        logger.warning("DeepSeek reply is not valid JSON")
+        return {}
+    notes = data.get("notes") if isinstance(data, dict) else None
+    if not isinstance(notes, list):
+        return {}
+    allowed = set(allowed_symbols)
+    out: dict[str, dict] = {}
+    for n in notes:
+        if not isinstance(n, dict):
+            continue
+        sym = str(n.get("symbol", "")).strip().upper()
+        summary = n.get("summary")
+        if sym not in allowed or sym in out or not isinstance(summary, str) or not summary.strip():
+            continue
+        risks = n.get("risks") if isinstance(n.get("risks"), list) else []
+        out[sym] = {
+            "summary": _clip(summary, LLM_SUMMARY_MAX),
+            "risks": [_clip(r, LLM_RISK_MAX) for r in risks if isinstance(r, str) and r.strip()][:LLM_RISKS],
+        }
+    dropped = len(notes) - len(out)
+    if dropped:
+        logger.warning("Dropped %s invalid/unknown DeepSeek notes", dropped)
+    return {sym: out[sym] for sym in allowed_symbols if sym in out}
 
 
 def _npt_now() -> str:
@@ -212,73 +267,6 @@ def _fmt_num(val, decimals=1) -> str:
         return f"{float(val):.{decimals}f}"
     except (ValueError, TypeError):
         return str(val)
-
-
-def _llm_mono_rows(raw: str) -> list[str]:
-    """
-    Monospace rows for <pre>: pipe-separated lines become a padded column layout;
-    otherwise long lines are wrapped to fit phones.
-    """
-    lines = raw.splitlines()
-    nonempty = [ln for ln in lines if ln.strip()]
-    if not nonempty:
-        return []
-
-    pipe_lines = [ln for ln in nonempty if "|" in ln]
-    use_table = bool(pipe_lines) and (
-        len(pipe_lines) >= 2
-        or (len(pipe_lines) == 1 and pipe_lines[0].count("|") >= 2)
-        or len(pipe_lines) * 2 >= len(nonempty)
-    )
-
-    if not use_table:
-        width = 44
-        out: list[str] = []
-        for ln in lines:
-            if not ln:
-                out.append("")
-                continue
-            if len(ln) <= width:
-                out.append(ln)
-            else:
-                wrapped = textwrap.wrap(
-                    ln,
-                    width=width,
-                    replace_whitespace=False,
-                    break_long_words=True,
-                )
-                out.extend(wrapped or [ln[:width]])
-        return out
-
-    max_cell = 24
-    max_cols = 8
-    cell_matrix: list[list[str]] = []
-    for ln in lines:
-        if "|" not in ln or not ln.strip():
-            continue
-        cells = [c.strip()[:max_cell] for c in ln.split("|")]
-        cell_matrix.append(cells)
-    ncols = min(max(len(r) for r in cell_matrix), max_cols) if cell_matrix else 1
-    widths = [2] * ncols
-    for r in cell_matrix:
-        for i in range(ncols):
-            cell = r[i] if i < len(r) else ""
-            widths[i] = min(max(widths[i], len(cell)), max_cell)
-
-    out: list[str] = []
-    for ln in lines:
-        if not ln.strip():
-            out.append("")
-            continue
-        if "|" in ln:
-            cells = [c.strip()[:max_cell] for c in ln.split("|")]
-            while len(cells) < ncols:
-                cells.append("")
-            cells = cells[:ncols]
-            out.append(" | ".join(c.ljust(widths[i]) for i, c in enumerate(cells)))
-        else:
-            out.append(ln.rstrip())
-    return out
 
 
 def _mono_block(lines: list[str]) -> str:
@@ -306,41 +294,68 @@ def format_market_line(context: dict | None) -> str:
     return "Market: " + " · ".join(parts)
 
 
+def _record_line(label: str, rec: dict | None) -> str | None:
+    if not rec or rec.get("n", 0) < 100:
+        return None
+    return (
+        f"{label}: {rec['hit'] * 100:.0f}% beat the market over {rec['horizon']}d "
+        f"(avg {rec['excess'] * 100:+.1f}%, n={rec['n']:,})"
+    )
+
+
 def format_telegram_digest(
-    llm_output: str,
+    notes: dict[str, dict],
     setups: list[dict],
     context: dict | None,
     class_counts: dict[str, int],
 ) -> str:
-    """Telegram HTML: market regime, optional LLM notes, top-ranked setups table, class counts."""
+    """Telegram HTML: regime, setups table with signal age, track record, DeepSeek notes, dropped names."""
+    context = context or {}
     ts = html.escape(_npt_now(), quote=False)
-    parts = [f"<b>NEPSE</b> · <code>{ts}</code>", format_market_line(context), ""]
-
-    raw = llm_output or ""
-    if any(x.strip() for x in raw.splitlines()):
-        parts.extend(["<b>LLM notes</b>", _mono_block(_llm_mono_rows(raw)), ""])
+    parts = [f"<b>NEPSE</b> · <code>{ts}</code>", format_market_line(context or None), ""]
 
     n_strong = class_counts.get("STRONG_SETUP", 0)
     n_setup = class_counts.get("SETUP", 0)
     parts.append(f"<b>Top setups</b> ({n_strong} strong, {n_setup} setup)")
-    rec = ((context or {}).get("track_record") or {}).get("STRONG_SETUP")
-    if rec and rec.get("n", 0) >= 100:
-        parts.append(
-            f"<i>Past strong setups beat the market over {rec['horizon']}d in {rec['hit'] * 100:.0f}% of "
-            f"{rec['n']:,} cases (avg {rec['excess'] * 100:+.1f}% vs market).</i>"
-        )
     if setups:
-        rows = [f"{'SYM':<7} {'Rs':>7} {'scr':>3} {'rsk':>3} {'20d%':>5}  cls", "-" * 36]
+        rows = [f"{'SYM':<7} {'Rs':>7} {'scr':>3} {'rsk':>3} {'20d%':>5} {'ses':>3} {'since':>6}", "-" * 41]
         for s in setups:
-            sym = str(s.get("symbol", "?"))[:7]
+            sym = str(s.get("symbol", "?"))[:7] + ("*" if s.get("classification") == "STRONG_SETUP" else "")
             ltp = _fmt_num(s.get("ltp"), 1)
             scr = int(round(float(s.get("score") or 0)))
             rsk = int(round(float(s.get("risk_score") or 0)))
-            cls = "S+" if s.get("classification") == "STRONG_SETUP" else "S"
-            rows.append(f"{sym:<7} {ltp:>7} {scr:>3} {rsk:>3} {_pct_cell(s.get('ret_20d')):>5}  {cls}")
+            ses = s.get("sessions")
+            ses_txt = str(int(ses)) if ses is not None else "—"
+            rows.append(
+                f"{sym:<8}{ltp:>7} {scr:>3} {rsk:>3} {_pct_cell(s.get('ret_20d')):>5} {ses_txt:>3} "
+                f"{_pct_cell(s.get('since_ret')):>6}"
+            )
         parts.append(_mono_block(rows))
     else:
         parts.append("<i>None.</i>")
+
+    records = [
+        _record_line(f"Strong setups, last {context.get('recent_sessions', 90)} sessions",
+                     (context.get("track_record_recent") or {}).get("STRONG_SETUP")),
+        _record_line("all history", (context.get("track_record") or {}).get("STRONG_SETUP")),
+    ]
+    records = [r for r in records if r]
+    if records:
+        parts.append("<i>" + html.escape(" · ".join(records), quote=False) + "</i>")
+
+    if notes:
+        parts.extend(["", "<b>Notes</b> (DeepSeek, explains the ranking — does not change it)"])
+        for sym, n in notes.items():
+            line = f"<b>{html.escape(sym)}</b> {html.escape(n['summary'], quote=False)}"
+            if n["risks"]:
+                line += " <i>Risk: " + html.escape("; ".join(n["risks"]), quote=False) + "</i>"
+            parts.append(line)
+
+    dropped = context.get("dropped") or []
+    if dropped:
+        shown = ", ".join(f"{d['symbol']}→{d['now'].lower().replace('_', ' ')}" for d in dropped[:10])
+        more = f" +{len(dropped) - 10} more" if len(dropped) > 10 else ""
+        parts.extend(["", f"<b>No longer a setup</b>: {html.escape(shown, quote=False)}{more}"])
 
     flagged = ", ".join(
         f"{class_counts[c]} {c.lower().replace('_', ' ')}" for c in ("HIGH_RISK", "AVOID") if class_counts.get(c)
@@ -349,8 +364,9 @@ def format_telegram_digest(
         parts.append(f"<i>Flagged: {flagged}.</i>")
     parts.extend([
         "",
-        "<i>scr = rank vs today's market (0-100), rsk = volatility rank. "
-        "Relative ranking, not a price forecast. Not financial advice.</i>",
+        "<i>* strong setup. scr = rank vs today's market (0-100), rsk = volatility rank, ses = sessions "
+        "flagged, since = return since first flagged. Relative ranking, not a price forecast. "
+        "Not financial advice.</i>",
     ])
     return "\n".join(parts)
 
@@ -590,13 +606,14 @@ if __name__ == "__main__":
         logger.exception("Failed to persist signals")
 
     setups = select_setups(all_stocks)
-    llm_output = get_llm_picks(setups, log_label="SETUPS") if setups else ""
-    if llm_output:
-        logger.info("LLM output:\n%s", llm_output)
+    raw_notes = get_llm_notes(setups)
+    notes = parse_llm_notes(raw_notes, [s["symbol"] for s in setups])
+    if raw_notes:
+        logger.info("DeepSeek notes: %s of %s setups", len(notes), len(setups))
 
     if not TELEGRAM_BOT_TOKEN:
         logger.warning("TELEGRAM_BOT_TOKEN not set — skipping Telegram")
     elif not TELEGRAM_CHAT_ID:
         logger.warning("TELEGRAM_CHAT_ID is unset")
     else:
-        send_telegram(format_telegram_digest(llm_output, setups, context, class_counts), chat_id=TELEGRAM_CHAT_ID)
+        send_telegram(format_telegram_digest(notes, setups, context, class_counts), chat_id=TELEGRAM_CHAT_ID)

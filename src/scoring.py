@@ -44,6 +44,7 @@ OPPORTUNITY = ("trend", "momentum", "calm", "liquidity")
 PRIOR_WEIGHTS = {"trend": 0.30, "momentum": 0.10, "low_risk": 0.30, "calm": 0.20, "liquidity": 0.10}
 
 LABEL_HORIZON = 20
+RECENT_SESSIONS = 90
 MIN_IC_DATES = 40
 MIN_COMPONENTS = 3
 MIN_NAMES = 30
@@ -180,14 +181,20 @@ def score_frame(df: pd.DataFrame, calendar: pd.Index, excess_col: str | None = f
     return out, weights
 
 
-def track_record(scored: pd.DataFrame, weights: pd.DataFrame, h: int = LABEL_HORIZON) -> dict[str, dict]:
+def track_record(
+    scored: pd.DataFrame, weights: pd.DataFrame, h: int = LABEL_HORIZON, last_sessions: int | None = None
+) -> dict[str, dict]:
     """
     How each class actually did over h days, on dates scored with learned (walk-forward)
     weights and whose outcome is known: n, share beating the universe, mean excess return.
-    This is the calibrated "confidence" shown in the digest.
+    This is the calibrated "confidence" shown in the digest. `last_sessions` restricts it to
+    signals from the most recent N sessions that have a known outcome.
     """
     prior = pd.Series(PRIOR_WEIGHTS) / sum(PRIOR_WEIGHTS.values())
     learned = weights.index[(weights - prior[weights.columns]).abs().max(axis=1) > 1e-12]
+    if last_sessions is not None:
+        realised = sorted(set(scored.index.get_level_values("date")[scored[f"fwd_excess_{h}"].notna()]))
+        learned = learned[learned.isin(realised[-last_sessions:])]
     ex = scored[f"fwd_excess_{h}"]
     mask = scored.index.get_level_values("date").isin(learned) & ex.notna()
     sub = scored[mask]
@@ -196,6 +203,50 @@ def track_record(scored: pd.DataFrame, weights: pd.DataFrame, h: int = LABEL_HOR
         e = g[f"fwd_excess_{h}"]
         out[cls] = {"n": int(len(e)), "hit": float((e > 0).mean()), "excess": float(e.mean()), "horizon": h}
     return out
+
+
+SETUP_CLASSES = ("STRONG_SETUP", "SETUP")
+HISTORY_SCORES = 5
+
+
+def signal_history(scored: pd.DataFrame, last: str) -> tuple[dict[str, dict], list[dict]]:
+    """
+    For each symbol that is a setup on `last`: the current unbroken run of SETUP/STRONG_SETUP
+    sessions (sessions the symbol traded), when it started, the adjusted-close return since the
+    first flagged close, and the last few scores. Also the names that were a setup in the
+    previous session but fell below SETUP today.
+    """
+    dates = sorted(scored.index.get_level_values("date").unique())
+    prev = dates[-2] if len(dates) > 1 else None
+    cls = scored["classification"].unstack("symbol")
+    close = scored["close"].unstack("symbol")
+    score = scored["score"].unstack("symbol")
+
+    runs: dict[str, dict] = {}
+    for sym in cls.columns[cls.loc[last].isin(SETUP_CLASSES)] if last in cls.index else []:
+        c = cls[sym].dropna()
+        c = c[c.index <= last]
+        flagged = c.isin(SETUP_CLASSES).to_numpy()
+        n = 0
+        while n < len(flagged) and flagged[len(flagged) - 1 - n]:
+            n += 1
+        start = c.index[len(c) - n]
+        runs[sym] = {
+            "flagged_since": start,
+            "sessions": n,
+            "since_ret": float(close.loc[last, sym] / close.loc[start, sym] - 1),
+            "scores": [round(float(v), 1) for v in score[sym].dropna().loc[:last].tail(HISTORY_SCORES)],
+        }
+
+    dropped: list[dict] = []
+    if prev is not None and prev in cls.index:
+        was = cls.loc[prev]
+        now = cls.loc[last] if last in cls.index else pd.Series(dtype=object)
+        for sym in was.index[was.isin(SETUP_CLASSES)]:
+            cur = now.get(sym)
+            if cur not in SETUP_CLASSES:
+                dropped.append({"symbol": sym, "was": was[sym], "now": cur if isinstance(cur, str) else "NOT_TRADED"})
+    return runs, dropped
 
 
 def score_latest(data_dir: Path = history_store.DATA_DIR) -> tuple[pd.DataFrame, dict]:
@@ -211,12 +262,19 @@ def score_latest(data_dir: Path = history_store.DATA_DIR) -> tuple[pd.DataFrame,
     scored, weights = score_frame(df, calendar)
     reg = R.compute_regime(p.index_close, df["dist_sma50"].unstack()).reindex(calendar)
     last = calendar[-1]
-    today = scored.xs(last, level="date")
+    today = scored.xs(last, level="date").copy()
+    runs, dropped = signal_history(scored, last)
+    for k in ("flagged_since", "sessions", "since_ret"):
+        today[k] = [runs.get(sym, {}).get(k) for sym in today.index]
+    today["recent_scores"] = [runs.get(sym, {}).get("scores") for sym in today.index]
     context = {
         "date": last,
         **{k: (None if pd.isna(v) else v) for k, v in reg.loc[last].items()},
         "weights": weights.loc[last].to_dict(),
         "track_record": track_record(scored, weights),
+        "track_record_recent": track_record(scored, weights, last_sessions=RECENT_SESSIONS),
+        "recent_sessions": RECENT_SESSIONS,
+        "dropped": dropped,
         "weights_learned": len(calendar) > 0 and not np.allclose(
             weights.loc[last].values, (pd.Series(PRIOR_WEIGHTS) / sum(PRIOR_WEIGHTS.values())).values
         ),

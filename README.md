@@ -53,8 +53,22 @@ is recorded in `data/signals/` so its open/VWAP-based votes can be evaluated onc
 
 ### Telegram output
 
-One HTML message to `TELEGRAM_CHAT_ID`: market regime line, optional DeepSeek notes, the top 8 setups
-(score, risk, 20d return, class), and counts of HIGH_RISK / AVOID names.
+One HTML message to `TELEGRAM_CHAT_ID`:
+
+- market regime line (NEPSE 20d return, breadth, volatility flag)
+- top 8 setups: price, score, risk, 20d return, **sessions flagged** and **return since first flagged**
+  (adjusted prices), `*` = strong setup
+- track record of strong setups over the last 90 sessions and all history (share that beat the market over 20d)
+- optional DeepSeek notes — one summary and up to 3 risks per setup
+- names that were a setup last session but no longer are, and HIGH_RISK / AVOID counts
+
+### DeepSeek (optional)
+
+DeepSeek explains the ranking; it cannot change it. It receives each setup's model fields and signal
+history and must reply with JSON `{"notes": [{"symbol", "summary", "risks": []}]}`. The reply is
+validated: unknown or duplicate symbols, empty summaries and non-JSON output are dropped, text is
+length-capped and HTML-escaped. Any failure (no key, API error, bad JSON) sends the digest without notes.
+Model: `DEEPSEEK_MODEL` (default `deepseek-reasoner`).
 
 ## Setup
 

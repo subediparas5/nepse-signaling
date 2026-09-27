@@ -125,3 +125,25 @@ def test_track_record_uses_only_learned_weight_dates_with_outcomes():
     rec = S.track_record(scored, weights)
     assert rec["STRONG_SETUP"] == {"n": 1, "hit": 1.0, "excess": pytest.approx(0.03), "horizon": 20}
     assert rec["AVOID"]["n"] == 1 and rec["AVOID"]["hit"] == 1.0
+
+
+def test_signal_history_runs_since_return_and_dropped():
+    dates = ["d1", "d2", "d3", "d4"]
+    cls = {
+        "A": ["WATCH", "SETUP", "STRONG_SETUP", "STRONG_SETUP"],  # run of 3 starting d2
+        "B": ["SETUP", "SETUP", "SETUP", "WATCH"],                 # dropped today
+        "C": ["STRONG_SETUP", "NEUTRAL", "SETUP", "SETUP"],        # run of 2 starting d3
+    }
+    close = {"A": [10, 20, 22, 25], "B": [5, 5, 5, 5], "C": [8, 8, 10, 12]}
+    rows = [
+        {"date": d, "symbol": s, "classification": cls[s][i], "close": close[s][i], "score": 50.0 + i}
+        for s in cls for i, d in enumerate(dates)
+    ]
+    scored = pd.DataFrame(rows).set_index(["date", "symbol"]).sort_index()
+    runs, dropped = S.signal_history(scored, "d4")
+    assert set(runs) == {"A", "C"}
+    assert (runs["A"]["flagged_since"], runs["A"]["sessions"]) == ("d2", 3)
+    assert runs["A"]["since_ret"] == pytest.approx(25 / 20 - 1)
+    assert (runs["C"]["flagged_since"], runs["C"]["sessions"]) == ("d3", 2)
+    assert runs["A"]["scores"] == [50.0, 51.0, 52.0, 53.0]
+    assert dropped == [{"symbol": "B", "was": "SETUP", "now": "WATCH"}]
